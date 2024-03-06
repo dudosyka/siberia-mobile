@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile_app_slb/presentation/pages/auth_page.dart';
 import 'package:mobile_app_slb/presentation/pages/home_page.dart';
-import 'package:mobile_app_slb/presentation/pages/new_auth_page.dart';
 import 'package:mobile_app_slb/presentation/states/auth_state.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:mobile_app_slb/presentation/states/main_state.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,17 +19,33 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'Flutter Demo',
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('es'),
+        Locale('ru')
+      ],
+      locale: ref.watch(localeChangeProvider).locale,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
         useMaterial3: true,
         fontFamily: "Lato",
-        scaffoldBackgroundColor: Colors.white
+        scaffoldBackgroundColor: Colors.white,
+        drawerTheme: const DrawerThemeData(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder()
+        )
       ),
       home: Scaffold(
         body: ref.watch(loadAuthProvider).when(
                 data: (value) {
                   if(value.authModel == null) {
-                    return const NewAuthPage();
+                    return const AuthPage();
                   }
                   return const HomePage();
                 },
