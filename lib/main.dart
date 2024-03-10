@@ -39,15 +39,21 @@ class MyApp extends ConsumerWidget {
         drawerTheme: const DrawerThemeData(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder()
-        )
+        ),
+        dividerTheme: const DividerThemeData(color: Color(0xFFD9D9D9))
       ),
       home: Scaffold(
         body: ref.watch(loadAuthProvider).when(
                 data: (value) {
                   if(value.authModel == null) {
                     return const AuthPage();
+                  } else {
+                    if(value.authModel!.type == "stock") {
+                      return const HomePage();
+                    } else {
+                      return const HomePage();
+                    }
                   }
-                  return const HomePage();
                 },
                 error: (error, stacktrace) {
                   return AlertDialog(
@@ -89,19 +95,4 @@ class MyApp extends ConsumerWidget {
       ),
     );
   }
-
-  // @override
-  // Widget build(BuildContext context, WidgetRef ref) {
-  //   return MaterialApp(
-  //     title: 'Flutter Demo',
-  //     theme: ThemeData(
-  //         colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
-  //         useMaterial3: true,
-  //         fontFamily: "Lato"
-  //     ),
-  //     home: Scaffold(
-  //       body: NewAuthPage()
-  //     ),
-  //   );
-  // }
 }

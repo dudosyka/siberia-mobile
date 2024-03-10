@@ -11,6 +11,12 @@ final getAssortmentProvider =
   return data;
 });
 
+final getFiltersProvider = FutureProvider((ref) async {
+  final filtersData = await AssortmentRepository().getFiltersData();
+  await Future.delayed(const Duration(milliseconds: 500));
+  return filtersData;
+});
+
 final getAvailabilityProvider = ChangeNotifierProvider((ref) => GetAvailabilityNotifier());
 
 class GetAvailabilityNotifier extends ChangeNotifier {

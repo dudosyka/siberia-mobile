@@ -1,9 +1,13 @@
 import 'package:mobile_app_slb/data/data_sources/remote_data.dart';
 import 'package:mobile_app_slb/data/models/assortment_model.dart';
+import 'package:mobile_app_slb/data/models/brand_model.dart';
+import 'package:mobile_app_slb/data/models/category_model.dart';
+import 'package:mobile_app_slb/data/models/collection_model.dart';
 import 'package:mobile_app_slb/data/models/error_model.dart';
 import 'package:mobile_app_slb/domain/repository/assortment_repository_impl.dart';
 import 'package:mobile_app_slb/domain/usecases/assortment_usecase.dart';
 import 'package:mobile_app_slb/domain/usecases/availability_usecase.dart';
+import 'package:mobile_app_slb/domain/usecases/filters_usecase.dart';
 
 import '../data_sources/local_data.dart';
 import '../models/availability_model.dart';
@@ -18,7 +22,7 @@ class AssortmentRepository extends AssortmentRepositoryImpl {
     if (authData != null) {
       final data = await remoteData.getAssortment(authData.token, filters);
 
-      if(data is List<AssortmentModel>) {
+      if (data is List<AssortmentModel>) {
         return AssortmentUseCase(assortmentModel: data);
       }
       return AssortmentUseCase(errorModel: data);
@@ -31,14 +35,38 @@ class AssortmentRepository extends AssortmentRepositoryImpl {
   Future<AvailabilityUseCase> getAvailability(int productId) async {
     final authData = await localData.getAuthData();
     if (authData != null) {
-      final data = await remoteData.getProductAvailability(authData.token, productId);
+      final data =
+          await remoteData.getProductAvailability(authData.token, productId);
 
-      if(data is List<AvailabilityModel>) {
+      if (data is List<AvailabilityModel>) {
         return AvailabilityUseCase(availabilityModel: data);
       }
       return AvailabilityUseCase(errorModel: data);
     }
     return AvailabilityUseCase(
+        errorModel: ErrorModel("auth error", 401, "Unauthorized"));
+  }
+
+  @override
+  Future<FiltersUseCase> getFiltersData() async {
+    final authData = await localData.getAuthData();
+    if (authData != null) {
+      final brands = await remoteData.getBrands(authData.token);
+      final collections = await remoteData.getCollections(authData.token);
+      final categories = await remoteData.getCategories(authData.token);
+
+      if (brands is List<BrandModel> &&
+          collections is List<CollectionModel> &&
+          categories is List<CategoryModel>) {
+        return FiltersUseCase(
+            brandModels: brands,
+            collectionModels: collections,
+            categoryModels: categories);
+      }
+      return FiltersUseCase(
+          errorModel: ErrorModel("auth error", 401, "Unauthorized"));
+    }
+    return FiltersUseCase(
         errorModel: ErrorModel("auth error", 401, "Unauthorized"));
   }
 }

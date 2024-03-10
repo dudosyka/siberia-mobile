@@ -22,7 +22,11 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
   @override
   void initState() {
-    cameraController.stop();
+    if(!cameraController.isStarting) {
+      cameraController.start();
+    } else {
+      cameraController.stop();
+    }
     super.initState();
   }
 
