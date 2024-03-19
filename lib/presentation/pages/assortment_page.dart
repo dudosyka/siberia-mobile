@@ -6,12 +6,14 @@ import 'package:mobile_app_slb/data/models/assortment_model.dart';
 import 'package:mobile_app_slb/data/models/category_model.dart';
 import 'package:mobile_app_slb/domain/usecases/filters_usecase.dart';
 import 'package:mobile_app_slb/presentation/pages/auth_page.dart';
+import 'package:mobile_app_slb/presentation/pages/productinfo_page.dart';
 import 'package:mobile_app_slb/presentation/states/auth_state.dart';
 import 'package:mobile_app_slb/presentation/widgets/app_drawer.dart';
 import 'package:mobile_app_slb/presentation/widgets/backButton.dart';
 import 'package:mobile_app_slb/presentation/widgets/gray_button.dart';
 import 'package:mobile_app_slb/presentation/widgets/outlined_gray_button.dart';
 import 'package:mobile_app_slb/utils/constants.dart' as constants;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../states/assortment_state.dart';
 
@@ -28,6 +30,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
   var scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController searchCont = TextEditingController();
   final TextEditingController colorCont = TextEditingController();
+  List<AssortmentModel> originalData = [];
   List selectedBrands = [];
   List selectedCollections = [];
   List selectedCategories = [];
@@ -48,21 +51,19 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
   String baseUrl = constants.baseUrl;
   FiltersUseCase? filtersUseCase;
 
-  Future<bool> delay() async {
-    await Future.delayed(const Duration(milliseconds: 500))
-        .then((value) => true);
-    return false;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
       resizeToAvoidBottomInset: false,
-      drawer: const AppDrawer(),
+      drawer: const AppDrawer(
+        isAbleToNavigate: true,
+        isAssembly: false,
+        isHomePage: false,
+      ),
       bottomNavigationBar: SafeArea(
         child: Container(
-          height: 60,
+          height: 80,
           decoration: const BoxDecoration(
               border:
                   Border(top: BorderSide(color: Color(0xFFD9D9D9), width: 1))),
@@ -85,9 +86,9 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                       scale: 4,
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      "Filters",
-                      style: TextStyle(fontSize: 12),
+                    Text(
+                      AppLocalizations.of(context)!.filters,
+                      style: const TextStyle(fontSize: 12),
                     )
                   ],
                 ),
@@ -104,9 +105,9 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                       scale: 4,
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      "Search",
-                      style: TextStyle(fontSize: 12),
+                    Text(
+                      AppLocalizations.of(context)!.search,
+                      style: const TextStyle(fontSize: 12),
                     )
                   ],
                 ),
@@ -145,7 +146,8 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  backButton(() => Navigator.pop(context)),
+                                  backButton(() => Navigator.pop(context),
+                                      AppLocalizations.of(context)!.backCaps, true),
                                   InkWell(
                                     onTap: () {
                                       scaffoldKey.currentState?.openDrawer();
@@ -166,9 +168,9 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                 ],
                               ),
                               const Spacer(),
-                              const Text(
-                                "ASSORTMENT",
-                                style: TextStyle(
+                              Text(
+                                AppLocalizations.of(context)!.assortmentCaps,
+                                style: const TextStyle(
                                     fontSize: 24,
                                     color: Color(0xFF909090),
                                     height: 0.5),
@@ -228,7 +230,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                                   Icons.search,
                                                   color: Color(0xFF5F5F5F),
                                                 ),
-                                                hintText: 'Search',
+                                                hintText: AppLocalizations.of(context)!.search,
                                               ),
                                             ),
                                           ),
@@ -278,9 +280,9 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                 : Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      const Text(
-                                        "VIEW",
-                                        style: TextStyle(
+                                      Text(
+                                        AppLocalizations.of(context)!.viewCaps,
+                                        style: const TextStyle(
                                             fontSize: 20,
                                             color: Color(0xFFAAAAAA)),
                                       ),
@@ -333,8 +335,8 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                       return getProductGridWidget(
                                           value.assortmentModel!);
                                     } else {
-                                      return getProductListWidget(theme,
-                                          value.assortmentModel!);
+                                      return getProductListWidget(
+                                          theme, value.assortmentModel!);
                                     }
                                   }
                                   if (value.errorModel!.statusCode == 401) {
@@ -421,9 +423,9 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
               return AlertDialog(
                 backgroundColor: Colors.white,
                 surfaceTintColor: Colors.transparent,
-                title: const Text(
-                  "IN STOCK",
-                  style: TextStyle(fontSize: 24),
+                title: Text(
+                  AppLocalizations.of(context)!.inStockCaps,
+                  style: const TextStyle(fontSize: 24),
                 ),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -437,9 +439,9 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                         ),
                         children: <TextSpan>[
                           TextSpan(text: e.name),
-                          const TextSpan(
-                              text: ' is in stock in this storehouses',
-                              style: TextStyle(fontWeight: FontWeight.normal)),
+                          TextSpan(
+                              text: AppLocalizations.of(context)!.isInStockInThis,
+                              style: const TextStyle(fontWeight: FontWeight.normal)),
                         ],
                       ),
                     ),
@@ -531,9 +533,9 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                     shape: RoundedRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(4))),
-                                child: const Text(
-                                  "BACK",
-                                  style: TextStyle(
+                                child: Text(
+                                  AppLocalizations.of(context)!.backCaps,
+                                  style: const TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 16,
                                       color: Colors.white),
@@ -597,17 +599,25 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          "NAME",
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)!.nameCaps,
+                          style: const TextStyle(
                               fontWeight: FontWeight.w900,
                               color: Colors.white,
                               fontSize: 20),
                         ),
                         isTappedName
                             ? isAscendingName
-                                ? const Icon(Icons.arrow_downward, color: Colors.white, size: 16,)
-                                : const Icon(Icons.arrow_upward, color: Colors.white, size: 16,)
+                                ? const Icon(
+                                    Icons.arrow_downward,
+                                    color: Colors.white,
+                                    size: 16,
+                                  )
+                                : const Icon(
+                                    Icons.arrow_upward,
+                                    color: Colors.white,
+                                    size: 16,
+                                  )
                             : Container()
                       ],
                     ),
@@ -632,17 +642,25 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          "SKU",
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)!.skuCaps,
+                          style: const TextStyle(
                               fontWeight: FontWeight.w900,
                               color: Colors.white,
                               fontSize: 20),
                         ),
                         isTappedVendor
                             ? isAscendingVendor
-                            ? const Icon(Icons.arrow_downward, color: Colors.white, size: 16,)
-                            : const Icon(Icons.arrow_upward, color: Colors.white, size: 16,)
+                                ? const Icon(
+                                    Icons.arrow_downward,
+                                    color: Colors.white,
+                                    size: 16,
+                                  )
+                                : const Icon(
+                                    Icons.arrow_upward,
+                                    color: Colors.white,
+                                    size: 16,
+                                  )
                             : Container()
                       ],
                     ),
@@ -660,7 +678,18 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                         ? () async {
                             await getAvailability(e, context);
                           }
-                        : null,
+                        : () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ProductInfoPage(
+                                        productId: data[index].id,
+                                        name: data[index].name,
+                                        photos: data[index].fileNames,
+                                        sku: data[index].vendorCode,
+                                        ean: data[index].eanCode,
+                                        count: data[index].quantity ?? 0.0)));
+                          },
                     child: Container(
                       height: 58,
                       decoration: BoxDecoration(
@@ -738,131 +767,238 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
   Widget getProductGridWidget(List<AssortmentModel> data) {
     return Expanded(
         child: Padding(
-      padding: const EdgeInsets.only(top: 20, left: 30, right: 30, bottom: 20),
-      child: GridView.builder(
-          itemCount: data.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 159 / 240,
-              crossAxisSpacing: 36,
-              mainAxisSpacing: 20),
-          itemBuilder: (context, index) {
-            final element = data[index];
-            return InkWell(
-              onTap: element.quantity == null
-                  ? () async {
-                      await getAvailability(element, context);
-                    }
-                  : null,
-              child: Container(
-                decoration: BoxDecoration(
-                    color: const Color(0xFFF3F3F3),
-                    borderRadius: BorderRadius.circular(16)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 4,
-                      child: SizedBox(
-                          child: CarouselSlider(
-                              items: data[index].fileNames != null
-                                  ? data[index].fileNames!.map((e) {
-                                      return ClipRRect(
-                                        borderRadius: const BorderRadius.only(
-                                            topLeft: Radius.circular(14),
-                                            topRight: Radius.circular(14)),
-                                        child: Image.network(
-                                          "${baseUrl}file/stream/$e",
-                                          errorBuilder:
-                                              (context, obj, stacktrace) {
-                                            return const Icon(
-                                              Icons.camera_alt,
-                                              color: Color(0xFF909090),
-                                            );
-                                          },
-                                          loadingBuilder:
-                                              (context, widget, event) {
-                                            if (event == null) return widget;
-                                            return const Center(
-                                              child: Text(
-                                                "Loading...",
-                                                style: TextStyle(
-                                                    color: Color(0xFF909090)),
-                                              ),
-                                            );
-                                          },
-                                          fit: BoxFit.cover,
-                                        ),
-                                      );
-                                    }).toList()
-                                  : [
-                                      ClipRRect(
-                                        borderRadius: const BorderRadius.only(
-                                            topLeft: Radius.circular(14),
-                                            topRight: Radius.circular(14)),
-                                        child: Image.network(
-                                          "",
-                                          errorBuilder:
-                                              (context, obj, stacktrace) =>
-                                                  const Icon(
-                                            Icons.camera_alt,
-                                            color: Color(0xFF909090),
-                                          ),
-                                          loadingBuilder:
-                                              (context, widget, event) {
-                                            if (event == null) return widget;
-                                            return const Center(
-                                              child: Text(
-                                                "Loading...",
-                                                style: TextStyle(
-                                                    color: Color(0xFF909090)),
-                                              ),
-                                            );
-                                          },
-                                          fit: BoxFit.cover,
-                                        ),
-                                      )
-                                    ],
-                              options: CarouselOptions(viewportFraction: 1))),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.only(left: 12, top: 8, bottom: 8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              element.name,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16),
-                            ),
-                            Text(
-                              element.vendorCode,
-                              style: const TextStyle(
-                                  fontSize: 13, color: Color(0xFF909090)),
-                            ),
-                            element.quantity == null
-                                ? const Text(
-                                    "Not available",
-                                    style: TextStyle(
-                                        fontSize: 13, color: Color(0xFF909090)),
-                                  )
-                                : const Text(
-                                    "Available",
-                                    style: TextStyle(
-                                        fontSize: 13, color: Color(0xFF058E6E)),
-                                  )
-                          ],
-                        ),
-                      ),
-                    )
-                  ],
+      padding: const EdgeInsets.only(top: 10, left: 30, right: 30, bottom: 20),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 30,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      isTappedName = true;
+                      data.sort((prod1, prod2) => compareString(
+                          isAscendingName, prod1.name, prod2.name));
+                      isAscendingName = !isAscendingName;
+                    });
+                  },
+                  child: Text(
+                    AppLocalizations.of(context)!.nameCaps,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFFAAAAAA),
+                        fontSize: 16),
+                  ),
                 ),
-              ),
-            );
-          }),
+                isTappedName
+                    ? isAscendingName
+                        ? const Icon(
+                            Icons.arrow_downward,
+                            color: Color(0xFFAAAAAA),
+                            size: 14,
+                          )
+                        : const Icon(
+                            Icons.arrow_upward,
+                            color: Color(0xFFAAAAAA),
+                            size: 14,
+                          )
+                    : Container(),
+                const SizedBox(
+                  width: 20,
+                ),
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      isTappedVendor = true;
+                      data.sort((prod1, prod2) => compareString(
+                          isAscendingVendor,
+                          prod1.vendorCode,
+                          prod2.vendorCode));
+                      isAscendingVendor = !isAscendingVendor;
+                    });
+                  },
+                  child: Text(
+                    AppLocalizations.of(context)!.skuCaps,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFFAAAAAA),
+                        fontSize: 16),
+                  ),
+                ),
+                isTappedVendor
+                    ? isAscendingVendor
+                        ? const Icon(
+                            Icons.arrow_downward,
+                            color: Color(0xFFAAAAAA),
+                            size: 14,
+                          )
+                        : const Icon(
+                            Icons.arrow_upward,
+                            color: Color(0xFFAAAAAA),
+                            size: 14,
+                          )
+                    : Container()
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: GridView.builder(
+                itemCount: data.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 159 / 240,
+                    crossAxisSpacing: 36,
+                    mainAxisSpacing: 20),
+                itemBuilder: (context, index) {
+                  final element = data[index];
+                  return InkWell(
+                    onTap: element.quantity == null
+                        ? () async {
+                            await getAvailability(element, context);
+                          }
+                        : () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ProductInfoPage(
+                                        productId: data[index].id,
+                                        name: data[index].name,
+                                        photos: data[index].fileNames,
+                                        sku: data[index].vendorCode,
+                                        ean: data[index].eanCode,
+                                        count: data[index].quantity ?? 0.0)));
+                          },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: const Color(0xFFF3F3F3),
+                          borderRadius: BorderRadius.circular(16)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 4,
+                            child: SizedBox(
+                                child: CarouselSlider(
+                                    items: data[index].fileNames != null
+                                        ? data[index].fileNames!.map((e) {
+                                            return ClipRRect(
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(14),
+                                                      topRight:
+                                                          Radius.circular(14)),
+                                              child: Image.network(
+                                                "${baseUrl}file/stream/$e",
+                                                errorBuilder:
+                                                    (context, obj, stacktrace) {
+                                                  return const Icon(
+                                                    Icons.camera_alt,
+                                                    color: Color(0xFF909090),
+                                                  );
+                                                },
+                                                loadingBuilder:
+                                                    (context, widget, event) {
+                                                  if (event == null) {
+                                                    return widget;
+                                                  }
+                                                  return Center(
+                                                    child: Text(
+                                                      AppLocalizations.of(context)!.loading,
+                                                      style: const TextStyle(
+                                                          color: Color(
+                                                              0xFF909090)),
+                                                    ),
+                                                  );
+                                                },
+                                                fit: BoxFit.cover,
+                                              ),
+                                            );
+                                          }).toList()
+                                        : [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(14),
+                                                      topRight:
+                                                          Radius.circular(14)),
+                                              child: Image.network(
+                                                "",
+                                                errorBuilder: (context, obj,
+                                                        stacktrace) =>
+                                                    const Icon(
+                                                  Icons.camera_alt,
+                                                  color: Color(0xFF909090),
+                                                ),
+                                                loadingBuilder:
+                                                    (context, widget, event) {
+                                                  if (event == null) {
+                                                    return widget;
+                                                  }
+                                                  return Center(
+                                                    child: Text(
+                                                      AppLocalizations.of(context)!.loading,
+                                                      style: const TextStyle(
+                                                          color: Color(
+                                                              0xFF909090)),
+                                                    ),
+                                                  );
+                                                },
+                                                fit: BoxFit.cover,
+                                              ),
+                                            )
+                                          ],
+                                    options:
+                                        CarouselOptions(viewportFraction: 1))),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 12, top: 8, bottom: 8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    element.name,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
+                                  ),
+                                  Text(
+                                    element.vendorCode,
+                                    style: const TextStyle(
+                                        fontSize: 13, color: Color(0xFF909090)),
+                                  ),
+                                  element.quantity == null
+                                      ? Text(
+                                    AppLocalizations.of(context)!.notAvailable,
+                                          style: const TextStyle(
+                                              fontSize: 13,
+                                              color: Color(0xFF909090)),
+                                        )
+                                      : Text(
+                                    AppLocalizations.of(context)!.available,
+                                          style: const TextStyle(
+                                              fontSize: 13,
+                                              color: Color(0xFF058E6E)),
+                                        )
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+          ),
+        ],
+      ),
     ));
   }
 
@@ -884,9 +1020,9 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        "FILTERS",
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.filtersCaps,
+                        style: const TextStyle(
                             fontSize: 24, fontWeight: FontWeight.w500),
                       ),
                       Row(
@@ -912,7 +1048,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                             //   element.isSelected = false;
                             // }
                             ref.refresh(getFiltersProvider).value;
-                          }, "CLEAR ALL"),
+                          }, AppLocalizations.of(context)!.clearAllCaps),
                           const SizedBox(
                             width: 18,
                           ),
@@ -922,7 +1058,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                             });
                             ref.refresh(getAssortmentProvider(filters)).value;
                             Navigator.pop(context);
-                          }, "APPLY"),
+                          }, AppLocalizations.of(context)!.applyCaps),
                         ],
                       )
                     ],
@@ -942,7 +1078,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Availability (${widget.currentStorehouse})",
+                          "${AppLocalizations.of(context)!.availability} (${widget.currentStorehouse})",
                           style: const TextStyle(
                               fontSize: 16, color: Color(0xFF3A3A3A)),
                           overflow: TextOverflow.ellipsis,
@@ -985,7 +1121,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                             padding: EdgeInsets.zero,
                                           ),
                                     child: Text(
-                                      "Available",
+                                      AppLocalizations.of(context)!.available,
                                       style: filters["availability"] == true
                                           ? const TextStyle(
                                               fontSize: 16, color: Colors.black)
@@ -1024,7 +1160,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                             padding: EdgeInsets.zero,
                                           ),
                                     child: Text(
-                                      "Not available",
+                                      AppLocalizations.of(context)!.notAvailable,
                                       style: filters["availability"] == false
                                           ? const TextStyle(
                                               fontSize: 16, color: Colors.black)
@@ -1053,10 +1189,10 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Color",
+                        Text(
+                          AppLocalizations.of(context)!.color,
                           style:
-                              TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
+                              const TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 10),
@@ -1104,10 +1240,10 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Brand",
+                        Text(
+                          AppLocalizations.of(context)!.brand,
                           style:
-                              TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
+                              const TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 10),
@@ -1124,7 +1260,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                       context,
                                       filteredList,
                                       brandCont,
-                                      "Brand",
+                                      AppLocalizations.of(context)!.brand,
                                       filtersUseCase!.brandModels!);
                                 }).then((value) => setState(() {
                                   selectedBrands = [];
@@ -1164,7 +1300,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                     width: 200,
                                     child: Text(
                                       filters["brand"] == null
-                                          ? "Select a brand..."
+                                          ? AppLocalizations.of(context)!.selectABrand
                                           : selectedBrands
                                               .map((e) => e.name)
                                               .toString()
@@ -1204,10 +1340,10 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Collection",
+                        Text(
+                          AppLocalizations.of(context)!.collection,
                           style:
-                              TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
+                              const TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 10),
@@ -1225,7 +1361,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                       context,
                                       filteredList,
                                       collectionCont,
-                                      "Collection",
+                                      AppLocalizations.of(context)!.collection,
                                       filtersUseCase!.collectionModels!);
                                 }).then((value) => setState(() {
                                   selectedCollections = [];
@@ -1265,7 +1401,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                     width: 200,
                                     child: Text(
                                       filters["collection"] == null
-                                          ? "Select a collection..."
+                                          ? AppLocalizations.of(context)!.selectACollection
                                           : selectedCollections
                                               .map((e) => e.name)
                                               .toString()
@@ -1305,10 +1441,10 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Category",
+                        Text(
+                          AppLocalizations.of(context)!.category,
                           style:
-                              TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
+                              const TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 10),
@@ -1325,7 +1461,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                       context,
                                       filteredList,
                                       categoryCont,
-                                      "Category",
+                                      AppLocalizations.of(context)!.category,
                                       filtersUseCase!.categoryModels!);
                                 }).then((value) => setState(() {
                                   selectedCategories = [];
@@ -1369,7 +1505,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                     width: 200,
                                     child: Text(
                                       filters["category"] == null
-                                          ? "Select a collection..."
+                                          ? AppLocalizations.of(context)!.selectACategory
                                           : selectedCategories
                                               .map((e) => e.name)
                                               .toString()
@@ -1454,7 +1590,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                 borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(3),
                                     bottomLeft: Radius.circular(3))),
-                            hintText: 'Item to search...',
+                            hintText: AppLocalizations.of(context)!.itemToSearch,
                           ),
                         ),
                       ),
@@ -1478,13 +1614,13 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                 borderRadius: BorderRadius.only(
                                     topRight: Radius.circular(8),
                                     bottomRight: Radius.circular(8))),
-                            child: const Padding(
-                              padding: EdgeInsets.only(
+                            child: Padding(
+                              padding: const EdgeInsets.only(
                                   left: 10, right: 10, top: 4, bottom: 4),
                               child: Center(
                                 child: Text(
-                                  "SEARCH",
-                                  style: TextStyle(
+                                  AppLocalizations.of(context)!.searchCaps,
+                                  style: const TextStyle(
                                       fontSize: 16,
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold),
@@ -1559,9 +1695,9 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                           backgroundColor: const Color(0xFF3C3C3C),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(4))),
-                      child: const Text(
-                        "APPLY",
-                        style: TextStyle(
+                      child: Text(
+                        AppLocalizations.of(context)!.applyCaps,
+                        style: const TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: 16,
                             color: Colors.white),
@@ -1622,7 +1758,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                 borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(3),
                                     bottomLeft: Radius.circular(3))),
-                            hintText: 'Item to search...',
+                            hintText: AppLocalizations.of(context)!.itemToSearch,
                           ),
                         ),
                       ),
@@ -1647,13 +1783,13 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                 borderRadius: BorderRadius.only(
                                     topRight: Radius.circular(8),
                                     bottomRight: Radius.circular(8))),
-                            child: const Padding(
-                              padding: EdgeInsets.only(
+                            child: Padding(
+                              padding: const EdgeInsets.only(
                                   left: 10, right: 10, top: 4, bottom: 4),
                               child: Center(
                                 child: Text(
-                                  "SEARCH",
-                                  style: TextStyle(
+                                  AppLocalizations.of(context)!.searchCaps,
+                                  style: const TextStyle(
                                       fontSize: 16,
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold),
@@ -1681,9 +1817,9 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                           backgroundColor: const Color(0xFF3C3C3C),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(4))),
-                      child: const Text(
-                        "APPLY",
-                        style: TextStyle(
+                      child: Text(
+                        AppLocalizations.of(context)!.applyCaps,
+                        style: const TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: 16,
                             color: Colors.white),
@@ -1866,14 +2002,4 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
 
   int compareString(bool ascending, String value1, String value2) =>
       ascending ? value1.compareTo(value2) : value2.compareTo(value1);
-
-  void onSort(int columnIndex, bool ascending, List items) {
-    if (columnIndex == 0) {
-      items.sort(
-          (prod1, prod2) => compareString(ascending, prod1.name, prod2.name));
-    } else if (columnIndex == 1) {
-      items.sort((prod1, prod2) =>
-          compareString(ascending, prod1.vendorCode, prod2.vendorCode));
-    }
-  }
 }

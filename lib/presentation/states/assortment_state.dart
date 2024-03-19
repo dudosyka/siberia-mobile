@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/data/repository/assortment_repository.dart';
 import 'package:mobile_app_slb/domain/usecases/assortment_usecase.dart';
 import 'package:mobile_app_slb/domain/usecases/availability_usecase.dart';
+import 'package:mobile_app_slb/domain/usecases/productinfo_usecase.dart';
 
 final getAssortmentProvider =
     FutureProvider.family<AssortmentUseCase, Map<String, dynamic>>(
@@ -13,11 +14,11 @@ final getAssortmentProvider =
 
 final getFiltersProvider = FutureProvider((ref) async {
   final filtersData = await AssortmentRepository().getFiltersData();
-  await Future.delayed(const Duration(milliseconds: 500));
   return filtersData;
 });
 
-final getAvailabilityProvider = ChangeNotifierProvider((ref) => GetAvailabilityNotifier());
+final getAvailabilityProvider =
+    ChangeNotifierProvider((ref) => GetAvailabilityNotifier());
 
 class GetAvailabilityNotifier extends ChangeNotifier {
   bool isSearching = false;
@@ -32,3 +33,9 @@ class GetAvailabilityNotifier extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+final getProductInfoProvider =
+    FutureProvider.family<ProductInfoUseCase, int>((ref, productId) async {
+  final data = await AssortmentRepository().getProductInfo(productId);
+  return data;
+});

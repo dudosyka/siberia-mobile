@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Widget backButton(void Function() onTap) {
+Widget backButton(void Function() onTap, String text, bool isIcon) {
   return InkWell(
     onTap: onTap,
     child: Container(
@@ -10,18 +10,18 @@ Widget backButton(void Function() onTap) {
         color: const Color(0xFF3C3C3C),
         borderRadius: BorderRadius.circular(4)
       ),
-      child: const Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          isIcon ? const Icon(
             Icons.arrow_back,
             color: Colors.white,
             size: 18,
-          ),
-          SizedBox(width: 6,),
+          ) : Container(),
+          isIcon ? const SizedBox(width: 6,) : Container(),
           Text(
-            "BACK",
-            style: TextStyle(fontSize: 16, color: Colors.white),
+            text,
+            style: const TextStyle(fontSize: 16, color: Colors.white),
           )
         ],
       ),

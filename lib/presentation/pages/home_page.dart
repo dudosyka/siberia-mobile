@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/presentation/pages/assortment_page.dart';
+import 'package:mobile_app_slb/presentation/pages/newsale_page.dart';
 import 'package:mobile_app_slb/presentation/states/home_state.dart';
 import 'package:mobile_app_slb/presentation/widgets/app_drawer.dart';
 import 'package:mobile_app_slb/presentation/widgets/home_card.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../states/auth_state.dart';
 import 'auth_page.dart';
@@ -22,16 +24,21 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      drawer: const AppDrawer(),
+      drawer: const AppDrawer(
+        isAbleToNavigate: true,
+        isAssembly: false,
+        isHomePage: true,
+      ),
       body: SafeArea(
           child: ref.watch(getHomeProvider).when(
               data: (value) {
-                if (value.$1.errorModel == null && value.$1.stockModel != null) {
+                if (value.$1.errorModel == null &&
+                    value.$1.stockModel != null) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        flex: 1,
+                        flex: 3,
                         child: Row(
                           children: [
                             Expanded(
@@ -68,7 +75,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       ),
                       const Divider(),
                       Expanded(
-                          flex: 1,
+                          flex: 3,
                           child: Padding(
                               padding: const EdgeInsets.all(30),
                               child: Column(
@@ -80,12 +87,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                                         fontSize: 16, color: Color(0xFFCACACA)),
                                   ),
                                   const SizedBox(height: 16),
-                                  const Text(
-                                    "Current storehouse:",
-                                    style: TextStyle(
-                                        fontSize: 24,
-                                        color: Color(0xFF909090),
-                                        height: 0.5),
+                                  Text(
+                                    AppLocalizations.of(context)!
+                                        .currentStorehouse,
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      color: Color(0xFF909090),
+                                    ),
                                   ),
                                   Text(
                                     value.$1.stockModel!.name,
@@ -99,7 +107,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                               ))),
                       const Divider(),
                       Expanded(
-                        flex: 3,
+                        flex: 7,
                         child: GridView.count(
                           physics: const NeverScrollableScrollPhysics(),
                           childAspectRatio: 166 / 122,
@@ -109,22 +117,36 @@ class _HomePageState extends ConsumerState<HomePage> {
                           padding: const EdgeInsets.all(25),
                           crossAxisCount: 2,
                           children: [
-                            homeCard("assets/images/boxes_icon.png", "Assortment",
-                                    () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (builder) => AssortmentPage(
+                            homeCard("assets/images/boxes_icon.png",
+                                AppLocalizations.of(context)!.assortment, () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (builder) => AssortmentPage(
                                             currentStorehouse:
-                                            value.$1.stockModel!.name,
+                                                value.$1.stockModel!.name,
                                           )));
-                                }),
+                            }),
                             homeCard("assets/images/calculator_icon.png",
-                                "+ New sale", () {}),
-                            homeCard("assets/images/bulk_icon.png",
-                                "Bulk assembling", () {}),
+                                AppLocalizations.of(context)!.newSale, () {
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (builder) => NewSalePage(
+                                            currentStorehouse:
+                                                value.$1.stockModel!.name,
+                                            storehouseId:
+                                                value.$1.stockModel!.id,
+                                        isTransaction: false,
+                                          )),
+                                  (route) => false);
+                            }),
+                            homeCard(
+                                "assets/images/bulk_icon.png",
+                                AppLocalizations.of(context)!.bulkAssembling,
+                                () {}),
                             homeCard("assets/images/monitor_icon.png",
-                                "+ New arrival", () {})
+                                AppLocalizations.of(context)!.newArrival, () {})
                           ],
                         ),
                       ),
@@ -134,9 +156,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ref.read(deleteAuthProvider).deleteAuth();
                   Future.microtask(() => Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const AuthPage()),
-                          (route) => false));
+                      MaterialPageRoute(builder: (context) => const AuthPage()),
+                      (route) => false));
 
                   return Container();
                 }
@@ -149,7 +170,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: const Text("Ok"))
+                        child: Text(AppLocalizations.of(context)!.ok))
                   ],
                 );
               },

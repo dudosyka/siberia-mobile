@@ -15,5 +15,13 @@ class AssortmentModel {
   AssortmentModel(this.id, this.name, this.vendorCode, this.price,
       this.fileNames, this.eanCode, this.quantity);
 
-  Map<String, dynamic> toJson() => {};
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "name": name,
+    "vendorCode": vendorCode,
+    "price": price,
+    "photo": fileNames,
+    "eanCode": eanCode,
+    "quantity": quantity
+  };
 }
