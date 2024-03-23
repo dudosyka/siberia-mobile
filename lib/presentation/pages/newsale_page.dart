@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:collection/collection.dart';
+import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/data/models/assortment_model.dart';
@@ -18,6 +19,7 @@ import 'package:mobile_app_slb/presentation/widgets/exit_dialog.dart';
 import 'package:mobile_app_slb/presentation/widgets/gray_button.dart';
 import 'package:mobile_app_slb/presentation/widgets/outlined_gray_button.dart';
 import 'package:mobile_app_slb/utils/constants.dart' as constants;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../data/models/cart_model.dart';
 import '../states/assortment_state.dart';
@@ -82,7 +84,37 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
 
     if (state == AppLifecycleState.inactive ||
         state == AppLifecycleState.detached) {
-      ref.read(cartDataProvider).deleteOutcome();
+      showDialog(
+          context: context,
+          builder: (context) {
+            return exitDialog(
+                context, AppLocalizations.of(context)!.areYouSure);
+          }).then((returned) {
+        if (returned) {
+          ref
+              .read(cartDataProvider)
+              .deleteOutcome();
+          if (widget.isTransaction) {
+            ref
+                .read(deleteAuthProvider)
+                .deleteAuth();
+            Future.microtask(() =>
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                        const AuthPage()),
+                        (route) => false));
+          } else {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                    const HomePage()),
+                    (route) => false);
+          }
+        }
+      });
     }
   }
 
@@ -100,7 +132,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
             context: context,
             builder: (context) {
               return exitDialog(
-                  context, "Are you sure? All data will be deleted");
+                  context, AppLocalizations.of(context)!.areYouSure);
             }).then((returned) {
           if (returned) {
             ref.read(cartDataProvider).deleteOutcome();
@@ -125,11 +157,11 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                 border: Border(
                     top: BorderSide(color: Color(0xFFD9D9D9), width: 1))),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  flex: 5,
+                  flex: MediaQuery.of(context).size.shortestSide > 650 ? 17 : 5,
                   child: InkWell(
                     onTap: () {
                       showModalBottomSheet(
@@ -145,9 +177,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                           scale: 4,
                         ),
                         const SizedBox(height: 4),
-                        const Text(
-                          "Filters",
-                          style: TextStyle(fontSize: 12),
+                        Text(
+                          AppLocalizations.of(context)!.filters,
+                          style: const TextStyle(fontSize: 12),
                         )
                       ],
                     ),
@@ -206,7 +238,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                   ),
                 ),
                 Expanded(
-                  flex: 5,
+                  flex: MediaQuery.of(context).size.shortestSide > 650 ? 17 : 5,
                   child: InkWell(
                     onTap: () {
                       ref.read(getAvailabilityProvider).changeSearchingState();
@@ -219,9 +251,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                           scale: 4,
                         ),
                         const SizedBox(height: 4),
-                        const Text(
-                          "Search",
-                          style: TextStyle(fontSize: 12),
+                        Text(
+                          AppLocalizations.of(context)!.search,
+                          style: const TextStyle(fontSize: 12),
                         )
                       ],
                     ),
@@ -251,7 +283,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          flex: 2,
+                          flex: 3,
                           child: Padding(
                             padding: const EdgeInsets.only(
                                 top: 40, right: 40, left: 40, bottom: 10),
@@ -266,22 +298,38 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                       showDialog(
                                           context: context,
                                           builder: (context) {
-                                            return exitDialog(context,
-                                                "Are you sure? All data will be deleted");
+                                            return exitDialog(
+                                                context,
+                                                AppLocalizations.of(context)!
+                                                    .areYouSure);
                                           }).then((returned) {
                                         if (returned) {
                                           ref
                                               .read(cartDataProvider)
                                               .deleteOutcome();
-                                          Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const HomePage()),
-                                              (route) => false);
+                                          if (widget.isTransaction) {
+                                            ref
+                                                .read(deleteAuthProvider)
+                                                .deleteAuth();
+                                            Future.microtask(() =>
+                                                Navigator.pushAndRemoveUntil(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const AuthPage()),
+                                                    (route) => false));
+                                          } else {
+                                            Navigator.pushAndRemoveUntil(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const HomePage()),
+                                                (route) => false);
+                                          }
                                         }
                                       });
-                                    }, "CANCEL", false),
+                                    }, AppLocalizations.of(context)!.cancelCaps,
+                                        false),
                                     InkWell(
                                       onTap: () {
                                         scaffoldKey.currentState?.openDrawer();
@@ -302,12 +350,15 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                   ],
                                 ),
                                 const Spacer(),
-                                const Text(
-                                  "NEW SALE",
-                                  style: TextStyle(
-                                      fontSize: 24,
-                                      color: Color(0xFF909090),
-                                      height: 0.5),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 10),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.newSaleCaps,
+                                    style: const TextStyle(
+                                        fontSize: 24,
+                                        color: Color(0xFF909090),
+                                        height: 0.5),
+                                  ),
                                 ),
                                 Text(
                                   widget.currentStorehouse,
@@ -323,7 +374,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                         ),
                         const Divider(),
                         Expanded(
-                          flex: 6,
+                          flex: 8,
                           child: Column(
                             children: [
                               ref.watch(getAvailabilityProvider).isSearching
@@ -365,7 +416,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                                     Icons.search,
                                                     color: Color(0xFF5F5F5F),
                                                   ),
-                                                  hintText: 'Search',
+                                                  hintText: AppLocalizations.of(
+                                                          context)!
+                                                      .search,
                                                 ),
                                               ),
                                             ),
@@ -415,9 +468,10 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                   : Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
-                                        const Text(
-                                          "VIEW",
-                                          style: TextStyle(
+                                        Text(
+                                          AppLocalizations.of(context)!
+                                              .viewCaps,
+                                          style: const TextStyle(
                                               fontSize: 20,
                                               color: Color(0xFFAAAAAA)),
                                         ),
@@ -559,9 +613,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
               return AlertDialog(
                 backgroundColor: Colors.white,
                 surfaceTintColor: Colors.transparent,
-                title: const Text(
-                  "IN STOCK",
-                  style: TextStyle(fontSize: 24),
+                title: Text(
+                  AppLocalizations.of(context)!.inStockCaps,
+                  style: const TextStyle(fontSize: 24),
                 ),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -575,9 +629,11 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                         ),
                         children: <TextSpan>[
                           TextSpan(text: e.name),
-                          const TextSpan(
-                              text: ' is in stock in this storehouses',
-                              style: TextStyle(fontWeight: FontWeight.normal)),
+                          TextSpan(
+                              text:
+                                  AppLocalizations.of(context)!.isInStockInThis,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.normal)),
                         ],
                       ),
                     ),
@@ -669,9 +725,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                     shape: RoundedRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(4))),
-                                child: const Text(
-                                  "BACK",
-                                  style: TextStyle(
+                                child: Text(
+                                  AppLocalizations.of(context)!.backCaps,
+                                  style: const TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 16,
                                       color: Colors.white),
@@ -735,9 +791,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          "NAME",
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)!.nameCaps,
+                          style: const TextStyle(
                               fontWeight: FontWeight.w900,
                               color: Colors.white,
                               fontSize: 20),
@@ -778,9 +834,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          "SKU",
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)!.skuCaps,
+                          style: const TextStyle(
                               fontWeight: FontWeight.w900,
                               color: Colors.white,
                               fontSize: 20),
@@ -913,10 +969,11 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                                   }).then((value) {
                                                 if (value) {
                                                   ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                          const SnackBar(
-                                                    content:
-                                                        Text("Added to cart"),
+                                                      .showSnackBar(SnackBar(
+                                                    content: Text(
+                                                        AppLocalizations.of(
+                                                                context)!
+                                                            .addedToCart),
                                                   ));
                                                 }
                                               });
@@ -976,9 +1033,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                       isAscendingName = !isAscendingName;
                     });
                   },
-                  child: const Text(
-                    "NAME",
-                    style: TextStyle(
+                  child: Text(
+                    AppLocalizations.of(context)!.nameCaps,
+                    style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         color: Color(0xFFAAAAAA),
                         fontSize: 16),
@@ -1011,9 +1068,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                       isAscendingVendor = !isAscendingVendor;
                     });
                   },
-                  child: const Text(
-                    "SKU",
-                    style: TextStyle(
+                  child: Text(
+                    AppLocalizations.of(context)!.skuCaps,
+                    style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         color: Color(0xFFAAAAAA),
                         fontSize: 16),
@@ -1039,10 +1096,12 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
           Expanded(
             child: GridView.builder(
                 itemCount: data.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount:
+                        MediaQuery.of(context).size.shortestSide > 550 ? 4 : 2,
                     childAspectRatio: 159 / 270,
                     crossAxisSpacing: 30,
+                    mainAxisExtent: 270,
                     mainAxisSpacing: 20),
                 itemBuilder: (context, index) {
                   final element = data[index];
@@ -1072,83 +1131,131 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                         children: [
                           Expanded(
                             flex: 4,
-                            child: SizedBox(
-                                child: CarouselSlider(
-                                    items: data[index].fileNames != null
-                                        ? data[index].fileNames!.map((e) {
-                                            return ClipRRect(
-                                              borderRadius:
-                                                  const BorderRadius.only(
-                                                      topLeft:
-                                                          Radius.circular(14),
-                                                      topRight:
-                                                          Radius.circular(14)),
-                                              child: Image.network(
-                                                "${baseUrl}file/stream/$e",
-                                                width: double.infinity,
-                                                errorBuilder:
-                                                    (context, obj, stacktrace) {
-                                                  return const Icon(
-                                                    Icons.camera_alt,
-                                                    color: Color(0xFF909090),
-                                                  );
-                                                },
-                                                loadingBuilder:
-                                                    (context, widget, event) {
-                                                  if (event == null) {
-                                                    return widget;
-                                                  }
-                                                  return const Center(
-                                                    child: Text(
-                                                      "Loading...",
-                                                      style: TextStyle(
-                                                          color: Color(
-                                                              0xFF909090)),
+                            child: Container(
+                                decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.only(
+                                        topRight: Radius.circular(16),
+                                        topLeft: Radius.circular(16))),
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: CarouselSlider(
+                                          items: data[index].fileNames != null
+                                              ? data[index].fileNames!.map((e) {
+                                                  return ClipRRect(
+                                                    borderRadius:
+                                                        const BorderRadius.only(
+                                                            topLeft:
+                                                                Radius.circular(
+                                                                    14),
+                                                            topRight:
+                                                                Radius.circular(
+                                                                    14)),
+                                                    child: Image.network(
+                                                      "${baseUrl}file/stream/$e",
+                                                      width: double.infinity,
+                                                      errorBuilder: (context,
+                                                          obj, stacktrace) {
+                                                        return const Icon(
+                                                          Icons.camera_alt,
+                                                          color:
+                                                              Color(0xFF909090),
+                                                        );
+                                                      },
+                                                      loadingBuilder: (context,
+                                                          widget, event) {
+                                                        if (event == null) {
+                                                          return widget;
+                                                        }
+                                                        return Center(
+                                                          child: Text(
+                                                            AppLocalizations.of(
+                                                                    context)!
+                                                                .loading,
+                                                            style: const TextStyle(
+                                                                color: Color(
+                                                                    0xFF909090)),
+                                                          ),
+                                                        );
+                                                      },
+                                                      fit: BoxFit.contain,
                                                     ),
                                                   );
-                                                },
-                                                fit: BoxFit.cover,
-                                              ),
-                                            );
-                                          }).toList()
-                                        : [
-                                            ClipRRect(
-                                              borderRadius:
-                                                  const BorderRadius.only(
-                                                      topLeft:
-                                                          Radius.circular(14),
-                                                      topRight:
-                                                          Radius.circular(14)),
-                                              child: Image.network(
-                                                "",
-                                                errorBuilder: (context, obj,
-                                                        stacktrace) =>
-                                                    const Icon(
-                                                  Icons.camera_alt,
-                                                  color: Color(0xFF909090),
-                                                ),
-                                                loadingBuilder:
-                                                    (context, widget, event) {
-                                                  if (event == null) {
-                                                    return widget;
-                                                  }
-                                                  return const Center(
-                                                    child: Text(
-                                                      "Loading...",
-                                                      style: TextStyle(
-                                                          color: Color(
-                                                              0xFF909090)),
+                                                }).toList()
+                                              : [
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        const BorderRadius.only(
+                                                            topLeft:
+                                                                Radius.circular(
+                                                                    14),
+                                                            topRight:
+                                                                Radius.circular(
+                                                                    14)),
+                                                    child: Image.network(
+                                                      "",
+                                                      errorBuilder: (context,
+                                                              obj,
+                                                              stacktrace) =>
+                                                          const Icon(
+                                                        Icons.camera_alt,
+                                                        color:
+                                                            Color(0xFF909090),
+                                                      ),
+                                                      loadingBuilder: (context,
+                                                          widget, event) {
+                                                        if (event == null) {
+                                                          return widget;
+                                                        }
+                                                        return Center(
+                                                          child: Text(
+                                                            AppLocalizations.of(
+                                                                    context)!
+                                                                .loading,
+                                                            style: const TextStyle(
+                                                                color: Color(
+                                                                    0xFF909090)),
+                                                          ),
+                                                        );
+                                                      },
+                                                      fit: BoxFit.cover,
                                                     ),
-                                                  );
-                                                },
-                                                fit: BoxFit.cover,
-                                              ),
-                                            )
-                                          ],
-                                    options: CarouselOptions(
-                                        viewportFraction: 1,
-                                        height: 159,
-                                        aspectRatio: 1))),
+                                                  )
+                                                ],
+                                          options: CarouselOptions(
+                                            viewportFraction: 1,
+                                            aspectRatio: 1,
+                                            onPageChanged: (newIndex, reason) {
+                                              setState(() {
+                                                data[index].currentIndex =
+                                                    newIndex;
+                                              });
+                                            },
+                                          )),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: DotsIndicator(
+                                        dotsCount: data[index].fileNames != null
+                                            ? data[index].fileNames!.length
+                                            : 1,
+                                        position: data[index].currentIndex,
+                                        decorator: DotsDecorator(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(15.0)),
+                                          activeShape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(15.0)),
+                                          size: const Size(6, 6),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                )),
                           ),
                           Expanded(
                             flex: 3,
@@ -1170,19 +1277,21 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                         fontSize: 13, color: Color(0xFF909090)),
                                   ),
                                   element.quantity == null
-                                      ? const Text(
-                                          "Not available",
-                                          style: TextStyle(
+                                      ? Text(
+                                          AppLocalizations.of(context)!
+                                              .notAvailable,
+                                          style: const TextStyle(
                                               fontSize: 13,
                                               color: Color(0xFF909090)),
                                         )
-                                      : const Text(
-                                          "Available",
-                                          style: TextStyle(
+                                      : Text(
+                                          AppLocalizations.of(context)!
+                                              .available,
+                                          style: const TextStyle(
                                               fontSize: 13,
                                               color: Color(0xFF058E6E)),
                                         ),
-                                  const SizedBox(height: 6),
+                                  const SizedBox(height: 10),
                                   element.quantity != null
                                       ? InkWell(
                                           onTap: () async {
@@ -1211,10 +1320,11 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                                   }).then((value) {
                                                 if (value) {
                                                   ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                          const SnackBar(
-                                                    content:
-                                                        Text("Added to cart"),
+                                                      .showSnackBar(SnackBar(
+                                                    content: Text(
+                                                        AppLocalizations.of(
+                                                                context)!
+                                                            .addedToCart),
                                                   ));
                                                 }
                                               });
@@ -1227,23 +1337,25 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                                 color: Colors.black,
                                                 borderRadius:
                                                     BorderRadius.circular(4)),
-                                            child: const Row(
+                                            child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
-                                                Icon(
+                                                const Icon(
                                                   Icons.add,
                                                   color: Colors.white,
                                                   size: 12,
                                                 ),
-                                                Icon(
+                                                const Icon(
                                                   Icons.shopping_cart,
                                                   color: Colors.white,
                                                   size: 12,
                                                 ),
+                                                const SizedBox(width: 6),
                                                 Text(
-                                                  "ADD TO CART",
-                                                  style: TextStyle(
+                                                  AppLocalizations.of(context)!
+                                                      .addToCartCaps,
+                                                  style: const TextStyle(
                                                       fontSize: 12,
                                                       color: Colors.white),
                                                 )
@@ -1273,532 +1385,546 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
         padding:
             EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
         child: StatefulBuilder(builder: (context, setState) {
-          return Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20, left: 28, right: 28),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "FILTERS",
-                        style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.w500),
-                      ),
-                      Row(
-                        children: [
-                          outlinedGrayButton(() {
-                            colorCont.clear();
-                            setState(() {
-                              filters = {
-                                "name": "",
-                                "availability": true,
-                                "color": "",
-                                "brand": null,
-                                "collection": null,
-                                "category": null
-                              };
-                            });
-                            // resetSelection(filtersUseCase!.categoryModels!);
-                            // for (var element
-                            //     in filtersUseCase!.collectionModels!) {
-                            //   element.isSelected = false;
-                            // }
-                            // for (var element in filtersUseCase!.brandModels!) {
-                            //   element.isSelected = false;
-                            // }
-                            ref.refresh(getFiltersProvider).value;
-                          }, "CLEAR ALL"),
-                          const SizedBox(
-                            width: 18,
-                          ),
-                          grayButton(() {
-                            setState(() {
-                              filters["color"] = colorCont.text;
-                            });
-                            ref.refresh(getAssortmentProvider(filters)).value;
-                            Navigator.pop(context);
-                          }, "APPLY"),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const Divider(
-                  height: 1,
-                ),
-                Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(color: Color(0xFFF6F6F6)),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 26, right: 26, top: 10, bottom: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+          return SingleChildScrollView(
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(top: 20, left: 28, right: 28),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Availability (${widget.currentStorehouse})",
+                          AppLocalizations.of(context)!.filtersCaps,
                           style: const TextStyle(
-                              fontSize: 16, color: Color(0xFF3A3A3A)),
-                          overflow: TextOverflow.ellipsis,
+                              fontSize: 24, fontWeight: FontWeight.w500),
                         ),
-                        const SizedBox(height: 10),
-                        Container(
-                          width: 223,
-                          height: 40,
-                          decoration: BoxDecoration(
-                              color: const Color(0xFFF4F4F4),
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(
-                                  color: Colors.black.withOpacity(0.1))),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: 27,
-                                width: 100,
-                                child: ElevatedButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        filters["availability"] = true;
-                                      });
-                                    },
-                                    style: filters["availability"] == true
-                                        ? ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.white,
-                                            elevation: 0,
-                                            padding: EdgeInsets.zero,
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(4)),
-                                            side: BorderSide(
-                                                color: Colors.black
-                                                    .withOpacity(0.1)))
-                                        : ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.transparent,
-                                            elevation: 0,
-                                            padding: EdgeInsets.zero,
-                                          ),
-                                    child: Text(
-                                      "Available",
+                        Row(
+                          children: [
+                            outlinedGrayButton(() {
+                              colorCont.clear();
+                              setState(() {
+                                filters = {
+                                  "name": "",
+                                  "availability": true,
+                                  "color": "",
+                                  "brand": null,
+                                  "collection": null,
+                                  "category": null
+                                };
+                              });
+                              // resetSelection(filtersUseCase!.categoryModels!);
+                              // for (var element
+                              //     in filtersUseCase!.collectionModels!) {
+                              //   element.isSelected = false;
+                              // }
+                              // for (var element in filtersUseCase!.brandModels!) {
+                              //   element.isSelected = false;
+                              // }
+                              ref.refresh(getFiltersProvider).value;
+                            }, AppLocalizations.of(context)!.clearAllCaps),
+                            const SizedBox(
+                              width: 18,
+                            ),
+                            grayButton(() {
+                              setState(() {
+                                filters["color"] = colorCont.text;
+                              });
+                              ref.refresh(getAssortmentProvider(filters)).value;
+                              Navigator.pop(context);
+                            }, AppLocalizations.of(context)!.applyCaps),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Divider(
+                    height: 1,
+                  ),
+                  Container(
+                    width: double.infinity,
+                    decoration: const BoxDecoration(color: Color(0xFFF6F6F6)),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 26, right: 26, top: 10, bottom: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "${AppLocalizations.of(context)!.availability} (${widget.currentStorehouse})",
+                            style: const TextStyle(
+                                fontSize: 16, color: Color(0xFF3A3A3A)),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 10),
+                          Container(
+                            width: 223,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                color: const Color(0xFFF4F4F4),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                    color: Colors.black.withOpacity(0.1))),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: 27,
+                                  width: 100,
+                                  child: ElevatedButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          filters["availability"] = true;
+                                        });
+                                      },
                                       style: filters["availability"] == true
-                                          ? const TextStyle(
-                                              fontSize: 16, color: Colors.black)
-                                          : TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black
-                                                  .withOpacity(0.3)),
-                                    )),
-                              ),
-                              const SizedBox(
-                                width: 6,
-                              ),
-                              SizedBox(
-                                height: 27,
-                                width: 100,
-                                child: ElevatedButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        filters["availability"] = false;
-                                      });
-                                    },
-                                    style: filters["availability"] == false
-                                        ? ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.white,
-                                            elevation: 0,
-                                            padding: EdgeInsets.zero,
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(4)),
-                                            side: BorderSide(
+                                          ? ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.white,
+                                              elevation: 0,
+                                              padding: EdgeInsets.zero,
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(4)),
+                                              side: BorderSide(
+                                                  color: Colors.black
+                                                      .withOpacity(0.1)))
+                                          : ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              elevation: 0,
+                                              padding: EdgeInsets.zero,
+                                            ),
+                                      child: Text(
+                                        AppLocalizations.of(context)!.available,
+                                        style: filters["availability"] == true
+                                            ? const TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black)
+                                            : TextStyle(
+                                                fontSize: 16,
                                                 color: Colors.black
-                                                    .withOpacity(0.1)))
-                                        : ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.transparent,
-                                            elevation: 0,
-                                            padding: EdgeInsets.zero,
-                                          ),
-                                    child: Text(
-                                      "Not available",
+                                                    .withOpacity(0.3)),
+                                      )),
+                                ),
+                                const SizedBox(
+                                  width: 6,
+                                ),
+                                SizedBox(
+                                  height: 27,
+                                  width: 100,
+                                  child: ElevatedButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          filters["availability"] = false;
+                                        });
+                                      },
                                       style: filters["availability"] == false
-                                          ? const TextStyle(
-                                              fontSize: 16, color: Colors.black)
-                                          : TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black
-                                                  .withOpacity(0.3)),
-                                    )),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const Divider(
-                  height: 1,
-                ),
-                Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(color: Colors.white),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 26, right: 26, top: 10, bottom: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Color",
-                          style:
-                              TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 10),
-                        SizedBox(
-                          height: 40,
-                          child: TextFormField(
-                            cursorColor: Colors.black,
-                            controller: colorCont,
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.only(left: 16),
-                              fillColor: const Color(0xFFFBFBFB),
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Colors.black.withOpacity(0.1)),
-                                  borderRadius: BorderRadius.circular(5)),
-                              disabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Colors.black.withOpacity(0.1)),
-                                  borderRadius: BorderRadius.circular(5)),
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Colors.black.withOpacity(0.1)),
-                                  borderRadius: BorderRadius.circular(5)),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      const BorderSide(color: Colors.black),
-                                  borderRadius: BorderRadius.circular(5)),
-                              hintText: '',
+                                          ? ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.white,
+                                              elevation: 0,
+                                              padding: EdgeInsets.zero,
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(4)),
+                                              side: BorderSide(
+                                                  color: Colors.black
+                                                      .withOpacity(0.1)))
+                                          : ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              elevation: 0,
+                                              padding: EdgeInsets.zero,
+                                            ),
+                                      child: Text(
+                                        AppLocalizations.of(context)!
+                                            .notAvailable,
+                                        style: filters["availability"] == false
+                                            ? const TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black)
+                                            : TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black
+                                                    .withOpacity(0.3)),
+                                      )),
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const Divider(
-                  height: 1,
-                ),
-                Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(color: Color(0xFFF6F6F6)),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 26, right: 26, top: 10, bottom: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Brand",
-                          style:
-                              TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 10),
-                        InkWell(
-                          onTap: () {
-                            final TextEditingController brandCont =
-                                TextEditingController();
-                            List filteredList = filtersUseCase!.brandModels!;
-
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return selectFiltersModal(
-                                      context,
-                                      filteredList,
-                                      brandCont,
-                                      "Brand",
-                                      filtersUseCase!.brandModels!);
-                                }).then((value) => setState(() {
-                                  selectedBrands = [];
-                                  for (var element
-                                      in filtersUseCase!.brandModels!) {
-                                    if (element.isSelected) {
-                                      selectedBrands.add(element);
-                                    }
-                                  }
-                                  if (selectedBrands
-                                      .map((e) => e.id)
-                                      .toList()
-                                      .isEmpty) {
-                                    filters["brand"] = null;
-                                  } else {
-                                    filters["brand"] = selectedBrands
-                                        .map((e) => e.id)
-                                        .toList();
-                                  }
-                                }));
-                          },
-                          child: Container(
+                  const Divider(
+                    height: 1,
+                  ),
+                  Container(
+                    width: double.infinity,
+                    decoration: const BoxDecoration(color: Colors.white),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 26, right: 26, top: 10, bottom: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.color,
+                            style: const TextStyle(
+                                fontSize: 16, color: Color(0xFF3A3A3A)),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 10),
+                          SizedBox(
                             height: 40,
-                            decoration: BoxDecoration(
-                                color: const Color(0xFFFBFBFB),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                    color: Colors.black.withOpacity(0.1))),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 20, right: 20),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  SizedBox(
-                                    width: 200,
-                                    child: Text(
-                                      filters["brand"] == null
-                                          ? "Select a brand..."
-                                          : selectedBrands
-                                              .map((e) => e.name)
-                                              .toString()
-                                              .substring(
-                                                  1,
-                                                  selectedBrands
-                                                          .map((e) => e.name)
-                                                          .toString()
-                                                          .length -
-                                                      1),
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontStyle: FontStyle.italic,
-                                          color: Color(0xFF909090)),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  const Icon(Icons.arrow_drop_down)
-                                ],
+                            child: TextFormField(
+                              cursorColor: Colors.black,
+                              controller: colorCont,
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.only(left: 16),
+                                fillColor: const Color(0xFFFBFBFB),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.black.withOpacity(0.1)),
+                                    borderRadius: BorderRadius.circular(5)),
+                                disabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.black.withOpacity(0.1)),
+                                    borderRadius: BorderRadius.circular(5)),
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.black.withOpacity(0.1)),
+                                    borderRadius: BorderRadius.circular(5)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                        const BorderSide(color: Colors.black),
+                                    borderRadius: BorderRadius.circular(5)),
+                                hintText: '',
                               ),
                             ),
                           ),
-                        )
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const Divider(
-                  height: 1,
-                ),
-                Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(color: Colors.white),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 26, right: 26, top: 10, bottom: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Collection",
-                          style:
-                              TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 10),
-                        InkWell(
-                          onTap: () {
-                            final TextEditingController collectionCont =
-                                TextEditingController();
-                            List filteredList =
-                                filtersUseCase!.collectionModels!;
+                  const Divider(
+                    height: 1,
+                  ),
+                  Container(
+                    width: double.infinity,
+                    decoration: const BoxDecoration(color: Color(0xFFF6F6F6)),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 26, right: 26, top: 10, bottom: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.brand,
+                            style: const TextStyle(
+                                fontSize: 16, color: Color(0xFF3A3A3A)),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 10),
+                          InkWell(
+                            onTap: () {
+                              final TextEditingController brandCont =
+                                  TextEditingController();
+                              List filteredList = filtersUseCase!.brandModels!;
 
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return selectFiltersModal(
-                                      context,
-                                      filteredList,
-                                      collectionCont,
-                                      "Collection",
-                                      filtersUseCase!.collectionModels!);
-                                }).then((value) => setState(() {
-                                  selectedCollections = [];
-                                  for (var element
-                                      in filtersUseCase!.collectionModels!) {
-                                    if (element.isSelected) {
-                                      selectedCollections.add(element);
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return selectFiltersModal(
+                                        context,
+                                        filteredList,
+                                        brandCont,
+                                        AppLocalizations.of(context)!.brand,
+                                        filtersUseCase!.brandModels!);
+                                  }).then((value) => setState(() {
+                                    selectedBrands = [];
+                                    for (var element
+                                        in filtersUseCase!.brandModels!) {
+                                      if (element.isSelected) {
+                                        selectedBrands.add(element);
+                                      }
                                     }
-                                  }
-                                  if (selectedCollections
-                                      .map((e) => e.id)
-                                      .toList()
-                                      .isEmpty) {
-                                    filters["collection"] = null;
-                                  } else {
-                                    filters["collection"] = selectedCollections
+                                    if (selectedBrands
                                         .map((e) => e.id)
-                                        .toList();
-                                  }
-                                }));
-                          },
-                          child: Container(
-                            height: 40,
-                            decoration: BoxDecoration(
-                                color: const Color(0xFFFBFBFB),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                    color: Colors.black.withOpacity(0.1))),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 20, right: 20),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  SizedBox(
-                                    width: 200,
-                                    child: Text(
-                                      filters["collection"] == null
-                                          ? "Select a collection..."
-                                          : selectedCollections
-                                              .map((e) => e.name)
-                                              .toString()
-                                              .substring(
-                                                  1,
-                                                  selectedCollections
-                                                          .map((e) => e.name)
-                                                          .toString()
-                                                          .length -
-                                                      1),
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontStyle: FontStyle.italic,
-                                          color: Color(0xFF909090)),
-                                      overflow: TextOverflow.ellipsis,
+                                        .toList()
+                                        .isEmpty) {
+                                      filters["brand"] = null;
+                                    } else {
+                                      filters["brand"] = selectedBrands
+                                          .map((e) => e.id)
+                                          .toList();
+                                    }
+                                  }));
+                            },
+                            child: Container(
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  color: const Color(0xFFFBFBFB),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                      color: Colors.black.withOpacity(0.1))),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 20, right: 20),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SizedBox(
+                                      width: 200,
+                                      child: Text(
+                                        filters["brand"] == null
+                                            ? AppLocalizations.of(context)!
+                                                .selectABrand
+                                            : selectedBrands
+                                                .map((e) => e.name)
+                                                .toString()
+                                                .substring(
+                                                    1,
+                                                    selectedBrands
+                                                            .map((e) => e.name)
+                                                            .toString()
+                                                            .length -
+                                                        1),
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontStyle: FontStyle.italic,
+                                            color: Color(0xFF909090)),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
-                                  ),
-                                  const Icon(Icons.arrow_drop_down)
-                                ],
+                                    const Icon(Icons.arrow_drop_down)
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        )
-                      ],
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const Divider(
-                  height: 1,
-                ),
-                Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(color: Color(0xFFF6F6F6)),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 26, right: 26, top: 10, bottom: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Category",
-                          style:
-                              TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 10),
-                        InkWell(
-                          onTap: () {
-                            final TextEditingController categoryCont =
-                                TextEditingController();
-                            List filteredList = filtersUseCase!.categoryModels!;
+                  const Divider(
+                    height: 1,
+                  ),
+                  Container(
+                    width: double.infinity,
+                    decoration: const BoxDecoration(color: Colors.white),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 26, right: 26, top: 10, bottom: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.collection,
+                            style: const TextStyle(
+                                fontSize: 16, color: Color(0xFF3A3A3A)),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 10),
+                          InkWell(
+                            onTap: () {
+                              final TextEditingController collectionCont =
+                                  TextEditingController();
+                              List filteredList =
+                                  filtersUseCase!.collectionModels!;
 
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return selectCategoriesModal(
-                                      context,
-                                      filteredList,
-                                      categoryCont,
-                                      "Category",
-                                      filtersUseCase!.categoryModels!);
-                                }).then((value) => setState(() {
-                                  selectedCategories = [];
-                                  for (var element
-                                      in filtersUseCase!.categoryModels!) {
-                                    if (isSelectedIfChildrenEmpty(element)) {
-                                      selectedCategories.add(element);
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return selectFiltersModal(
+                                        context,
+                                        filteredList,
+                                        collectionCont,
+                                        AppLocalizations.of(context)!
+                                            .collection,
+                                        filtersUseCase!.collectionModels!);
+                                  }).then((value) => setState(() {
+                                    selectedCollections = [];
+                                    for (var element
+                                        in filtersUseCase!.collectionModels!) {
+                                      if (element.isSelected) {
+                                        selectedCollections.add(element);
+                                      }
                                     }
-                                    getSelectedChildren(element)
-                                        .forEach((element) {
-                                      selectedCategories.add(element);
-                                    });
-                                  }
-                                  if (selectedCategories
-                                      .map((e) => e.id)
-                                      .toList()
-                                      .isEmpty) {
-                                    filters["category"] = null;
-                                  } else {
-                                    filters["category"] = selectedCategories
+                                    if (selectedCollections
                                         .map((e) => e.id)
-                                        .toList();
-                                  }
-                                }));
-                          },
-                          child: Container(
-                            height: 40,
-                            decoration: BoxDecoration(
-                                color: const Color(0xFFFBFBFB),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                    color: Colors.black.withOpacity(0.1))),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 20, right: 20),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  SizedBox(
-                                    width: 200,
-                                    child: Text(
-                                      filters["category"] == null
-                                          ? "Select a collection..."
-                                          : selectedCategories
-                                              .map((e) => e.name)
-                                              .toString()
-                                              .substring(
-                                                  1,
-                                                  selectedCategories
-                                                          .map((e) => e.name)
-                                                          .toString()
-                                                          .length -
-                                                      1),
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontStyle: FontStyle.italic,
-                                          color: Color(0xFF909090)),
-                                      overflow: TextOverflow.ellipsis,
+                                        .toList()
+                                        .isEmpty) {
+                                      filters["collection"] = null;
+                                    } else {
+                                      filters["collection"] =
+                                          selectedCollections
+                                              .map((e) => e.id)
+                                              .toList();
+                                    }
+                                  }));
+                            },
+                            child: Container(
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  color: const Color(0xFFFBFBFB),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                      color: Colors.black.withOpacity(0.1))),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 20, right: 20),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SizedBox(
+                                      width: 200,
+                                      child: Text(
+                                        filters["collection"] == null
+                                            ? AppLocalizations.of(context)!
+                                                .selectACollection
+                                            : selectedCollections
+                                                .map((e) => e.name)
+                                                .toString()
+                                                .substring(
+                                                    1,
+                                                    selectedCollections
+                                                            .map((e) => e.name)
+                                                            .toString()
+                                                            .length -
+                                                        1),
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontStyle: FontStyle.italic,
+                                            color: Color(0xFF909090)),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
-                                  ),
-                                  const Icon(Icons.arrow_drop_down)
-                                ],
+                                    const Icon(Icons.arrow_drop_down)
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        )
-                      ],
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                  const Divider(
+                    height: 1,
+                  ),
+                  Container(
+                    width: double.infinity,
+                    decoration: const BoxDecoration(color: Color(0xFFF6F6F6)),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 26, right: 26, top: 10, bottom: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.category,
+                            style: const TextStyle(
+                                fontSize: 16, color: Color(0xFF3A3A3A)),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 10),
+                          InkWell(
+                            onTap: () {
+                              final TextEditingController categoryCont =
+                                  TextEditingController();
+                              List filteredList =
+                                  filtersUseCase!.categoryModels!;
+
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return selectCategoriesModal(
+                                        context,
+                                        filteredList,
+                                        categoryCont,
+                                        AppLocalizations.of(context)!.category,
+                                        filtersUseCase!.categoryModels!);
+                                  }).then((value) => setState(() {
+                                    selectedCategories = [];
+                                    for (var element
+                                        in filtersUseCase!.categoryModels!) {
+                                      if (isSelectedIfChildrenEmpty(element)) {
+                                        selectedCategories.add(element);
+                                      }
+                                      getSelectedChildren(element)
+                                          .forEach((element) {
+                                        selectedCategories.add(element);
+                                      });
+                                    }
+                                    if (selectedCategories
+                                        .map((e) => e.id)
+                                        .toList()
+                                        .isEmpty) {
+                                      filters["category"] = null;
+                                    } else {
+                                      filters["category"] = selectedCategories
+                                          .map((e) => e.id)
+                                          .toList();
+                                    }
+                                  }));
+                            },
+                            child: Container(
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  color: const Color(0xFFFBFBFB),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                      color: Colors.black.withOpacity(0.1))),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 20, right: 20),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SizedBox(
+                                      width: 200,
+                                      child: Text(
+                                        filters["category"] == null
+                                            ? AppLocalizations.of(context)!
+                                                .selectACategory
+                                            : selectedCategories
+                                                .map((e) => e.name)
+                                                .toString()
+                                                .substring(
+                                                    1,
+                                                    selectedCategories
+                                                            .map((e) => e.name)
+                                                            .toString()
+                                                            .length -
+                                                        1),
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontStyle: FontStyle.italic,
+                                            color: Color(0xFF909090)),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const Icon(Icons.arrow_drop_down)
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         }),
@@ -1817,158 +1943,165 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
         ),
         content: StatefulBuilder(builder: (context, setState) {
           return SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 6,
-                      child: SizedBox(
-                        height: 40,
-                        child: TextFormField(
-                          controller: cont,
-                          cursorColor: Colors.black,
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.only(left: 16),
-                            fillColor: const Color(0xFFFBFBFB),
-                            border: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Colors.black.withOpacity(0.1)),
-                                borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(3),
-                                    bottomLeft: Radius.circular(3))),
-                            disabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Colors.black.withOpacity(0.1)),
-                                borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(3),
-                                    bottomLeft: Radius.circular(3))),
-                            enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Colors.black.withOpacity(0.1)),
-                                borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(3),
-                                    bottomLeft: Radius.circular(3))),
-                            focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.black),
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(3),
-                                    bottomLeft: Radius.circular(3))),
-                            hintText: 'Item to search...',
+            child: GestureDetector(
+              onTap: () {
+                FocusScope.of(context).requestFocus(FocusNode());
+              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 6,
+                        child: SizedBox(
+                          height: 40,
+                          child: TextFormField(
+                            controller: cont,
+                            cursorColor: Colors.black,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.only(left: 16),
+                              fillColor: const Color(0xFFFBFBFB),
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.black.withOpacity(0.1)),
+                                  borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(3),
+                                      bottomLeft: Radius.circular(3))),
+                              disabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.black.withOpacity(0.1)),
+                                  borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(3),
+                                      bottomLeft: Radius.circular(3))),
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.black.withOpacity(0.1)),
+                                  borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(3),
+                                      bottomLeft: Radius.circular(3))),
+                              focusedBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.black),
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(3),
+                                      bottomLeft: Radius.circular(3))),
+                              hintText:
+                                  AppLocalizations.of(context)!.itemToSearch,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: InkWell(
-                        onTap: () {
-                          setState(() {
-                            filteredList = models
-                                .where((model) => model.name
-                                    .toLowerCase()
-                                    .contains(cont.text.toLowerCase()))
-                                .toList();
-                          });
-                        },
-                        child: Container(
-                            height: 40,
-                            decoration: const BoxDecoration(
-                                color: Color(0xFF292929),
-                                borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(8),
-                                    bottomRight: Radius.circular(8))),
-                            child: const Padding(
-                              padding: EdgeInsets.only(
-                                  left: 10, right: 10, top: 4, bottom: 4),
-                              child: Center(
-                                child: Text(
-                                  "SEARCH",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
+                      Expanded(
+                        flex: 3,
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              filteredList = models
+                                  .where((model) => model.name
+                                      .toLowerCase()
+                                      .contains(cont.text.toLowerCase()))
+                                  .toList();
+                            });
+                          },
+                          child: Container(
+                              height: 40,
+                              decoration: const BoxDecoration(
+                                  color: Color(0xFF292929),
+                                  borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(8),
+                                      bottomRight: Radius.circular(8))),
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 10, right: 10, top: 4, bottom: 4),
+                                child: Center(
+                                  child: Text(
+                                    AppLocalizations.of(context)!.searchCaps,
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
-                              ),
-                            )),
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.maxFinite,
-                  height: 400,
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: filteredList.mapIndexed((index, element) {
-                      return InkWell(
-                        onTap: () {
-                          setState(() {
-                            filteredList[index].isSelected =
-                                !models[index].isSelected;
-                          });
-                        },
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                                height: 40,
-                                width: double.maxFinite,
-                                decoration: BoxDecoration(
-                                    color: index % 2 == 0
-                                        ? const Color(0xFFF6F6F6)
-                                        : Colors.white),
-                                child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 8, right: 8),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          element.name,
-                                          style: const TextStyle(fontSize: 16),
-                                        ),
-                                        filteredList[index].isSelected
-                                            ? const Icon(
-                                                Icons.check,
-                                                size: 18,
-                                              )
-                                            : Container()
-                                      ],
-                                    ))),
-                            const Divider(
-                              height: 1,
-                            ),
-                          ],
+                              )),
                         ),
-                      );
-                    }).toList(),
+                      )
+                    ],
                   ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  height: 30,
-                  child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                          elevation: 0,
-                          backgroundColor: const Color(0xFF3C3C3C),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4))),
-                      child: const Text(
-                        "APPLY",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            color: Colors.white),
-                      )),
-                )
-              ],
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.maxFinite,
+                    height: 400,
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: filteredList.mapIndexed((index, element) {
+                        return InkWell(
+                          onTap: () {
+                            setState(() {
+                              filteredList[index].isSelected =
+                                  !models[index].isSelected;
+                            });
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                  height: 40,
+                                  width: double.maxFinite,
+                                  decoration: BoxDecoration(
+                                      color: index % 2 == 0
+                                          ? const Color(0xFFF6F6F6)
+                                          : Colors.white),
+                                  child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 8, right: 8),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            element.name,
+                                            style:
+                                                const TextStyle(fontSize: 16),
+                                          ),
+                                          filteredList[index].isSelected
+                                              ? const Icon(
+                                                  Icons.check,
+                                                  size: 18,
+                                                )
+                                              : Container()
+                                        ],
+                                      ))),
+                              const Divider(
+                                height: 1,
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: 30,
+                    child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            backgroundColor: const Color(0xFF3C3C3C),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4))),
+                        child: Text(
+                          AppLocalizations.of(context)!.applyCaps,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              color: Colors.white),
+                        )),
+                  )
+                ],
+              ),
             ),
           );
         }));
@@ -1985,112 +2118,118 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
         ),
         content: StatefulBuilder(builder: (context, setState) {
           return SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 6,
-                      child: SizedBox(
-                        height: 40,
-                        child: TextFormField(
-                          controller: cont,
-                          cursorColor: Colors.black,
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.only(left: 16),
-                            fillColor: const Color(0xFFFBFBFB),
-                            border: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Colors.black.withOpacity(0.1)),
-                                borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(3),
-                                    bottomLeft: Radius.circular(3))),
-                            disabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Colors.black.withOpacity(0.1)),
-                                borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(3),
-                                    bottomLeft: Radius.circular(3))),
-                            enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Colors.black.withOpacity(0.1)),
-                                borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(3),
-                                    bottomLeft: Radius.circular(3))),
-                            focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.black),
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(3),
-                                    bottomLeft: Radius.circular(3))),
-                            hintText: 'Item to search...',
+            child: GestureDetector(
+              onTap: () {
+                FocusScope.of(context).requestFocus(FocusNode());
+              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 6,
+                        child: SizedBox(
+                          height: 40,
+                          child: TextFormField(
+                            controller: cont,
+                            cursorColor: Colors.black,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.only(left: 16),
+                              fillColor: const Color(0xFFFBFBFB),
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.black.withOpacity(0.1)),
+                                  borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(3),
+                                      bottomLeft: Radius.circular(3))),
+                              disabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.black.withOpacity(0.1)),
+                                  borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(3),
+                                      bottomLeft: Radius.circular(3))),
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.black.withOpacity(0.1)),
+                                  borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(3),
+                                      bottomLeft: Radius.circular(3))),
+                              focusedBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.black),
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(3),
+                                      bottomLeft: Radius.circular(3))),
+                              hintText:
+                                  AppLocalizations.of(context)!.itemToSearch,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: InkWell(
-                        onTap: () {
-                          setState(() {
-                            if (cont.text == "") {
-                              filteredList = models;
-                            } else {
-                              filteredList = searchInChildren(
-                                  models, cont.text.toLowerCase());
-                            }
-                          });
-                        },
-                        child: Container(
-                            height: 40,
-                            decoration: const BoxDecoration(
-                                color: Color(0xFF292929),
-                                borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(8),
-                                    bottomRight: Radius.circular(8))),
-                            child: const Padding(
-                              padding: EdgeInsets.only(
-                                  left: 10, right: 10, top: 4, bottom: 4),
-                              child: Center(
-                                child: Text(
-                                  "SEARCH",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
+                      Expanded(
+                        flex: 3,
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              if (cont.text == "") {
+                                filteredList = models;
+                              } else {
+                                filteredList = searchInChildren(
+                                    models, cont.text.toLowerCase());
+                              }
+                            });
+                          },
+                          child: Container(
+                              height: 40,
+                              decoration: const BoxDecoration(
+                                  color: Color(0xFF292929),
+                                  borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(8),
+                                      bottomRight: Radius.circular(8))),
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 10, right: 10, top: 4, bottom: 4),
+                                child: Center(
+                                  child: Text(
+                                    AppLocalizations.of(context)!.searchCaps,
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
-                              ),
-                            )),
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                    width: double.maxFinite,
-                    height: 400,
-                    child: listOfCategories(filteredList, -3, true, null)),
-                const SizedBox(height: 20),
-                SizedBox(
-                  height: 30,
-                  child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                          elevation: 0,
-                          backgroundColor: const Color(0xFF3C3C3C),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4))),
-                      child: const Text(
-                        "APPLY",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            color: Colors.white),
-                      )),
-                )
-              ],
+                              )),
+                        ),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                      width: double.maxFinite,
+                      height: 400,
+                      child: listOfCategories(filteredList, -3, true, null)),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: 30,
+                    child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            backgroundColor: const Color(0xFF3C3C3C),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4))),
+                        child: Text(
+                          AppLocalizations.of(context)!.applyCaps,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              color: Colors.white),
+                        )),
+                  )
+                ],
+              ),
             ),
           );
         }));
@@ -2290,16 +2429,16 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        "CART",
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.cartCaps,
+                        style: const TextStyle(
                             fontSize: 24, fontWeight: FontWeight.w500),
                       ),
                       Row(
                         children: [
                           outlinedGrayButton(() {
                             Navigator.pop(context);
-                          }, "BACK"),
+                          }, AppLocalizations.of(context)!.backCaps),
                           const SizedBox(
                             width: 18,
                           ),
@@ -2313,8 +2452,10 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                               showDialog(
                                   context: context,
                                   builder: (context) {
-                                    return exitDialog(context,
-                                        "Are you sure? You would not be able to edit cart anymore");
+                                    return exitDialog(
+                                        context,
+                                        AppLocalizations.of(context)!
+                                            .areYouSureCart);
                                   }).then((returned) {
                                 if (returned) {
                                   ref.read(cartDataProvider).startAssembly();
@@ -2328,7 +2469,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                                 cartData: ref
                                                     .watch(cartDataProvider)
                                                     .cartData,
-                                            isTransaction: widget.isTransaction,
+                                                isTransaction:
+                                                    widget.isTransaction,
                                               )));
                                 }
                               });
@@ -2339,8 +2481,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                     return AlertDialog(
                                       backgroundColor: Colors.white,
                                       surfaceTintColor: Colors.transparent,
-                                      title: const Text(
-                                          "You haven't added any products to cart"),
+                                      title: Text(AppLocalizations.of(context)!
+                                          .youHaventCart),
                                       actions: [
                                         TextButton(
                                             onPressed: () {
@@ -2355,7 +2497,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                     );
                                   });
                             }
-                          }, "START ASSEMBLY"),
+                          }, AppLocalizations.of(context)!.startAssemblyCaps),
                         ],
                       )
                     ],
@@ -2365,14 +2507,14 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                 Container(
                   height: 30,
                   decoration: const BoxDecoration(color: Colors.black),
-                  child: const Row(
+                  child: Row(
                     children: [
                       Expanded(
                         flex: 1,
                         child: Center(
                           child: Text(
-                            "NAME",
-                            style: TextStyle(
+                            AppLocalizations.of(context)!.nameCaps,
+                            style: const TextStyle(
                                 fontWeight: FontWeight.w900,
                                 color: Colors.white,
                                 fontSize: 16),
@@ -2383,8 +2525,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                         flex: 1,
                         child: Center(
                           child: Text(
-                            "QUANTITY",
-                            style: TextStyle(
+                            AppLocalizations.of(context)!.quantityCaps,
+                            style: const TextStyle(
                                 fontWeight: FontWeight.w900,
                                 color: Colors.white,
                                 fontSize: 16),
@@ -2394,8 +2536,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                       Expanded(
                         flex: 1,
                         child: Text(
-                          "PRICE",
-                          style: TextStyle(
+                          AppLocalizations.of(context)!.priceCaps,
+                          style: const TextStyle(
                               fontWeight: FontWeight.w900,
                               color: Colors.white,
                               fontSize: 16),
@@ -2508,7 +2650,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: Text(
-                    "Total: ${sum.toString()}",
+                    "${AppLocalizations.of(context)!.total} ${sum.toString()}",
                     style: const TextStyle(
                         fontSize: 24, fontWeight: FontWeight.bold),
                   ),
@@ -2533,9 +2675,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
     return AlertDialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
-        title: const Text(
-          "CART ITEM EDIT",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+        title: Text(
+          AppLocalizations.of(context)!.cartItemEditCaps,
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
         ),
         content: StatefulBuilder(builder: (context, setState) {
           return SingleChildScrollView(
@@ -2544,7 +2686,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Product \"${data.name}\"",
+                  "${AppLocalizations.of(context)!.product} \"${data.name}\"",
                   style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -2555,10 +2697,10 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                   child: Column(
                     children: [
                       const SizedBox(height: 10),
-                      const Text(
-                        "QUANTITY",
-                        style:
-                            TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
+                      Text(
+                        AppLocalizations.of(context)!.quantityCaps,
+                        style: const TextStyle(
+                            fontSize: 16, color: Color(0xFF3A3A3A)),
                       ),
                       const SizedBox(height: 10),
                       Row(
@@ -2607,29 +2749,30 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                   fontSize: 14,
                                   fontStyle: FontStyle.italic,
                                   fontWeight: FontWeight.w300),
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 contentPadding: EdgeInsets.zero,
-                                fillColor: Color(0xFFFCFCFC),
-                                border: OutlineInputBorder(
+                                fillColor: const Color(0xFFFCFCFC),
+                                border: const OutlineInputBorder(
                                     borderSide:
                                         BorderSide(color: Color(0xFFC8C8C8)),
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(6))),
-                                disabledBorder: OutlineInputBorder(
+                                disabledBorder: const OutlineInputBorder(
                                     borderSide:
                                         BorderSide(color: Color(0xFFC8C8C8)),
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(6))),
-                                enabledBorder: OutlineInputBorder(
+                                enabledBorder: const OutlineInputBorder(
                                     borderSide:
                                         BorderSide(color: Color(0xFFC8C8C8)),
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(6))),
-                                focusedBorder: OutlineInputBorder(
+                                focusedBorder: const OutlineInputBorder(
                                     borderSide: BorderSide(color: Colors.black),
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(6))),
-                                hintText: 'COUNT',
+                                hintText:
+                                    AppLocalizations.of(context)!.countCaps,
                               ),
                             ),
                           ),
@@ -2673,26 +2816,32 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                       const SizedBox(height: 10),
                       const Divider(),
                       const SizedBox(height: 10),
-                      const Text(
-                        "PRICE",
-                        style:
-                            TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
+                      Text(
+                        AppLocalizations.of(context)!.priceCaps,
+                        style: const TextStyle(
+                            fontSize: 16, color: Color(0xFF3A3A3A)),
                       ),
                       const SizedBox(height: 10),
                       DropdownButton(
                         value: curPrice,
-                        items: const [
-                          DropdownMenuItem(
+                        items: [
+                          const DropdownMenuItem(
                             value: "Distribution",
                             child: Text("Distribution"),
                           ),
-                          DropdownMenuItem(
+                          const DropdownMenuItem(
                             value: "Professional",
                             child: Text("Professional"),
                           ),
                           DropdownMenuItem(
                             value: "Oferta",
-                            child: Text("Oferta"),
+                            enabled: productInfo.offertaPrice != 0.0,
+                            child: Text("Oferta",
+                                style: TextStyle(
+                                  color: productInfo.offertaPrice != 0.0
+                                      ? Colors.black
+                                      : const Color(0xFF969696),
+                                )),
                           ),
                         ],
                         onChanged: (Object? value) {
@@ -2729,7 +2878,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                         children: [
                           outlinedGrayButton(() {
                             Navigator.pop(context, false);
-                          }, "CANCEL"),
+                          }, AppLocalizations.of(context)!.cancelCaps),
                           const SizedBox(
                             width: 18,
                           ),
@@ -2760,7 +2909,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                 ref.read(cartDataProvider).getSum();
                                 Navigator.pop(context, true);
                               }
-                            }, "SAVE"),
+                            }, AppLocalizations.of(context)!.saveCaps),
                           ),
                         ],
                       )
@@ -2787,11 +2936,12 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
     return AlertDialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(6),
         title: Row(
           children: [
-            const Text(
-              "CART ITEM EDIT",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+            Text(
+              AppLocalizations.of(context)!.cartItemEditCaps,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
             ),
             const SizedBox(
               width: 18,
@@ -2803,9 +2953,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                     builder: (context) => AlertDialog(
                           backgroundColor: Colors.white,
                           surfaceTintColor: Colors.transparent,
-                          title: const Text(
-                            "DELETION CONFIRMATION",
-                            style: TextStyle(
+                          title: Text(
+                            AppLocalizations.of(context)!.deletionCaps,
+                            style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w500,
                                 color: Color(0xFF151515)),
@@ -2820,7 +2970,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                               ),
                               const Divider(),
                               Text(
-                                "Are you sure you want to delete ${data.model.name}?",
+                                "${AppLocalizations.of(context)!.sureDelete} ${data.model.name}?",
                                 style: const TextStyle(
                                     fontSize: 16, color: Color(0xFF3A3A3A)),
                                 textAlign: TextAlign.center,
@@ -2831,7 +2981,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                 children: [
                                   outlinedGrayButton(() {
                                     Navigator.pop(context, false);
-                                  }, "CANCEL"),
+                                  }, AppLocalizations.of(context)!.cancelCaps),
                                   const SizedBox(
                                     width: 20,
                                   ),
@@ -2847,16 +2997,17 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                             color: const Color(0xFFFF5F5F),
                                             borderRadius:
                                                 BorderRadius.circular(4)),
-                                        child: const Padding(
-                                          padding: EdgeInsets.only(
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
                                               left: 20,
                                               right: 20,
                                               top: 4,
                                               bottom: 4),
                                           child: Center(
                                             child: Text(
-                                              "DELETE",
-                                              style: TextStyle(
+                                              AppLocalizations.of(context)!
+                                                  .deleteCaps,
+                                              style: const TextStyle(
                                                   fontSize: 12,
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.w500),
@@ -2877,13 +3028,13 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                   decoration: BoxDecoration(
                       color: const Color(0xFFFF5F5F),
                       borderRadius: BorderRadius.circular(4)),
-                  child: const Padding(
-                    padding:
-                        EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 4),
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        left: 20, right: 20, top: 4, bottom: 4),
                     child: Center(
                       child: Text(
-                        "DELETE",
-                        style: TextStyle(
+                        AppLocalizations.of(context)!.deleteCaps,
+                        style: const TextStyle(
                             fontSize: 12,
                             color: Colors.white,
                             fontWeight: FontWeight.w500),
@@ -2900,7 +3051,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Product \"${data.model.name}\"",
+                  "${AppLocalizations.of(context)!.product} \"${data.model.name}\"",
                   style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -2911,10 +3062,10 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                   child: Column(
                     children: [
                       const SizedBox(height: 10),
-                      const Text(
-                        "QUANTITY",
-                        style:
-                            TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
+                      Text(
+                        AppLocalizations.of(context)!.quantityCaps,
+                        style: const TextStyle(
+                            fontSize: 16, color: Color(0xFF3A3A3A)),
                       ),
                       const SizedBox(height: 10),
                       Row(
@@ -2963,29 +3114,30 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                   fontSize: 14,
                                   fontStyle: FontStyle.italic,
                                   fontWeight: FontWeight.w300),
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 contentPadding: EdgeInsets.zero,
-                                fillColor: Color(0xFFFCFCFC),
-                                border: OutlineInputBorder(
+                                fillColor: const Color(0xFFFCFCFC),
+                                border: const OutlineInputBorder(
                                     borderSide:
                                         BorderSide(color: Color(0xFFC8C8C8)),
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(6))),
-                                disabledBorder: OutlineInputBorder(
+                                disabledBorder: const OutlineInputBorder(
                                     borderSide:
                                         BorderSide(color: Color(0xFFC8C8C8)),
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(6))),
-                                enabledBorder: OutlineInputBorder(
+                                enabledBorder: const OutlineInputBorder(
                                     borderSide:
                                         BorderSide(color: Color(0xFFC8C8C8)),
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(6))),
-                                focusedBorder: OutlineInputBorder(
+                                focusedBorder: const OutlineInputBorder(
                                     borderSide: BorderSide(color: Colors.black),
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(6))),
-                                hintText: 'COUNT',
+                                hintText:
+                                    AppLocalizations.of(context)!.countCaps,
                               ),
                             ),
                           ),
@@ -3029,26 +3181,33 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                       const SizedBox(height: 10),
                       const Divider(),
                       const SizedBox(height: 10),
-                      const Text(
-                        "PRICE",
-                        style:
-                            TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
+                      Text(
+                        AppLocalizations.of(context)!.priceCaps,
+                        style: const TextStyle(
+                            fontSize: 16, color: Color(0xFF3A3A3A)),
                       ),
                       const SizedBox(height: 10),
                       DropdownButton(
                         value: curPrice,
-                        items: const [
-                          DropdownMenuItem(
+                        items: [
+                          const DropdownMenuItem(
                             value: "Distribution",
                             child: Text("Distribution"),
                           ),
-                          DropdownMenuItem(
+                          const DropdownMenuItem(
                             value: "Professional",
                             child: Text("Professional"),
                           ),
                           DropdownMenuItem(
                             value: "Oferta",
-                            child: Text("Oferta"),
+                            enabled: productInfo.offertaPrice != 0.0,
+                            child: Text(
+                              "Oferta",
+                              style: TextStyle(
+                                  color: productInfo.offertaPrice != 0.0
+                                      ? Colors.black
+                                      : const Color(0xFF969696)),
+                            ),
                           ),
                         ],
                         onChanged: (Object? value) {
@@ -3085,7 +3244,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                         children: [
                           outlinedGrayButton(() {
                             Navigator.pop(context, false);
-                          }, "CANCEL"),
+                          }, AppLocalizations.of(context)!.cancelCaps),
                           const SizedBox(
                             width: 18,
                           ),
@@ -3112,7 +3271,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                 ref.read(cartDataProvider).getSum();
                                 Navigator.pop(context, true);
                               }
-                            }, "SAVE"),
+                            }, AppLocalizations.of(context)!.saveCaps),
                           ),
                         ],
                       )

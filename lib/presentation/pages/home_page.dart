@@ -6,7 +6,6 @@ import 'package:mobile_app_slb/presentation/states/home_state.dart';
 import 'package:mobile_app_slb/presentation/widgets/app_drawer.dart';
 import 'package:mobile_app_slb/presentation/widgets/home_card.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 import '../states/auth_state.dart';
 import 'auth_page.dart';
 
@@ -21,6 +20,14 @@ class _HomePageState extends ConsumerState<HomePage> {
   var scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => ref.read(timeProvider).updatePeriodic(),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
@@ -32,13 +39,12 @@ class _HomePageState extends ConsumerState<HomePage> {
       body: SafeArea(
           child: ref.watch(getHomeProvider).when(
               data: (value) {
-                if (value.$1.errorModel == null &&
-                    value.$1.stockModel != null) {
+                if (value.errorModel == null && value.stockModel != null) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        flex: 3,
+                        flex: 2,
                         child: Row(
                           children: [
                             Expanded(
@@ -77,12 +83,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                       Expanded(
                           flex: 3,
                           child: Padding(
-                              padding: const EdgeInsets.all(30),
+                              padding: const EdgeInsets.only(
+                                  left: 30, right: 30, top: 10, bottom: 10),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    value.$2,
+                                    ref.watch(timeProvider).spainTime,
                                     style: const TextStyle(
                                         fontSize: 16, color: Color(0xFFCACACA)),
                                   ),
@@ -96,7 +103,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                     ),
                                   ),
                                   Text(
-                                    value.$1.stockModel!.name,
+                                    value.stockModel!.name,
                                     style: const TextStyle(
                                         fontSize: 36,
                                         color: Color(0xFF363636),
@@ -107,49 +114,61 @@ class _HomePageState extends ConsumerState<HomePage> {
                               ))),
                       const Divider(),
                       Expanded(
-                        flex: 7,
-                        child: GridView.count(
-                          physics: const NeverScrollableScrollPhysics(),
-                          childAspectRatio: 166 / 122,
-                          crossAxisSpacing: 25,
-                          mainAxisSpacing: 25,
-                          primary: false,
-                          padding: const EdgeInsets.all(25),
-                          crossAxisCount: 2,
-                          children: [
-                            homeCard("assets/images/boxes_icon.png",
-                                AppLocalizations.of(context)!.assortment, () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (builder) => AssortmentPage(
-                                            currentStorehouse:
-                                                value.$1.stockModel!.name,
-                                          )));
-                            }),
-                            homeCard("assets/images/calculator_icon.png",
-                                AppLocalizations.of(context)!.newSale, () {
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (builder) => NewSalePage(
-                                            currentStorehouse:
-                                                value.$1.stockModel!.name,
-                                            storehouseId:
-                                                value.$1.stockModel!.id,
-                                        isTransaction: false,
-                                          )),
-                                  (route) => false);
-                            }),
-                            homeCard(
-                                "assets/images/bulk_icon.png",
-                                AppLocalizations.of(context)!.bulkAssembling,
-                                () {}),
-                            homeCard("assets/images/monitor_icon.png",
-                                AppLocalizations.of(context)!.newArrival, () {})
-                          ],
-                        ),
-                      ),
+                          flex: 7,
+                          child: GridView.builder(
+                              itemCount: 4,
+                              padding: const EdgeInsets.all(25),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 25,
+                                      mainAxisSpacing: 25,
+                                      mainAxisExtent: 138),
+                              itemBuilder: (context, index) {
+                                if (index == 0) {
+                                  return homeCard(
+                                      "assets/images/boxes_icon.png",
+                                      AppLocalizations.of(context)!.assortment,
+                                      () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (builder) =>
+                                                AssortmentPage(
+                                                  currentStorehouse:
+                                                      value.stockModel!.name,
+                                                )));
+                                  });
+                                } else if (index == 1) {
+                                  return homeCard(
+                                      "assets/images/calculator_icon.png",
+                                      AppLocalizations.of(context)!.newSale,
+                                      () {
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (builder) => NewSalePage(
+                                                  currentStorehouse:
+                                                      value.stockModel!.name,
+                                                  storehouseId:
+                                                      value.stockModel!.id,
+                                                  isTransaction: false,
+                                                )),
+                                        (route) => false);
+                                  });
+                                } else if (index == 2) {
+                                  return homeCard(
+                                      "assets/images/bulk_icon.png",
+                                      AppLocalizations.of(context)!
+                                          .bulkAssembling,
+                                      () {});
+                                } else {
+                                  return homeCard(
+                                      "assets/images/monitor_icon.png",
+                                      AppLocalizations.of(context)!.newArrival,
+                                      () {});
+                                }
+                              })),
                     ],
                   );
                 } else {

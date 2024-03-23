@@ -42,5 +42,47 @@
 
   "saleCompletedCaps": "SALE COMPLETED!",
   "youWillGetBack": "You will get back to home screen in 5 seconds",
-  "homeCaps": "HOME"
+  "homeCaps": "HOME",
+
+
+  "youWillGetAuth": "You will get back to auth screen in 5 seconds",
+  "authCaps": "AUTH",
+
+  "singleProductCaps": "SINGLE PRODUCT",
+  "eanCaps": "EAN",
+  "brandCaps": "BRAND",
+  "collectionCaps": "COLLECTION",
+  "colorCaps": "COLOR",
+  "descriptionCaps": "DESCRIPTION",
+  "defaultPriceCaps": "DEFAULT PRICE",
+  "distributionPriceCaps": "DISTRIBUTION PRICE",
+  "professionalPriceCaps": "PROFESSIONAL PRICE",
+  "ofertaPriceCaps": "OFERTA PRICE",
+
+  "newSaleCaps": "NEW SALE",
+  "addedToCart": "Added to cart",
+  "addToCartCaps": "ADD TO CART",
+  "areYouSureCart": "Are you sure? You would not be able to edit cart anymore",
+  "youHaventCart": "You haven't added any products to cart",
+  "startAssemblyCaps": "START ASSEMBLY",
+  "priceCaps": "PRICE",
+  "total": "Total:",
+  "cartItemEditCaps": "CART ITEM EDIT",
+  "product": "Product",
+  "countCaps": "COUNT",
+  "saveCaps": "SAVE",
+  "deletionCaps": "DELETION CONFIRMATION",
+  "sureDelete": "Are you sure you want to delete",
+  "deleteCaps": "DELETE",
+
+  "wouldAddress": "Would you like to add delivery address?",
+  "addAddressCaps": "ADD ADDRESS",
+  "endSaleCaps": "END SALE",
+  "addAddressInfo": "Add address information",
+  "zipCode": "Zip code",
+  "city": "City",
+  "region": "Region",
+  "address": "Address",
+  "person": "Person",
+  "endSaleCaps": "END SALE"
 }

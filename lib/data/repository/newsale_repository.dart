@@ -89,7 +89,7 @@ class NewSaleRepository extends NewSaleRepositoryImpl {
     final authData = await localData.getAuthData();
     if (authData != null) {
       final data =
-      await remoteData.startAssembly(authData.token, transactionId);
+          await remoteData.startAssembly(authData.token, transactionId);
 
       if (data is bool) {
         return OutcomeUseCase();
@@ -105,7 +105,7 @@ class NewSaleRepository extends NewSaleRepositoryImpl {
     final authData = await localData.getAuthData();
     if (authData != null) {
       final data =
-      await remoteData.deleteAssembly(authData.token, transactionId);
+          await remoteData.deleteAssembly(authData.token, transactionId);
 
       if (data is bool) {
         return OutcomeUseCase();
@@ -136,8 +136,7 @@ class NewSaleRepository extends NewSaleRepositoryImpl {
   Future<CurrentStockUseCase> getCurrentStock() async {
     final authData = await localData.getAuthData();
     if (authData != null) {
-      final data =
-          await remoteData.getCurrentStock(authData.token);
+      final data = await remoteData.getCurrentStock(authData.token);
 
       if (data is CurrentStockModel) {
         return CurrentStockUseCase(currentStock: data);

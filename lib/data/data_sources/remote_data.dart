@@ -322,6 +322,35 @@ class RemoteData {
     if (res.statusCode == 200) {
       List<CartModel> curData = [];
       for (var element in (res.data["transactionData"]["products"] as List)) {
+        Map<String, dynamic> curPrice = {};
+
+        if (element["product"]["offertaPrice"] == null) {
+          if (element["product"]["distributorPrice"] <=
+              element["product"]["professionalPrice"]) {
+            curPrice = {"Distribution": element["product"]["distributorPrice"]};
+          } else {
+            curPrice = {
+              "Professional": element["product"]["professionalPrice"]
+            };
+          }
+        } else {
+          if (element["product"]["distributorPrice"] <=
+                  element["product"]["professionalPrice"] &&
+              element["product"]["distributorPrice"] <=
+                  element["product"]["offertaPrice"]) {
+            curPrice = {"Distribution": element["product"]["distributorPrice"]};
+          } else if (element["product"]["professionalPrice"] <=
+                  element["product"]["distributorPrice"] &&
+              element["product"]["professionalPrice"] <=
+                  element["product"]["offertaPrice"]) {
+            curPrice = {
+              "Professional": element["product"]["professionalPrice"]
+            };
+          } else {
+            curPrice = {"Oferta": element["product"]["offertaPrice"]};
+          }
+        }
+
         curData.add(CartModel(
             AssortmentModel(
                 element["product"]["id"],
@@ -332,9 +361,8 @@ class RemoteData {
                 element["product"]["eanCode"].toString(),
                 double.parse(element["product"]["amountInBox"].toString())),
             element["amount"].toInt(),
-            {"Distribution": element["product"]["distributorPrice"]},
-            element["product"]["distributorPrice"] *
-                    element["amount"]));
+            curPrice,
+            curPrice[curPrice.keys.first] * element["amount"]));
       }
       return CurrentStockModel(res.data["transactionData"]["id"],
           res.data["transactionData"]["type"]["id"], curData);

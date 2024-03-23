@@ -11,12 +11,18 @@ Widget exitDialog(BuildContext context, String text) {
           onPressed: () {
             Navigator.pop(context, false);
           },
-          child: const Text("No", style: TextStyle(color: Colors.black),)),
+          child: const Text(
+            "No",
+            style: TextStyle(color: Colors.black),
+          )),
       TextButton(
           onPressed: () {
             Navigator.pop(context, true);
           },
-          child: const Text("Yes", style: TextStyle(color: Colors.redAccent),))
+          child: const Text(
+            "Yes",
+            style: TextStyle(color: Colors.redAccent),
+          ))
     ],
   );
 }

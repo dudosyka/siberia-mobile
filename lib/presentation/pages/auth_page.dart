@@ -147,58 +147,68 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                   const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.only(left: 50, right: 50),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          "-",
-                          style: TextStyle(fontSize: 40, color: Colors.grey),
-                        ),
-                        Expanded(
-                          child: Slider(
-                            value: _currentSliderValue,
-                            min: 0,
-                            max: 1,
-                            activeColor: Colors.black,
-                            inactiveColor: Colors.grey,
-                            label: _currentSliderValue.round().toString(),
-                            onChanged: (double value) {
-                              if (value < 0.1) {
-                                cameraController.resetZoomScale();
-                              } else {
-                                cameraController.setZoomScale(value);
-                              }
-                              setState(() {
-                                _currentSliderValue = value;
-                              });
-                            },
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 320
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "-",
+                            style: TextStyle(fontSize: 40, color: Colors.grey),
                           ),
-                        ),
-                        const Text("+",
-                            style: TextStyle(fontSize: 40, color: Colors.grey))
-                      ],
+                          Expanded(
+                            child: Slider(
+                              value: _currentSliderValue,
+                              min: 0,
+                              max: 1,
+                              activeColor: Colors.black,
+                              inactiveColor: Colors.grey,
+                              label: _currentSliderValue.round().toString(),
+                              onChanged: (double value) {
+                                if (value < 0.1) {
+                                  cameraController.resetZoomScale();
+                                } else {
+                                  cameraController.setZoomScale(value);
+                                }
+                                setState(() {
+                                  _currentSliderValue = value;
+                                });
+                              },
+                            ),
+                          ),
+                          const Text("+",
+                              style: TextStyle(fontSize: 40, color: Colors.grey))
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.only(left: 50, right: 50),
-                    child: blackButton(
-                        null,
-                        ValueListenableBuilder(
-                          valueListenable: cameraController.torchState,
-                          builder: (context, state, child) {
-                            switch (state) {
-                              case TorchState.off:
-                                return const Icon(Icons.flash_off,
-                                    color: Colors.grey);
-                              case TorchState.on:
-                                return const Icon(Icons.flash_on,
-                                    color: Colors.white);
-                            }
-                          },
-                        ), () {
-                      cameraController.toggleTorch();
-                    }),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                          maxWidth: 320
+                      ),
+                      child: blackButton(
+                          null,
+                          ValueListenableBuilder(
+                            valueListenable: cameraController.torchState,
+                            builder: (context, state, child) {
+                              switch (state) {
+                                case TorchState.off:
+                                  return const Icon(Icons.flash_off,
+                                      color: Colors.grey);
+                                case TorchState.on:
+                                  return const Icon(Icons.flash_on,
+                                      color: Colors.white);
+                              }
+                            },
+                          ), () {
+                        cameraController.toggleTorch();
+                      }),
+                    ),
                   ),
                 ],
               ))

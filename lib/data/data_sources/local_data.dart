@@ -3,8 +3,6 @@ import 'package:localstorage/localstorage.dart';
 import 'package:mobile_app_slb/data/models/auth_model.dart';
 import 'package:mobile_app_slb/data/models/cart_model.dart';
 
-import '../models/assortment_model.dart';
-
 class LocalData {
   final LocalStorage authStorage = LocalStorage('auth_storage');
   final LocalStorage cartStorage = LocalStorage('cart_storage');

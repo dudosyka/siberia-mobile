@@ -8,12 +8,15 @@ Widget grayButton(void Function() onTap, String text) {
             color: const Color(0xFF3C3C3C),
             borderRadius: BorderRadius.circular(4)),
         child: Padding(
-          padding: const EdgeInsets.only(left: 10, right: 10, top: 4, bottom: 4),
+          padding:
+              const EdgeInsets.only(left: 10, right: 10, top: 4, bottom: 4),
           child: Center(
             child: Text(
               text,
               style: const TextStyle(
-                  fontSize: 12, color: Colors.white, fontWeight: FontWeight.w500),
+                  fontSize: 12,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500),
             ),
           ),
         )),

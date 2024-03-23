@@ -14,15 +14,6 @@ class CartDataNotifier extends ChangeNotifier {
   int? transactionId;
   bool isAssembly = false;
 
-  // Future<void> getCartModels() async {
-  //   final data = await NewSaleRepository().getCartData();
-  //   if (data.cartModels != null && data.errorModel == null) {
-  //     cartData = data.cartModels ?? [];
-  //     getSum();
-  //     notifyListeners();
-  //   }
-  // }
-
   Future<void> getCurrentStock() async {
     final data = await NewSaleRepository().getCurrentStock();
     transactionId = data.currentStock!.id;
@@ -56,8 +47,6 @@ class CartDataNotifier extends ChangeNotifier {
       await NewSaleRepository()
           .updateOutcome(cartData, storeId, transactionId!);
     }
-    //await NewSaleRepository().saveCartData(cartData);
-    //await getCartModels();
     notifyListeners();
   }
 
@@ -69,8 +58,6 @@ class CartDataNotifier extends ChangeNotifier {
   Future<void> deleteFromCart(CartModel oldModel, int storeId) async {
     cartData.removeWhere((element) => element.model.id == oldModel.model.id);
     await NewSaleRepository().updateOutcome(cartData, storeId, transactionId!);
-    //await NewSaleRepository().saveCartData(cartData);
-    //await getCartModels();
     notifyListeners();
   }
 
@@ -95,8 +82,6 @@ class CartDataNotifier extends ChangeNotifier {
       }
     }
     await NewSaleRepository().updateOutcome(cartData, storeId, transactionId!);
-    //await NewSaleRepository().saveCartData(cartData);
-    //await getCartModels();
     notifyListeners();
   }
 
@@ -111,7 +96,7 @@ class CartDataNotifier extends ChangeNotifier {
   }
 
   Future<void> deleteCart() async {
-    if(isAssembly) {
+    if (isAssembly) {
       deleteAssembly(transactionId!);
     }
     transactionId = null;

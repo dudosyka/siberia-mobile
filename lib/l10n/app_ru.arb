@@ -42,5 +42,47 @@
 
   "saleCompletedCaps": "ПРОДАЖА ЗАВЕРШЕНА!",
   "youWillGetBack": "Вы вернетесь на главный экран через 5 секунд",
-  "homeCaps": "ГЛАВНАЯ"
+  "homeCaps": "ГЛАВНАЯ",
+
+
+  "youWillGetAuth": "Вы вернетесь к экрану авторизации через 5 секунд.",
+  "authCaps": "РЕГИСТРАЦИЯ",
+
+  "singleProductCaps": "ВЫБРАННЫЙ ПРОДУКТ",
+  "eanCaps": "EAN",
+  "brandCaps": "БРЕНД",
+  "collectionCaps": "КОЛЛЕКЦИЯ",
+  "colorCaps": "ЦВЕТ",
+  "descriptionCaps": "ОПИСАНИЕ",
+  "defaultPriceCaps": "DEFAULT ЦЕНА",
+  "distributionPriceCaps": "DISTRIBUTION ЦЕНА",
+  "professionalPriceCaps": "PROFESSIONAL ЦЕНА",
+  "ofertaPriceCaps": "OFERTA ЦЕНА",
+
+  "newSaleCaps": "НОВАЯ ПРОДАЖА",
+  "addedToCart": "Добавлено в корзину",
+  "addToCartCaps": "В КОРЗИНУ",
+  "areYouSureCart": "Вы уверены? Вы больше не сможете редактировать корзину.",
+  "youHaventCart": "Вы не добавили ни одного товара в корзину",
+  "startAssemblyCaps": "НАЧАТЬ СБОРКУ",
+  "priceCaps": "ЦЕНА",
+  "total": "Итого:",
+  "cartItemEditCaps": "ИЗМЕНЕНИЕ ЭЛЕМЕНТА ",
+  "product": "Продукт",
+  "countCaps": "КОЛ-ВО",
+  "saveCaps": "СОХРАНИТЬ",
+  "deletionCaps": "ПОДТВЕРЖДЕНИЕ УДАЛЕНИЯ",
+  "sureDelete": "Вы уверены, что хотите удалить?",
+  "deleteCaps": "УДАЛИТЬ",
+
+  "wouldAddress": "Хотите добавить адрес доставки?",
+  "addAddressCaps": "ДОБАВИТЬ АДРЕС",
+  "endSaleCaps": "ЗАВЕРШИТЬ ПРОДАЖИ",
+  "addAddressInfo": "Добавление адресной информации",
+  "zipCode": "Zip Код",
+  "city": "Город",
+  "region": "Регион",
+  "address": "Адрес",
+  "person": "Получатель",
+  "endSaleCaps": "ЗАВЕРШИТЬ"
 }

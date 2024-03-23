@@ -42,5 +42,47 @@
 
   "saleCompletedCaps": "¡LA VENTA ESTÁ COMPLETADA!",
   "youWillGetBack": "Volverás a la pantalla principal en 5 segundos",
-  "homeCaps": "CASA"
+  "homeCaps": "CASA",
+
+
+  "youWillGetAuth": "Volverá a la pantalla de inicio de sesión después de 5 segundos.",
+  "authCaps": "REGISTRO",
+
+  "singleProductCaps": "PRODUCTO SELECCIONADO",
+  "eanCaps": "EAN",
+  "brandCaps": "MARCA",
+  "collectionCaps": "RECOPILACIÓN",
+  "colorCaps": "COLOR",
+  "descriptionCaps": "DESCRIPCIÓN",
+  "defaultPriceCaps": "PRECIO POR DEFECTO",
+  "distributionPriceCaps": "PRECIO DE DISTRIBUCIÓN",
+  "professionalPriceCaps": "PRECIO PROFESIONAL",
+  "ofertaPriceCaps": "PRECIO DE OFERTA",
+
+  "newSaleCaps": "NUEVA VENTA",
+  "addedToCart": "Agregado al carrito",
+  "addToCartCaps": "AÑADIR A LA CESTA",
+  "areYouSureCart": "¿Está seguro? Ya no podrás editar tu carrito.",
+  "youHaventCart": "No has añadido ningún artículo a tu carrito.",
+  "startAssemblyCaps": "INICIAR MONTAJE",
+  "priceCaps": "PRECIO",
+  "total": "Total:",
+  "cartItemEditCaps": "ARTÍCULO CAMBIADO",
+  "product": "Producto",
+  "countCaps": "CANTIDAD",
+  "saveCaps": "AHORRAR",
+  "deletionCaps": "CONFIRMACIÓN DE ELIMINACIÓN",
+  "sureDelete": "¿Estas seguro que quieres borrarlo?",
+  "deleteCaps": "BORRAR",
+
+  "wouldAddress": "¿Quieres añadir una dirección de entrega?",
+  "addAddressCaps": "AÑADIR DIRECCIÓN",
+  "endSaleCaps": "FINALIZAR VENTAS",
+  "addAddressInfo": "Agregar información de dirección",
+  "zipCode": "Código postal",
+  "city": "Ciudad",
+  "region": "Región",
+  "address": "DIRECCIÓN",
+  "person": "Recipiente",
+  "endSaleCaps": "COMPLETO"
 }

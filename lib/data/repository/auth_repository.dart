@@ -16,7 +16,7 @@ class AuthRepository extends AuthRepositoryImpl {
   Future<AuthUseCase> loginUser(String qrToken) async {
     final data = await remoteData.loginUser(qrToken);
 
-    if(data is AuthModel) {
+    if (data is AuthModel) {
       localData.saveAuthData(data);
       return AuthUseCase(authModel: data);
     } else {
@@ -42,7 +42,7 @@ class AuthRepository extends AuthRepositoryImpl {
     if (authData != null) {
       final data = await remoteData.getStock(authData.token);
 
-      if(data is StockModel) {
+      if (data is StockModel) {
         return StockUseCase(stockModel: data);
       }
       return StockUseCase(errorModel: data);

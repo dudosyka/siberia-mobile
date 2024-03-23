@@ -103,7 +103,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                     ),
                     onTap: () {
                       if (widget.isAbleToNavigate) {
-                        if(widget.isHomePage) {
+                        if (widget.isHomePage) {
                           Navigator.pop(context);
                         } else {
                           Navigator.push(
@@ -150,7 +150,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                 ],
               ),
             ),
-            const Spacer(),
+            //const Spacer(),
             const Divider(),
             ListTile(
               horizontalTitleGap: 0,

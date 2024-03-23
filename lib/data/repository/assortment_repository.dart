@@ -76,8 +76,7 @@ class AssortmentRepository extends AssortmentRepositoryImpl {
   Future<ProductInfoUseCase> getProductInfo(int productId) async {
     final authData = await localData.getAuthData();
     if (authData != null) {
-      final data =
-          await remoteData.getProductInfo(authData.token, productId);
+      final data = await remoteData.getProductInfo(authData.token, productId);
 
       if (data is ProductInfoModel) {
         return ProductInfoUseCase(productModel: data);

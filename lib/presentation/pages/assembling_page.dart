@@ -29,32 +29,17 @@ class AssemblingPage extends ConsumerStatefulWidget {
   ConsumerState<AssemblingPage> createState() => _AssemblingPageState();
 }
 
-class _AssemblingPageState extends ConsumerState<AssemblingPage>
-    with WidgetsBindingObserver {
+class _AssemblingPageState extends ConsumerState<AssemblingPage> {
   var scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-
-    if (state == AppLifecycleState.inactive ||
-        state == AppLifecycleState.detached) {
-      ref.read(cartDataProvider).deleteCart();
-      //ref.read(cartDataProvider).deleteAssembly(widget.transactionId);
-    }
   }
 
   @override
@@ -77,7 +62,6 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage>
             }).then((returned) {
           if (returned) {
             ref.read(cartDataProvider).deleteCart();
-            //ref.read(cartDataProvider).deleteAssembly(widget.transactionId);
             navigator.pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => const HomePage()),
                 (route) => false);
@@ -114,9 +98,10 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage>
                                             CrossAxisAlignment.start,
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const Text(
-                                            "Would you like to add delivery address?",
-                                            style: TextStyle(
+                                          Text(
+                                            AppLocalizations.of(context)!
+                                                .wouldAddress,
+                                            style: const TextStyle(
                                                 fontSize: 24,
                                                 fontWeight: FontWeight.w500),
                                             textAlign: TextAlign.center,
@@ -133,7 +118,9 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage>
                                                     context: context,
                                                     builder: (context) =>
                                                         addressModal());
-                                              }, "ADD ADDRESS"),
+                                              },
+                                                  AppLocalizations.of(context)!
+                                                      .addAddressCaps),
                                               const SizedBox(
                                                 width: 18,
                                               ),
@@ -143,28 +130,20 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage>
                                                   ref
                                                       .read(cartDataProvider)
                                                       .approveAssembly();
-                                                  if (widget.isTransaction) {
-                                                    ref
-                                                        .read(
-                                                            deleteAuthProvider)
-                                                        .deleteAuth();
-                                                    Future.microtask(() => Navigator
-                                                        .pushAndRemoveUntil(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        const AuthPage()),
-                                                            (route) => false));
-                                                  } else {
-                                                    Navigator.pushAndRemoveUntil(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                const SaleCompletePage()),
-                                                        (route) => false);
-                                                  }
-                                                }, "END SALE"),
+                                                  Navigator.pushAndRemoveUntil(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              SaleCompletePage(
+                                                                isTransaction:
+                                                                    widget
+                                                                        .isTransaction,
+                                                              )),
+                                                      (route) => false);
+                                                },
+                                                    AppLocalizations.of(
+                                                            context)!
+                                                        .endSaleCaps),
                                               ),
                                             ],
                                           )
@@ -232,13 +211,24 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage>
                                     AppLocalizations.of(context)!.areYouSure);
                               }).then((returned) {
                             if (returned) {
-                              ref.read(cartDataProvider).deleteCart();
                               //ref.read(cartDataProvider).deleteAssembly(widget.transactionId);
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const HomePage()),
-                                  (route) => false);
+                              if (widget.isTransaction) {
+                                ref.read(deleteAuthProvider).deleteAuth();
+                                Future.microtask(() =>
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const AuthPage()),
+                                        (route) => false));
+                              } else {
+                                ref.read(cartDataProvider).deleteCart();
+                                Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const HomePage()),
+                                    (route) => false);
+                              }
                             }
                           });
                         }, AppLocalizations.of(context)!.cancelCaps, false),
@@ -334,26 +324,26 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage>
             flex: 5,
             child: ListView(
               children: data.mapIndexed((index, e) {
-                return Container(
-                  height: 58,
-                  decoration: BoxDecoration(
-                      color: index % 2 == 0
-                          ? const Color(0xFFF9F9F9)
-                          : Colors.white),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 10, right: 10),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Row(
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  e.isSelected = !e.isSelected;
-                                  setState(() {});
-                                },
-                                child: Stack(
+                return InkWell(
+                  onTap: () {
+                    e.isSelected = !e.isSelected;
+                    setState(() {});
+                  },
+                  child: Container(
+                    height: 58,
+                    decoration: BoxDecoration(
+                        color: index % 2 == 0
+                            ? const Color(0xFFF9F9F9)
+                            : Colors.white),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10, right: 10),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Row(
+                              children: [
+                                Stack(
                                   alignment: Alignment.center,
                                   children: [
                                     Container(
@@ -376,33 +366,33 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage>
                                     ),
                                   ],
                                 ),
-                              ),
-                              const SizedBox(
-                                width: 20,
-                              ),
-                              Text(
-                                e.model.name,
-                                style: const TextStyle(
-                                    fontSize: 16, color: Color(0xFF222222)),
-                              ),
-                            ],
+                                const SizedBox(
+                                  width: 20,
+                                ),
+                                Text(
+                                  e.model.name,
+                                  style: const TextStyle(
+                                      fontSize: 16, color: Color(0xFF222222)),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        const VerticalDivider(),
-                        Expanded(
-                          flex: 1,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                e.quantity.toString(),
-                                style: const TextStyle(
-                                    fontSize: 16, color: Color(0xFF222222)),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
+                          const VerticalDivider(),
+                          Expanded(
+                            flex: 1,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  e.quantity.toString(),
+                                  style: const TextStyle(
+                                      fontSize: 16, color: Color(0xFF222222)),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -431,262 +421,256 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage>
     return AlertDialog(
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.transparent,
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            "Add address information",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 10),
-          const Divider(),
-          const SizedBox(height: 10),
-          Column(
-            children: [
-              const Text(
-                "Zip code",
-                style: TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 40,
-                width: 290,
-                child: TextFormField(
-                  controller: zipCont,
-                  cursorColor: Colors.black,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w300),
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.zero,
-                    fillColor: Color(0xFFFCFCFC),
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFC8C8C8)),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
-                    disabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFC8C8C8)),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFC8C8C8)),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
+      content: SingleChildScrollView(
+        padding: MediaQuery.of(context).viewInsets,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              AppLocalizations.of(context)!.addAddressInfo,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            const Divider(),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.zipCode,
+                  style:
+                      const TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 40,
+                  width: 290,
+                  child: TextFormField(
+                    controller: zipCont,
+                    cursorColor: Colors.black,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w300),
+                    decoration: const InputDecoration(
+                      contentPadding: EdgeInsets.zero,
+                      fillColor: Color(0xFFFCFCFC),
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                      disabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              const Divider(),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Column(
-            children: [
-              const Text(
-                "City",
-                style: TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 40,
-                width: 290,
-                child: TextFormField(
-                  controller: cityCont,
-                  cursorColor: Colors.black,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w300),
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.zero,
-                    fillColor: Color(0xFFFCFCFC),
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFC8C8C8)),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
-                    disabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFC8C8C8)),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFC8C8C8)),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
+                const SizedBox(height: 10),
+                const Divider(),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.city,
+                  style:
+                      const TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 40,
+                  width: 290,
+                  child: TextFormField(
+                    controller: cityCont,
+                    cursorColor: Colors.black,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w300),
+                    decoration: const InputDecoration(
+                      contentPadding: EdgeInsets.zero,
+                      fillColor: Color(0xFFFCFCFC),
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                      disabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              const Divider(),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Column(
-            children: [
-              const Text(
-                "Region",
-                style: TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 40,
-                width: 290,
-                child: TextFormField(
-                  controller: regionCont,
-                  cursorColor: Colors.black,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w300),
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.zero,
-                    fillColor: Color(0xFFFCFCFC),
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFC8C8C8)),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
-                    disabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFC8C8C8)),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFC8C8C8)),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
+                const SizedBox(height: 10),
+                const Divider(),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.region,
+                  style:
+                      const TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 40,
+                  width: 290,
+                  child: TextFormField(
+                    controller: regionCont,
+                    cursorColor: Colors.black,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w300),
+                    decoration: const InputDecoration(
+                      contentPadding: EdgeInsets.zero,
+                      fillColor: Color(0xFFFCFCFC),
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                      disabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              const Divider(),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Column(
-            children: [
-              const Text(
-                "Address",
-                style: TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 40,
-                width: 290,
-                child: TextFormField(
-                  controller: addressCont,
-                  cursorColor: Colors.black,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w300),
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.zero,
-                    fillColor: Color(0xFFFCFCFC),
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFC8C8C8)),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
-                    disabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFC8C8C8)),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFC8C8C8)),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
+                const SizedBox(height: 10),
+                const Divider(),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.address,
+                  style:
+                      const TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 40,
+                  width: 290,
+                  child: TextFormField(
+                    controller: addressCont,
+                    cursorColor: Colors.black,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w300),
+                    decoration: const InputDecoration(
+                      contentPadding: EdgeInsets.zero,
+                      fillColor: Color(0xFFFCFCFC),
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                      disabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              const Divider(),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Column(
-            children: [
-              const Text(
-                "Person",
-                style: TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 40,
-                width: 290,
-                child: TextFormField(
-                  controller: personCont,
-                  cursorColor: Colors.black,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w300),
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.zero,
-                    fillColor: Color(0xFFFCFCFC),
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFC8C8C8)),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
-                    disabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFC8C8C8)),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFC8C8C8)),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black),
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
+                const SizedBox(height: 10),
+                const Divider(),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.person,
+                  style:
+                      const TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 40,
+                  width: 290,
+                  child: TextFormField(
+                    controller: personCont,
+                    cursorColor: Colors.black,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w300),
+                    decoration: const InputDecoration(
+                      contentPadding: EdgeInsets.zero,
+                      fillColor: Color(0xFFFCFCFC),
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                      disabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black),
+                          borderRadius: BorderRadius.all(Radius.circular(6))),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              const Divider(),
-            ],
-          ),
-          const SizedBox(height: 30),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              outlinedGrayButton(() {
-                Navigator.pop(context, false);
-              }, "BACK"),
-              const SizedBox(
-                width: 18,
-              ),
-              SizedBox(
-                width: 96,
-                child: grayButton(() {
-                  ref.read(cartDataProvider).approveAssembly();
-                  if (widget.isTransaction) {
-                    ref
-                        .read(
-                        deleteAuthProvider)
-                        .deleteAuth();
-                    Future.microtask(() => Navigator
-                        .pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                            builder:
-                                (context) =>
-                            const AuthPage()),
-                            (route) => false));
-                  } else {
+                const SizedBox(height: 10),
+                const Divider(),
+              ],
+            ),
+            const SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                outlinedGrayButton(() {
+                  Navigator.pop(context, false);
+                }, AppLocalizations.of(context)!.backCaps),
+                const SizedBox(
+                  width: 18,
+                ),
+                SizedBox(
+                  width: 96,
+                  child: grayButton(() {
+                    ref.read(cartDataProvider).approveAssembly();
                     Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                            const SaleCompletePage()),
-                            (route) => false);
-                  }
-                }, "END SALE"),
-              ),
-            ],
-          )
-        ],
+                            builder: (context) => SaleCompletePage(
+                                  isTransaction: widget.isTransaction,
+                                )),
+                        (route) => false);
+                  }, AppLocalizations.of(context)!.endSaleCaps),
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
