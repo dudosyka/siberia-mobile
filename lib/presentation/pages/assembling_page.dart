@@ -82,110 +82,117 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
               decoration: const BoxDecoration(
                   border: Border(
                       top: BorderSide(color: Color(0xFFD9D9D9), width: 1))),
-              child: Center(
-                child: Opacity(
-                  opacity: isAllSelected ? 1.0 : 0.2,
-                  child: InkWell(
-                    onTap: isAllSelected
-                        ? () {
-                            showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                      backgroundColor: Colors.white,
-                                      surfaceTintColor: Colors.transparent,
-                                      content: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            AppLocalizations.of(context)!
-                                                .wouldAddress,
-                                            style: const TextStyle(
-                                                fontSize: 24,
-                                                fontWeight: FontWeight.w500),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                          const SizedBox(height: 10),
-                                          const Divider(),
-                                          const SizedBox(height: 10),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: Opacity(
+                      opacity: isAllSelected ? 1.0 : 0.2,
+                      child: InkWell(
+                        onTap: isAllSelected
+                            ? () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                          backgroundColor: Colors.white,
+                                          surfaceTintColor: Colors.transparent,
+                                          content: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              outlinedGrayButton(() {
-                                                showDialog(
-                                                    context: context,
-                                                    builder: (context) =>
-                                                        addressModal());
-                                              },
-                                                  AppLocalizations.of(context)!
-                                                      .addAddressCaps),
-                                              const SizedBox(
-                                                width: 18,
+                                              Text(
+                                                AppLocalizations.of(context)!
+                                                    .wouldAddress,
+                                                style: const TextStyle(
+                                                    fontSize: 24,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                                textAlign: TextAlign.center,
                                               ),
-                                              SizedBox(
-                                                width: 96,
-                                                child: grayButton(() {
-                                                  ref
-                                                      .read(cartDataProvider)
-                                                      .approveAssembly();
-                                                  Navigator.pushAndRemoveUntil(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              SaleCompletePage(
-                                                                isTransaction:
-                                                                    widget
-                                                                        .isTransaction,
-                                                              )),
-                                                      (route) => false);
-                                                },
-                                                    AppLocalizations.of(
-                                                            context)!
-                                                        .endSaleCaps),
-                                              ),
+                                              const SizedBox(height: 10),
+                                              const Divider(),
+                                              const SizedBox(height: 10),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  outlinedGrayButton(() {
+                                                    showDialog(
+                                                        context: context,
+                                                        builder: (context) =>
+                                                            addressModal());
+                                                  },
+                                                      AppLocalizations.of(
+                                                              context)!
+                                                          .addAddressCaps),
+                                                  const SizedBox(
+                                                    width: 18,
+                                                  ),
+                                                  grayButton(() {
+                                                    ref
+                                                        .read(cartDataProvider)
+                                                        .approveAssembly();
+                                                    Navigator
+                                                        .pushAndRemoveUntil(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        SaleCompletePage(
+                                                                          isTransaction:
+                                                                              widget.isTransaction,
+                                                                        )),
+                                                            (route) => false);
+                                                  },
+                                                      AppLocalizations.of(
+                                                              context)!
+                                                          .endSaleCaps),
+                                                ],
+                                              )
                                             ],
-                                          )
-                                        ],
-                                      ),
-                                    ));
-                          }
-                        : () {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(
-                                  AppLocalizations.of(context)!.notAllProducts),
-                            ));
-                          },
-                    child: Stack(
-                      children: [
-                        Center(
-                          child: Container(
-                            width: 68,
-                            height: 68,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                color: const Color(0xFFDFDFDF)),
-                          ),
+                                          ),
+                                        ));
+                              }
+                            : () {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content: Text(AppLocalizations.of(context)!
+                                      .notAllProducts),
+                                ));
+                              },
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Center(
+                              child: Container(
+                                width: 68,
+                                height: 68,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(50),
+                                    color: const Color(0xFFDFDFDF)),
+                              ),
+                            ),
+                            Center(
+                              child: Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(50),
+                                      color: Colors.black),
+                                  child: Center(
+                                    child: Image.asset(
+                                      "assets/images/approve_assembly_icon.png",
+                                      scale: 4,
+                                    ),
+                                  )),
+                            ),
+                          ],
                         ),
-                        Center(
-                          child: Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(50),
-                                  color: Colors.black),
-                              child: Center(
-                                child: Image.asset(
-                                  "assets/images/approve_assembly_icon.png",
-                                  scale: 4,
-                                ),
-                              )),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+                ],
               )),
         ),
         body: SafeArea(
@@ -271,11 +278,11 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
             const Divider(
               height: 1,
             ),
-            SizedBox(
-                height: 58 * widget.cartData.length + 56,
-                child:
-                    getProductListWidget(Theme.of(context), widget.cartData)),
-            const Expanded(flex: 3, child: Center(child: VerticalDivider()))
+            Expanded(
+              flex: 6,
+              child: getProductListWidget(Theme.of(context), widget.cartData),
+            ),
+            const Center(child: VerticalDivider())
           ],
         )),
       ),
@@ -654,19 +661,16 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                 const SizedBox(
                   width: 18,
                 ),
-                SizedBox(
-                  width: 96,
-                  child: grayButton(() {
-                    ref.read(cartDataProvider).approveAssembly();
-                    Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SaleCompletePage(
-                                  isTransaction: widget.isTransaction,
-                                )),
-                        (route) => false);
-                  }, AppLocalizations.of(context)!.endSaleCaps),
-                ),
+                grayButton(() {
+                  ref.read(cartDataProvider).approveAssembly();
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SaleCompletePage(
+                                isTransaction: widget.isTransaction,
+                              )),
+                      (route) => false);
+                }, AppLocalizations.of(context)!.endSaleCaps),
               ],
             )
           ],

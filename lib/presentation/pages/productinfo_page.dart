@@ -1,7 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:collection/collection.dart';
 import 'package:dots_indicator/dots_indicator.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile_app_slb/data/models/availability_model.dart';
 import 'package:mobile_app_slb/presentation/states/assortment_state.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -19,7 +23,8 @@ class ProductInfoPage extends ConsumerStatefulWidget {
       required this.photos,
       required this.sku,
       required this.ean,
-      required this.count});
+      required this.count,
+      required this.availabilityModel});
 
   final int productId;
   final String name;
@@ -27,6 +32,7 @@ class ProductInfoPage extends ConsumerStatefulWidget {
   final String sku;
   final String ean;
   final double count;
+  final List<AvailabilityModel> availabilityModel;
 
   @override
   ConsumerState<ProductInfoPage> createState() => _ProductInfoPageState();
@@ -477,6 +483,25 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                               ],
                             ),
                           ),
+                          const SizedBox(height: 10),
+                          const Divider(),
+                          const SizedBox(height: 10),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12, right: 12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "IN STOCK",
+                                  style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xFF909090)),
+                                ),
+                                getAvailability()
+                              ],
+                            ),
+                          ),
                           const SizedBox(height: 20),
                         ],
                       ),
@@ -502,6 +527,72 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
             )
           ],
         ),
+      ),
+    );
+  }
+
+  Widget getAvailability() {
+    return SizedBox(
+      height: widget.availabilityModel.length * 75,
+      child: ListView(
+        children: widget.availabilityModel
+            .mapIndexed((index, e) => Column(
+                  children: [
+                    index == 0
+                        ? Container()
+                        : const Divider(
+                            height: 1,
+                          ),
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(top: 6),
+                            child: Icon(
+                              Icons.place,
+                              color: Colors.black,
+                              size: 16,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width:
+                                    MediaQuery.of(context).size.shortestSide >
+                                            650
+                                        ? 500
+                                        : 300,
+                                child: Text(
+                                  e.name,
+                                  style: const TextStyle(fontSize: 16),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Text(
+                                e.address,
+                                style: const TextStyle(
+                                    fontSize: 16, color: Color(0xFF969696)),
+                                overflow: TextOverflow.ellipsis,
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                    index == widget.availabilityModel.length - 1
+                        ? const Divider(
+                            height: 1,
+                          )
+                        : Container()
+                  ],
+                ))
+            .toList(),
       ),
     );
   }

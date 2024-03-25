@@ -91,27 +91,18 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                 context, AppLocalizations.of(context)!.areYouSure);
           }).then((returned) {
         if (returned) {
-          ref
-              .read(cartDataProvider)
-              .deleteOutcome();
+          ref.read(cartDataProvider).deleteOutcome();
           if (widget.isTransaction) {
-            ref
-                .read(deleteAuthProvider)
-                .deleteAuth();
-            Future.microtask(() =>
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                        const AuthPage()),
-                        (route) => false));
+            ref.read(deleteAuthProvider).deleteAuth();
+            Future.microtask(() => Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const AuthPage()),
+                (route) => false));
           } else {
             Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                    const HomePage()),
-                    (route) => false);
+                MaterialPageRoute(builder: (context) => const HomePage()),
+                (route) => false);
           }
         }
       });
@@ -161,7 +152,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  flex: MediaQuery.of(context).size.shortestSide > 650 ? 17 : 5,
+                  flex: 4,
                   child: InkWell(
                     onTap: () {
                       showModalBottomSheet(
@@ -187,10 +178,11 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                 ),
                 Expanded(
                   flex: 2,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Stack(
+                  child: Center(
+                    child: SizedBox(
+                      width: 65,
+                      height: 65,
+                      child: Stack(
                         children: [
                           roundButton(
                               const Icon(
@@ -234,11 +226,11 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                 )
                         ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
                 Expanded(
-                  flex: MediaQuery.of(context).size.shortestSide > 650 ? 17 : 5,
+                  flex: 4,
                   child: InkWell(
                     onTap: () {
                       ref.read(getAvailabilityProvider).changeSearchingState();
@@ -866,22 +858,35 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
               child: ListView(
                 children: data.mapIndexed((index, e) {
                   return InkWell(
-                    onTap: e.quantity == null
-                        ? () async {
-                            await getAvailability(e, context);
-                          }
-                        : () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ProductInfoPage(
+                    onTap: () async {
+                      final availability = await ref
+                          .read(getAvailabilityProvider)
+                          .getAvailability(e.id);
+                      if (availability.errorModel == null) {
+                        if (mounted) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ProductInfoPage(
                                         productId: data[index].id,
                                         name: data[index].name,
                                         photos: data[index].fileNames,
                                         sku: data[index].vendorCode,
                                         ean: data[index].eanCode,
-                                        count: data[index].quantity ?? 0.0)));
-                          },
+                                        count: data[index].quantity ?? 0.0,
+                                        availabilityModel:
+                                            availability.availabilityModel!,
+                                      )));
+                        } else {
+                          ref.read(deleteAuthProvider).deleteAuth();
+                          Future.microtask(() => Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const AuthPage()),
+                              (route) => false));
+                        }
+                      }
+                    },
                     child: Container(
                       height: 58,
                       decoration: BoxDecoration(
@@ -1106,22 +1111,35 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                 itemBuilder: (context, index) {
                   final element = data[index];
                   return InkWell(
-                    onTap: element.quantity == null
-                        ? () async {
-                            await getAvailability(element, context);
-                          }
-                        : () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ProductInfoPage(
+                    onTap: () async {
+                      final availability = await ref
+                          .read(getAvailabilityProvider)
+                          .getAvailability(element.id);
+                      if (availability.errorModel == null) {
+                        if (context.mounted) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ProductInfoPage(
                                         productId: data[index].id,
                                         name: data[index].name,
                                         photos: data[index].fileNames,
                                         sku: data[index].vendorCode,
                                         ean: data[index].eanCode,
-                                        count: data[index].quantity ?? 0.0)));
-                          },
+                                        count: data[index].quantity ?? 0.0,
+                                        availabilityModel:
+                                            availability.availabilityModel!,
+                                      )));
+                        } else {
+                          ref.read(deleteAuthProvider).deleteAuth();
+                          Future.microtask(() => Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const AuthPage()),
+                              (route) => false));
+                        }
+                      }
+                    },
                     child: Container(
                       decoration: BoxDecoration(
                           color: const Color(0xFFF3F3F3),
@@ -2882,35 +2900,31 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                           const SizedBox(
                             width: 18,
                           ),
-                          SizedBox(
-                            width: 96,
-                            child: grayButton(() {
-                              if (int.parse(quantityCont.text) >
-                                  data.quantity!) {
-                                ref.read(cartDataProvider).addToCart(
-                                    CartModel(
-                                        data,
-                                        data.quantity!.toInt(),
-                                        {curPrice: pricesData[curPrice]!},
-                                        pricesData[curPrice]! *
-                                            int.parse(quantityCont.text)),
-                                    widget.storehouseId);
+                          grayButton(() {
+                            if (int.parse(quantityCont.text) > data.quantity!) {
+                              ref.read(cartDataProvider).addToCart(
+                                  CartModel(
+                                      data,
+                                      data.quantity!.toInt(),
+                                      {curPrice: pricesData[curPrice]!},
+                                      pricesData[curPrice]! *
+                                          int.parse(quantityCont.text)),
+                                  widget.storehouseId);
 
-                                Navigator.pop(context, true);
-                              } else {
-                                ref.read(cartDataProvider).addToCart(
-                                    CartModel(
-                                        data,
-                                        int.parse(quantityCont.text),
-                                        {curPrice: pricesData[curPrice]!},
-                                        pricesData[curPrice]! *
-                                            int.parse(quantityCont.text)),
-                                    widget.storehouseId);
-                                ref.read(cartDataProvider).getSum();
-                                Navigator.pop(context, true);
-                              }
-                            }, AppLocalizations.of(context)!.saveCaps),
-                          ),
+                              Navigator.pop(context, true);
+                            } else {
+                              ref.read(cartDataProvider).addToCart(
+                                  CartModel(
+                                      data,
+                                      int.parse(quantityCont.text),
+                                      {curPrice: pricesData[curPrice]!},
+                                      pricesData[curPrice]! *
+                                          int.parse(quantityCont.text)),
+                                  widget.storehouseId);
+                              ref.read(cartDataProvider).getSum();
+                              Navigator.pop(context, true);
+                            }
+                          }, AppLocalizations.of(context)!.saveCaps),
                         ],
                       )
                     ],
@@ -2939,9 +2953,14 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
         insetPadding: const EdgeInsets.all(6),
         title: Row(
           children: [
-            Text(
-              AppLocalizations.of(context)!.cartItemEditCaps,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+            SizedBox(
+              width: MediaQuery.of(context).size.shortestSide > 650 ? 400 : 200,
+              child: Text(
+                AppLocalizations.of(context)!.cartItemEditCaps,
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
             const SizedBox(
               width: 18,
@@ -3248,31 +3267,28 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                           const SizedBox(
                             width: 18,
                           ),
-                          SizedBox(
-                            width: 96,
-                            child: grayButton(() {
-                              data.priceType = {curPrice: pricesData[curPrice]};
-                              data.curPrice = pricesData[curPrice]! *
-                                  int.parse(quantityCont.text);
-                              if (int.parse(quantityCont.text) >
-                                  data.model.quantity!) {
-                                ref.read(cartDataProvider).updateCartModel(
-                                    data,
-                                    false,
-                                    data.model.quantity!.toInt(),
-                                    widget.storehouseId);
-                                Navigator.pop(context, true);
-                              } else {
-                                ref.read(cartDataProvider).updateCartModel(
-                                    data,
-                                    false,
-                                    int.parse(quantityCont.text),
-                                    widget.storehouseId);
-                                ref.read(cartDataProvider).getSum();
-                                Navigator.pop(context, true);
-                              }
-                            }, AppLocalizations.of(context)!.saveCaps),
-                          ),
+                          grayButton(() {
+                            data.priceType = {curPrice: pricesData[curPrice]};
+                            data.curPrice = pricesData[curPrice]! *
+                                int.parse(quantityCont.text);
+                            if (int.parse(quantityCont.text) >
+                                data.model.quantity!) {
+                              ref.read(cartDataProvider).updateCartModel(
+                                  data,
+                                  false,
+                                  data.model.quantity!.toInt(),
+                                  widget.storehouseId);
+                              Navigator.pop(context, true);
+                            } else {
+                              ref.read(cartDataProvider).updateCartModel(
+                                  data,
+                                  false,
+                                  int.parse(quantityCont.text),
+                                  widget.storehouseId);
+                              ref.read(cartDataProvider).getSum();
+                              Navigator.pop(context, true);
+                            }
+                          }, AppLocalizations.of(context)!.saveCaps),
                         ],
                       )
                     ],

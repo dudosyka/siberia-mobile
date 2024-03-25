@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:mobile_app_slb/data/models/assembly_model.dart';
 import 'package:mobile_app_slb/data/models/assortment_model.dart';
 import 'package:mobile_app_slb/data/models/auth_model.dart';
 import 'package:mobile_app_slb/data/models/availability_model.dart';
 import 'package:mobile_app_slb/data/models/brand_model.dart';
+import 'package:mobile_app_slb/data/models/bulksorted_model.dart';
 import 'package:mobile_app_slb/data/models/cart_model.dart';
 import 'package:mobile_app_slb/data/models/category_model.dart';
 import 'package:mobile_app_slb/data/models/collection_model.dart';
@@ -366,6 +368,164 @@ class RemoteData {
       }
       return CurrentStockModel(res.data["transactionData"]["id"],
           res.data["transactionData"]["type"]["id"], curData);
+    } else {
+      return ErrorModel("auth error", 401, "Unauthorized");
+    }
+  }
+
+  Future<dynamic> getBulkAssembly(String token) async {
+    final res = await dio.get("${baseUrl}transaction/assembly",
+        options: Options(validateStatus: (_) => true, headers: {
+          "Content-Type": "application/json",
+          "authorization": "Bearer $token",
+        }));
+
+    if (res.statusCode == 200) {
+      final data =
+          (res.data as List).map((e) => AssemblyModel.fromJson(e)).toList();
+
+      return data;
+    } else {
+      return ErrorModel("auth error", 401, "Unauthorized");
+    }
+  }
+
+  Future<dynamic> getBulkList(String token, List<int> ids) async {
+    final res = await dio.post("${baseUrl}transaction/assembly/products/list",
+        data: ids,
+        options: Options(validateStatus: (_) => true, headers: {
+          "Content-Type": "application/json",
+          "authorization": "Bearer $token",
+        }));
+
+    if (res.statusCode == 200) {
+      List<CartModel> curData = [];
+      for (var element in (res.data as List)) {
+        Map<String, dynamic> curPrice = {};
+
+        if (element["product"]["offertaPrice"] == null) {
+          if (element["product"]["distributorPrice"] <=
+              element["product"]["professionalPrice"]) {
+            curPrice = {"Distribution": element["product"]["distributorPrice"]};
+          } else {
+            curPrice = {
+              "Professional": element["product"]["professionalPrice"]
+            };
+          }
+        } else {
+          if (element["product"]["distributorPrice"] <=
+                  element["product"]["professionalPrice"] &&
+              element["product"]["distributorPrice"] <=
+                  element["product"]["offertaPrice"]) {
+            curPrice = {"Distribution": element["product"]["distributorPrice"]};
+          } else if (element["product"]["professionalPrice"] <=
+                  element["product"]["distributorPrice"] &&
+              element["product"]["professionalPrice"] <=
+                  element["product"]["offertaPrice"]) {
+            curPrice = {
+              "Professional": element["product"]["professionalPrice"]
+            };
+          } else {
+            curPrice = {"Oferta": element["product"]["offertaPrice"]};
+          }
+        }
+
+        curData.add(CartModel(
+            AssortmentModel(
+                element["product"]["id"],
+                element["product"]["name"].toString(),
+                element["product"]["vendorCode"].toString(),
+                element["product"]["commonPrice"],
+                element["product"]["photo"],
+                element["product"]["eanCode"].toString(),
+                double.parse(element["product"]["amountInBox"].toString())),
+            element["amount"].toInt(),
+            curPrice,
+            curPrice[curPrice.keys.first] * element["amount"]));
+      }
+
+      return curData;
+    } else {
+      return ErrorModel("auth error", 401, "Unauthorized");
+    }
+  }
+
+  Future<dynamic> getBulkSorted(String token, List<int> ids) async {
+    final res = await dio.post("${baseUrl}transaction/assembly/products/sorted",
+        data: ids,
+        options: Options(validateStatus: (_) => true, headers: {
+          "Content-Type": "application/json",
+          "authorization": "Bearer $token",
+        }));
+
+    if (res.statusCode == 200) {
+      List<BulkSortedModel> curData = [];
+      for (var element in (res.data as List)) {
+        List<CartModel> curCart = [];
+        for (var element in (element["products"] as List)) {
+          Map<String, dynamic> curPrice = {};
+
+          if (element["product"]["offertaPrice"] == null) {
+            if (element["product"]["distributorPrice"] <=
+                element["product"]["professionalPrice"]) {
+              curPrice = {
+                "Distribution": element["product"]["distributorPrice"]
+              };
+            } else {
+              curPrice = {
+                "Professional": element["product"]["professionalPrice"]
+              };
+            }
+          } else {
+            if (element["product"]["distributorPrice"] <=
+                    element["product"]["professionalPrice"] &&
+                element["product"]["distributorPrice"] <=
+                    element["product"]["offertaPrice"]) {
+              curPrice = {
+                "Distribution": element["product"]["distributorPrice"]
+              };
+            } else if (element["product"]["professionalPrice"] <=
+                    element["product"]["distributorPrice"] &&
+                element["product"]["professionalPrice"] <=
+                    element["product"]["offertaPrice"]) {
+              curPrice = {
+                "Professional": element["product"]["professionalPrice"]
+              };
+            } else {
+              curPrice = {"Oferta": element["product"]["offertaPrice"]};
+            }
+          }
+
+          curCart.add(CartModel(
+              AssortmentModel(
+                  element["product"]["id"],
+                  element["product"]["name"].toString(),
+                  element["product"]["vendorCode"].toString(),
+                  element["product"]["commonPrice"],
+                  element["product"]["photo"],
+                  element["product"]["eanCode"].toString(),
+                  double.parse(element["product"]["amountInBox"].toString())),
+              element["amount"].toInt(),
+              curPrice,
+              curPrice[curPrice.keys.first] * element["amount"]));
+        }
+
+        curData.add(BulkSortedModel(
+            AssemblyModel(
+                element["id"],
+                element["from"]["id"],
+                element["from"]["name"],
+                element["from"]["address"],
+                element["status"]["id"],
+                element["status"]["name"],
+                element["type"]["id"],
+                element["type"]["name"],
+                element["timestamp"]),
+            element["to"],
+            curCart));
+      }
+
+      return curData;
     } else {
       return ErrorModel("auth error", 401, "Unauthorized");
     }

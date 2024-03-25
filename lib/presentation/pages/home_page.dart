@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/presentation/pages/assortment_page.dart';
+import 'package:mobile_app_slb/presentation/pages/bulk_page.dart';
 import 'package:mobile_app_slb/presentation/pages/newsale_page.dart';
 import 'package:mobile_app_slb/presentation/states/home_state.dart';
 import 'package:mobile_app_slb/presentation/widgets/app_drawer.dart';
@@ -160,8 +161,16 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   return homeCard(
                                       "assets/images/bulk_icon.png",
                                       AppLocalizations.of(context)!
-                                          .bulkAssembling,
-                                      () {});
+                                          .bulkAssembling, () {
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (builder) => BulkPage(
+                                                  currentStorehouse:
+                                                      value.stockModel!.name,
+                                                )),
+                                        (route) => false);
+                                  });
                                 } else {
                                   return homeCard(
                                       "assets/images/monitor_icon.png",

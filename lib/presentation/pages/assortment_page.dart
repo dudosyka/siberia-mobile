@@ -690,22 +690,35 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
               child: ListView(
                 children: data.mapIndexed((index, e) {
                   return InkWell(
-                    onTap: e.quantity == null
-                        ? () async {
-                            await getAvailability(e, context);
-                          }
-                        : () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ProductInfoPage(
+                    onTap: () async {
+                      final availability = await ref
+                          .read(getAvailabilityProvider)
+                          .getAvailability(e.id);
+                      if (availability.errorModel == null) {
+                        if (mounted) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ProductInfoPage(
                                         productId: data[index].id,
                                         name: data[index].name,
                                         photos: data[index].fileNames,
                                         sku: data[index].vendorCode,
                                         ean: data[index].eanCode,
-                                        count: data[index].quantity ?? 0.0)));
-                          },
+                                        count: data[index].quantity ?? 0.0,
+                                        availabilityModel:
+                                            availability.availabilityModel!,
+                                      )));
+                        } else {
+                          ref.read(deleteAuthProvider).deleteAuth();
+                          Future.microtask(() => Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const AuthPage()),
+                              (route) => false));
+                        }
+                      }
+                    },
                     child: Container(
                       height: 58,
                       decoration: BoxDecoration(
@@ -874,22 +887,35 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                   final element = data[index];
 
                   return InkWell(
-                    onTap: element.quantity == null
-                        ? () async {
-                            await getAvailability(element, context);
-                          }
-                        : () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ProductInfoPage(
+                    onTap: () async {
+                      final availability = await ref
+                          .read(getAvailabilityProvider)
+                          .getAvailability(element.id);
+                      if (availability.errorModel == null) {
+                        if (context.mounted) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ProductInfoPage(
                                         productId: data[index].id,
                                         name: data[index].name,
                                         photos: data[index].fileNames,
                                         sku: data[index].vendorCode,
                                         ean: data[index].eanCode,
-                                        count: data[index].quantity ?? 0.0)));
-                          },
+                                        count: data[index].quantity ?? 0.0,
+                                        availabilityModel:
+                                            availability.availabilityModel!,
+                                      )));
+                        } else {
+                          ref.read(deleteAuthProvider).deleteAuth();
+                          Future.microtask(() => Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const AuthPage()),
+                              (route) => false));
+                        }
+                      }
+                    },
                     child: Container(
                       decoration: BoxDecoration(
                           color: const Color(0xFFF3F3F3),
@@ -1085,7 +1111,8 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(top: 20, left: 28, right: 28),
+                    padding:
+                        const EdgeInsets.only(top: 20, left: 28, right: 28),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -1185,7 +1212,8 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                                   color: Colors.black
                                                       .withOpacity(0.1)))
                                           : ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.transparent,
+                                              backgroundColor:
+                                                  Colors.transparent,
                                               elevation: 0,
                                               padding: EdgeInsets.zero,
                                             ),
@@ -1193,7 +1221,8 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                         AppLocalizations.of(context)!.available,
                                         style: filters["availability"] == true
                                             ? const TextStyle(
-                                                fontSize: 16, color: Colors.black)
+                                                fontSize: 16,
+                                                color: Colors.black)
                                             : TextStyle(
                                                 fontSize: 16,
                                                 color: Colors.black
@@ -1224,7 +1253,8 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                                   color: Colors.black
                                                       .withOpacity(0.1)))
                                           : ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.transparent,
+                                              backgroundColor:
+                                                  Colors.transparent,
                                               elevation: 0,
                                               padding: EdgeInsets.zero,
                                             ),
@@ -1233,7 +1263,8 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                             .notAvailable,
                                         style: filters["availability"] == false
                                             ? const TextStyle(
-                                                fontSize: 16, color: Colors.black)
+                                                fontSize: 16,
+                                                color: Colors.black)
                                             : TextStyle(
                                                 fontSize: 16,
                                                 color: Colors.black
@@ -1432,7 +1463,8 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                         context,
                                         filteredList,
                                         collectionCont,
-                                        AppLocalizations.of(context)!.collection,
+                                        AppLocalizations.of(context)!
+                                            .collection,
                                         filtersUseCase!.collectionModels!);
                                   }).then((value) => setState(() {
                                     selectedCollections = [];
@@ -1448,9 +1480,10 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                         .isEmpty) {
                                       filters["collection"] = null;
                                     } else {
-                                      filters["collection"] = selectedCollections
-                                          .map((e) => e.id)
-                                          .toList();
+                                      filters["collection"] =
+                                          selectedCollections
+                                              .map((e) => e.id)
+                                              .toList();
                                     }
                                   }));
                             },
@@ -1524,7 +1557,8 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                             onTap: () {
                               final TextEditingController categoryCont =
                                   TextEditingController();
-                              List filteredList = filtersUseCase!.categoryModels!;
+                              List filteredList =
+                                  filtersUseCase!.categoryModels!;
 
                               showDialog(
                                   context: context,
@@ -1743,7 +1777,8 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                         children: [
                                           Text(
                                             element.name,
-                                            style: const TextStyle(fontSize: 16),
+                                            style:
+                                                const TextStyle(fontSize: 16),
                                           ),
                                           filteredList[index].isSelected
                                               ? const Icon(

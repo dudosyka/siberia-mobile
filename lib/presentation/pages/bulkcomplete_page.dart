@@ -1,24 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_app_slb/presentation/pages/home_page.dart';
-import 'package:mobile_app_slb/presentation/states/newsale_state.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'home_page.dart';
 
-import '../states/auth_state.dart';
-import 'auth_page.dart';
-
-class SaleCompletePage extends ConsumerStatefulWidget {
-  const SaleCompletePage({super.key, required this.isTransaction});
-
-  final bool isTransaction;
+class BulkCompletePage extends StatefulWidget {
+  const BulkCompletePage({super.key});
 
   @override
-  ConsumerState<SaleCompletePage> createState() => _SaleCompletePageState();
+  State<BulkCompletePage> createState() => _BulkCompletePageState();
 }
 
-class _SaleCompletePageState extends ConsumerState<SaleCompletePage> {
+class _BulkCompletePageState extends State<BulkCompletePage> {
   Timer? _timer;
 
   @override
@@ -26,17 +19,8 @@ class _SaleCompletePageState extends ConsumerState<SaleCompletePage> {
     super.initState();
 
     _timer = Timer(const Duration(seconds: 5), () {
-      ref.read(cartDataProvider).deleteCart();
-      if (widget.isTransaction) {
-        ref.read(deleteAuthProvider).deleteAuth();
-        Future.microtask(() => Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const AuthPage()),
-            (route) => false));
-      } else {
-        Future.microtask(() => Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const HomePage())));
-      }
+      Future.microtask(() => Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const HomePage())));
     });
   }
 
@@ -80,7 +64,7 @@ class _SaleCompletePageState extends ConsumerState<SaleCompletePage> {
                                   color: Colors.black),
                               child: Center(
                                 child: Image.asset(
-                                  "assets/images/sale_complete_icon.png",
+                                  "assets/images/assembling_complete_icon.png",
                                   scale: 4,
                                 ),
                               )),
@@ -88,18 +72,16 @@ class _SaleCompletePageState extends ConsumerState<SaleCompletePage> {
                       ],
                     ),
                     const SizedBox(height: 36),
-                    Text(
-                      AppLocalizations.of(context)!.saleCompletedCaps,
-                      style: const TextStyle(
+                    const Text(
+                      "ASSEMBLING COMPLETED!",
+                      style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF424242)),
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      widget.isTransaction
-                          ? AppLocalizations.of(context)!.youWillGetAuth
-                          : AppLocalizations.of(context)!.youWillGetBack,
+                      AppLocalizations.of(context)!.youWillGetBack,
                       style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 20,
@@ -116,20 +98,10 @@ class _SaleCompletePageState extends ConsumerState<SaleCompletePage> {
                 padding: const EdgeInsets.only(bottom: 30),
                 child: InkWell(
                   onTap: () {
-                    ref.read(cartDataProvider).deleteCart();
-                    if (widget.isTransaction) {
-                      ref.read(deleteAuthProvider).deleteAuth();
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const AuthPage()),
-                          (route) => false);
-                    } else {
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const HomePage()));
-                    }
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomePage()));
                   },
                   child: Container(
                       width: 152,
@@ -139,9 +111,7 @@ class _SaleCompletePageState extends ConsumerState<SaleCompletePage> {
                           borderRadius: BorderRadius.circular(8)),
                       child: Center(
                         child: Text(
-                          widget.isTransaction
-                              ? AppLocalizations.of(context)!.authCaps
-                              : AppLocalizations.of(context)!.homeCaps,
+                          AppLocalizations.of(context)!.homeCaps,
                           style: const TextStyle(
                               fontSize: 24,
                               color: Colors.white,

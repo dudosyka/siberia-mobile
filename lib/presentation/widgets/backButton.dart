@@ -4,7 +4,7 @@ Widget backButton(void Function() onTap, String text, bool isIcon) {
   return InkWell(
     onTap: onTap,
     child: Container(
-      width: 80,
+      width: 90,
       height: 30,
       decoration: BoxDecoration(
           color: const Color(0xFF3C3C3C),

@@ -148,9 +148,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                   Padding(
                     padding: const EdgeInsets.only(left: 50, right: 50),
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: 320
-                      ),
+                      constraints: const BoxConstraints(maxWidth: 320),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -179,7 +177,8 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                             ),
                           ),
                           const Text("+",
-                              style: TextStyle(fontSize: 40, color: Colors.grey))
+                              style:
+                                  TextStyle(fontSize: 40, color: Colors.grey))
                         ],
                       ),
                     ),
@@ -188,9 +187,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                   Padding(
                     padding: const EdgeInsets.only(left: 50, right: 50),
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                          maxWidth: 320
-                      ),
+                      constraints: const BoxConstraints(maxWidth: 320),
                       child: blackButton(
                           null,
                           ValueListenableBuilder(
