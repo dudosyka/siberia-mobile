@@ -25,222 +25,239 @@ class BulkPage extends ConsumerStatefulWidget {
 class _BulkPageState extends ConsumerState<BulkPage> {
   var scaffoldKey = GlobalKey<ScaffoldState>();
 
+  bool isAscendingDate = true;
+  bool isTappedDate = false;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        key: scaffoldKey,
-        resizeToAvoidBottomInset: false,
-        drawer: const AppDrawer(
-          isAbleToNavigate: false,
-          isAssembly: false,
-          isHomePage: false,
-        ),
-        bottomNavigationBar: SafeArea(
-          child: Container(
-              height: 80,
-              decoration: const BoxDecoration(
-                  border: Border(
-                      top: BorderSide(color: Color(0xFFD9D9D9), width: 1))),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Center(
-                    child: Opacity(
-                      opacity:
-                          ref.watch(bulkProvider).selectedAssemblies.isNotEmpty
+    return MediaQuery(
+        data: MediaQuery.of(context).copyWith(
+            textScaler: MediaQuery.of(context).size.shortestSide > 650
+                ? const TextScaler.linear(1.1)
+                : const TextScaler.linear(1.0)),
+        child: Scaffold(
+            key: scaffoldKey,
+            resizeToAvoidBottomInset: false,
+            drawer: const AppDrawer(
+              isAbleToNavigate: false,
+              isAssembly: false,
+              isHomePage: false,
+            ),
+            bottomNavigationBar: SafeArea(
+              child: Container(
+                  height: 80,
+                  decoration: const BoxDecoration(
+                      border: Border(
+                          top: BorderSide(color: Color(0xFFD9D9D9), width: 1))),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Opacity(
+                          opacity: ref
+                                  .watch(bulkProvider)
+                                  .selectedAssemblies
+                                  .isNotEmpty
                               ? 1.0
                               : 0.2,
-                      child: InkWell(
-                        onTap: ref
-                                .watch(bulkProvider)
-                                .selectedAssemblies
-                                .isNotEmpty
-                            ? () {
-                                showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return exitDialog(context,
-                                          "Are you sure? You wouldn't be able to return");
-                                    }).then((returned) async {
-                                  if (returned) {
-                                    final ids = ref
-                                        .watch(bulkProvider)
-                                        .selectedAssemblies
-                                        .map((e) => e.id)
-                                        .toList();
-                                    final data = await ref
-                                        .read(bulkProvider)
-                                        .getBulkList();
-                                    if (context.mounted) {
-                                      Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  BulkListPage(
-                                                    currentStorehouse: widget
-                                                        .currentStorehouse,
-                                                    cartModels: data,
-                                                    ids: ids,
-                                                  )));
-                                    }
+                          child: InkWell(
+                            onTap: ref
+                                    .watch(bulkProvider)
+                                    .selectedAssemblies
+                                    .isNotEmpty
+                                ? () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return exitDialog(context,
+                                              "Are you sure? You wouldn't be able to return");
+                                        }).then((returned) async {
+                                      if (returned) {
+                                        final ids = ref
+                                            .watch(bulkProvider)
+                                            .selectedAssemblies
+                                            .map((e) => e.id)
+                                            .toList();
+                                        final data = await ref
+                                            .read(bulkProvider)
+                                            .getBulkList();
+                                        if (context.mounted) {
+                                          Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      BulkListPage(
+                                                        currentStorehouse: widget
+                                                            .currentStorehouse,
+                                                        cartModels: data,
+                                                        ids: ids,
+                                                      )));
+                                        }
+                                      }
+                                    });
                                   }
-                                });
-                              }
-                            : () {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text("Select at least one product"),
-                                ));
-                              },
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Center(
-                              child: Container(
-                                width: 68,
-                                height: 68,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(50),
-                                    color: const Color(0xFFDFDFDF)),
-                              ),
-                            ),
-                            Center(
-                              child: Container(
-                                  width: 60,
-                                  height: 60,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(50),
-                                      color: Colors.black),
-                                  child: Center(
-                                    child: Image.asset(
-                                      "assets/images/bulk_boxes_icon.png",
-                                      scale: 4,
-                                    ),
-                                  )),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              )),
-        ),
-        body: SafeArea(
-          child: ref.watch(getBulkProvider).when(
-              data: (value) {
-                if (value.errorModel != null) {
-                  ref.read(deleteAuthProvider).deleteAuth();
-                  Future.microtask(() => Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => const AuthPage()),
-                      (route) => false));
-
-                  return Container();
-                }
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 40, right: 40, left: 40, bottom: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                backButton(() {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return exitDialog(
-                                            context,
-                                            AppLocalizations.of(context)!
-                                                .areYouSure);
-                                      }).then((returned) {
-                                    if (returned) {
-                                      ref.read(bulkProvider).deleteAssemblies();
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const HomePage()),
-                                          (route) => false);
-                                    }
-                                  });
-                                }, AppLocalizations.of(context)!.cancelCaps,
-                                    false),
-                                InkWell(
-                                  onTap: () {
-                                    scaffoldKey.currentState?.openDrawer();
+                                : () {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(const SnackBar(
+                                      content:
+                                          Text("Select at least one product"),
+                                    ));
                                   },
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Center(
                                   child: Container(
-                                    width: 30,
-                                    height: 30,
+                                    width: 68,
+                                    height: 68,
                                     decoration: BoxDecoration(
-                                        color: const Color(0xFF3C3C3C),
-                                        borderRadius: BorderRadius.circular(5)),
-                                    child: const Icon(
-                                      Icons.menu,
-                                      color: Colors.white,
-                                    ),
+                                        borderRadius: BorderRadius.circular(50),
+                                        color: const Color(0xFFDFDFDF)),
                                   ),
+                                ),
+                                Center(
+                                  child: Container(
+                                      width: 60,
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          color: Colors.black),
+                                      child: Center(
+                                        child: Image.asset(
+                                          "assets/images/bulk_boxes_icon.png",
+                                          scale: 4,
+                                        ),
+                                      )),
                                 ),
                               ],
                             ),
-                            const Spacer(),
-                            const Text(
-                              "BULK ASSEMBLY",
-                              style: TextStyle(
-                                  fontSize: 24,
-                                  color: Color(0xFF909090),
-                                  height: 0.5),
-                            ),
-                            const Text(
-                              "Operations",
-                              style: TextStyle(
-                                  fontSize: 36,
-                                  color: Color(0xFF363636),
-                                  fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
-                    const Divider(
-                      height: 1,
-                    ),
-                    Expanded(
-                      flex: 6,
-                      child: getProductListWidget(
-                          Theme.of(context), value.assemblyModels!),
-                    ),
-                    const Center(child: VerticalDivider()),
-                  ],
-                );
-              },
-              error: (error, stacktrace) {
-                return AlertDialog(
-                  title: Text(error.toString()),
-                  actions: [
-                    ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text("Ok"))
-                  ],
-                );
-              },
-              loading: () => const Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.black,
-                    ),
+                    ],
                   )),
-        ));
+            ),
+            body: SafeArea(
+              child: ref.watch(getBulkProvider).when(
+                  data: (value) {
+                    if (value.errorModel != null) {
+                      ref.read(deleteAuthProvider).deleteAuth();
+                      Future.microtask(() => Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AuthPage()),
+                          (route) => false));
+
+                      return Container();
+                    }
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                top: 40, right: 40, left: 40, bottom: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    backButton(() {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return exitDialog(
+                                                context,
+                                                AppLocalizations.of(context)!
+                                                    .areYouSure);
+                                          }).then((returned) {
+                                        if (returned) {
+                                          ref
+                                              .read(bulkProvider)
+                                              .deleteAssemblies();
+                                          Navigator.pushAndRemoveUntil(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const HomePage()),
+                                              (route) => false);
+                                        }
+                                      });
+                                    }, AppLocalizations.of(context)!.cancelCaps,
+                                        false),
+                                    InkWell(
+                                      onTap: () {
+                                        scaffoldKey.currentState?.openDrawer();
+                                      },
+                                      child: Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                            color: const Color(0xFF3C3C3C),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        child: const Icon(
+                                          Icons.menu,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Spacer(),
+                                const Text(
+                                  "BULK ASSEMBLY",
+                                  style: TextStyle(
+                                      fontSize: 24,
+                                      color: Color(0xFF909090),
+                                      height: 0.5),
+                                ),
+                                const Text(
+                                  "Operations",
+                                  style: TextStyle(
+                                      fontSize: 36,
+                                      color: Color(0xFF363636),
+                                      fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const Divider(
+                          height: 1,
+                        ),
+                        Expanded(
+                          flex: 6,
+                          child: getProductListWidget(
+                              Theme.of(context), value.assemblyModels!),
+                        ),
+                        const Center(child: VerticalDivider()),
+                      ],
+                    );
+                  },
+                  error: (error, stacktrace) {
+                    return AlertDialog(
+                      title: Text(error.toString()),
+                      actions: [
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text("Ok"))
+                      ],
+                    );
+                  },
+                  loading: () => const Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.black,
+                        ),
+                      )),
+            )));
   }
 
   Widget getProductListWidget(ThemeData theme, List<AssemblyModel> data) {
@@ -266,16 +283,46 @@ class _BulkPageState extends ConsumerState<BulkPage> {
               const VerticalDivider(
                 color: Color(0xFFD9D9D9),
               ),
-              const Expanded(
+              Expanded(
                 flex: 1,
-                child: Center(
-                  child: Text(
-                    "DATE",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        fontSize: 16),
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          isTappedDate = true;
+                          data.sort((prod1, prod2) => compareString(
+                              isAscendingDate,
+                              prod1.timestamp,
+                              prod2.timestamp));
+                          isAscendingDate = !isAscendingDate;
+                        });
+                      },
+                      child: const Center(
+                        child: Text(
+                          "DATE",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                              fontSize: 16),
+                        ),
+                      ),
+                    ),
+                    isTappedDate
+                        ? isAscendingDate
+                            ? const Icon(
+                                Icons.arrow_downward,
+                                color: Colors.white,
+                                size: 16,
+                              )
+                            : const Icon(
+                                Icons.arrow_upward,
+                                color: Colors.white,
+                                size: 16,
+                              )
+                        : Container(),
+                  ],
                 ),
               ),
             ],
@@ -370,4 +417,7 @@ class _BulkPageState extends ConsumerState<BulkPage> {
       ],
     );
   }
+
+  int compareString(bool ascending, String value1, String value2) =>
+      ascending ? value1.compareTo(value2) : value2.compareTo(value1);
 }

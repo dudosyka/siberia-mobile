@@ -44,491 +44,542 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldKey,
-      resizeToAvoidBottomInset: false,
-      drawer: const AppDrawer(
-        isAbleToNavigate: true,
-        isAssembly: false,
-        isHomePage: false,
-      ),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 2,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(top: 40, right: 40, left: 40),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        backButton(() => Navigator.pop(context),
-                            AppLocalizations.of(context)!.backCaps, true),
-                        InkWell(
-                          onTap: () {
-                            scaffoldKey.currentState?.openDrawer();
-                          },
-                          child: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                                color: const Color(0xFF3C3C3C),
-                                borderRadius: BorderRadius.circular(5)),
-                            child: const Icon(
-                              Icons.menu,
-                              color: Colors.white,
+    return MediaQuery(
+        data: MediaQuery.of(context).copyWith(
+            textScaler: MediaQuery.of(context).size.shortestSide > 650
+                ? const TextScaler.linear(1.1)
+                : const TextScaler.linear(1.0)),
+        child: Scaffold(
+          key: scaffoldKey,
+          resizeToAvoidBottomInset: false,
+          drawer: const AppDrawer(
+            isAbleToNavigate: true,
+            isAssembly: false,
+            isHomePage: false,
+          ),
+          body: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(top: 40, right: 40, left: 40),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            backButton(() => Navigator.pop(context),
+                                AppLocalizations.of(context)!.backCaps, true),
+                            InkWell(
+                              onTap: () {
+                                scaffoldKey.currentState?.openDrawer();
+                              },
+                              child: Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                    color: const Color(0xFF3C3C3C),
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: const Icon(
+                                  Icons.menu,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      const Spacer(),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 40, right: 40),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppLocalizations.of(context)!.singleProductCaps,
+                              style: const TextStyle(
+                                  fontSize: 24,
+                                  color: Color(0xFF909090),
+                                  height: 0.5),
+                            ),
+                            Text(
+                              widget.name,
+                              style: const TextStyle(
+                                  fontSize: 36,
+                                  color: Color(0xFF363636),
+                                  fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(),
+                    ],
                   ),
-                  const Spacer(),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 40, right: 40),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!.singleProductCaps,
-                          style: const TextStyle(
-                              fontSize: 24,
-                              color: Color(0xFF909090),
-                              height: 0.5),
-                        ),
-                        Text(
-                          widget.name,
-                          style: const TextStyle(
-                              fontSize: 36,
-                              color: Color(0xFF363636),
-                              fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Divider(),
-                ],
-              ),
-            ),
-            Expanded(
-              flex: 6,
-              child: ref.watch(getProductInfoProvider(widget.productId)).when(
-                  data: (value) {
-                    if (value.errorModel != null) {
-                      ref.read(deleteAuthProvider).deleteAuth();
-                      Future.microtask(() => Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const AuthPage()),
-                          (route) => false));
+                ),
+                Expanded(
+                  flex: 6,
+                  child:
+                      ref.watch(getProductInfoProvider(widget.productId)).when(
+                          data: (value) {
+                            if (value.errorModel != null) {
+                              ref.read(deleteAuthProvider).deleteAuth();
+                              Future.microtask(() =>
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const AuthPage()),
+                                      (route) => false));
 
-                      return Container();
-                    }
+                              return Container();
+                            }
 
-                    return SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                flex: 1,
-                                child: SizedBox(
-                                  width: 170,
-                                  height: 190,
-                                  child: Stack(
+                            return SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
                                     children: [
-                                      CarouselSlider(
-                                          items: widget.photos != null
-                                              ? widget.photos!.map((e) {
-                                                  return Image.network(
-                                                    "${baseUrl}file/stream/$e",
-                                                    width: 160,
-                                                    height: 160,
-                                                    errorBuilder: (context, obj,
-                                                        stacktrace) {
-                                                      return const Icon(
-                                                        Icons.camera_alt,
-                                                        color:
-                                                            Color(0xFF909090),
-                                                      );
-                                                    },
-                                                    loadingBuilder: (context,
-                                                        widget, event) {
-                                                      if (event == null) {
-                                                        return widget;
-                                                      }
-                                                      return Center(
-                                                        child: Text(
-                                                          AppLocalizations.of(
-                                                                  context)!
-                                                              .loading,
-                                                          style: const TextStyle(
+                                      Expanded(
+                                        flex: 1,
+                                        child: SizedBox(
+                                          width: 170,
+                                          height: 190,
+                                          child: Stack(
+                                            children: [
+                                              CarouselSlider(
+                                                  items: widget.photos != null
+                                                      ? widget.photos!.map((e) {
+                                                          return Image.network(
+                                                            "${baseUrl}file/stream/$e",
+                                                            width: 160,
+                                                            height: 160,
+                                                            errorBuilder:
+                                                                (context, obj,
+                                                                    stacktrace) {
+                                                              return const Icon(
+                                                                Icons
+                                                                    .camera_alt,
+                                                                color: Color(
+                                                                    0xFF909090),
+                                                              );
+                                                            },
+                                                            loadingBuilder:
+                                                                (context,
+                                                                    widget,
+                                                                    event) {
+                                                              if (event ==
+                                                                  null) {
+                                                                return widget;
+                                                              }
+                                                              return Center(
+                                                                child: Text(
+                                                                  AppLocalizations.of(
+                                                                          context)!
+                                                                      .loading,
+                                                                  style: const TextStyle(
+                                                                      color: Color(
+                                                                          0xFF909090)),
+                                                                ),
+                                                              );
+                                                            },
+                                                            fit: BoxFit.contain,
+                                                          );
+                                                        }).toList()
+                                                      : [
+                                                          Image.network(
+                                                            "",
+                                                            errorBuilder: (context,
+                                                                    obj,
+                                                                    stacktrace) =>
+                                                                const Icon(
+                                                              Icons.camera_alt,
                                                               color: Color(
-                                                                  0xFF909090)),
-                                                        ),
-                                                      );
+                                                                  0xFF909090),
+                                                            ),
+                                                            loadingBuilder:
+                                                                (context,
+                                                                    widget,
+                                                                    event) {
+                                                              if (event ==
+                                                                  null) {
+                                                                return widget;
+                                                              }
+                                                              return Center(
+                                                                child: Text(
+                                                                  AppLocalizations.of(
+                                                                          context)!
+                                                                      .loading,
+                                                                  style: const TextStyle(
+                                                                      color: Color(
+                                                                          0xFF909090)),
+                                                                ),
+                                                              );
+                                                            },
+                                                            fit: BoxFit.cover,
+                                                          )
+                                                        ],
+                                                  options: CarouselOptions(
+                                                    viewportFraction: 1,
+                                                    height: 170,
+                                                    onPageChanged:
+                                                        (index, reason) {
+                                                      setState(() {
+                                                        currentIndex = index;
+                                                      });
                                                     },
-                                                    fit: BoxFit.contain,
-                                                  );
-                                                }).toList()
-                                              : [
-                                                  Image.network(
-                                                    "",
-                                                    errorBuilder: (context, obj,
-                                                            stacktrace) =>
-                                                        const Icon(
-                                                      Icons.camera_alt,
-                                                      color: Color(0xFF909090),
-                                                    ),
-                                                    loadingBuilder: (context,
-                                                        widget, event) {
-                                                      if (event == null) {
-                                                        return widget;
-                                                      }
-                                                      return Center(
-                                                        child: Text(
-                                                          AppLocalizations.of(
-                                                                  context)!
-                                                              .loading,
-                                                          style: const TextStyle(
-                                                              color: Color(
-                                                                  0xFF909090)),
-                                                        ),
-                                                      );
-                                                    },
-                                                    fit: BoxFit.cover,
-                                                  )
-                                                ],
-                                          options: CarouselOptions(
-                                            viewportFraction: 1,
-                                            height: 170,
-                                            onPageChanged: (index, reason) {
-                                              setState(() {
-                                                currentIndex = index;
-                                              });
-                                            },
-                                          )),
-                                      Align(
-                                        alignment: Alignment.bottomCenter,
-                                        child: DotsIndicator(
-                                          dotsCount: widget.photos != null
-                                              ? widget.photos!.length
-                                              : 1,
-                                          position: currentIndex,
-                                          decorator: DotsDecorator(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        15.0)),
-                                            activeShape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        15.0)),
-                                            size: const Size(6, 6),
+                                                  )),
+                                              Align(
+                                                alignment:
+                                                    Alignment.bottomCenter,
+                                                child: DotsIndicator(
+                                                  dotsCount: widget.photos !=
+                                                          null
+                                                      ? widget.photos!.length
+                                                      : 1,
+                                                  position: currentIndex,
+                                                  decorator: DotsDecorator(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        15.0)),
+                                                    activeShape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        15.0)),
+                                                    size: const Size(6, 6),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
                                           ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .quantityCaps,
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Color(0xFF909090)),
+                                            ),
+                                            Text(
+                                              widget.count.toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0xFF363636)),
+                                            ),
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .skuCaps,
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Color(0xFF909090)),
+                                            ),
+                                            Text(
+                                              widget.sku,
+                                              style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0xFF363636)),
+                                            ),
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .eanCaps,
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Color(0xFF909090)),
+                                            ),
+                                            Text(
+                                              widget.ean,
+                                              style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0xFF363636)),
+                                            )
+                                          ],
                                         ),
                                       )
                                     ],
                                   ),
-                                ),
+                                  const SizedBox(height: 10),
+                                  const Divider(),
+                                  const SizedBox(height: 10),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 12, right: 12),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .brandCaps,
+                                              style: const TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Color(0xFF909090)),
+                                            ),
+                                            Text(
+                                              value.productModel!.brand,
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0xFF363636)),
+                                            ),
+                                          ],
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .collectionCaps,
+                                              style: const TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Color(0xFF909090)),
+                                            ),
+                                            Text(
+                                              value.productModel!.collection,
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0xFF363636)),
+                                            ),
+                                          ],
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .colorCaps,
+                                              style: const TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Color(0xFF909090)),
+                                            ),
+                                            Text(
+                                              value.productModel!.color,
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0xFF363636)),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  const Divider(),
+                                  const SizedBox(height: 10),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 12, right: 12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          AppLocalizations.of(context)!
+                                              .descriptionCaps,
+                                          style: const TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xFF909090)),
+                                        ),
+                                        Text(
+                                          value.productModel!.description,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFF363636)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  const Divider(),
+                                  const SizedBox(height: 10),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 12, right: 12),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .defaultPriceCaps,
+                                              style: const TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Color(0xFF909090)),
+                                            ),
+                                            Text(
+                                              value.productModel!.commonPrice
+                                                  .toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0xFF363636)),
+                                            ),
+                                          ],
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .distributionPriceCaps,
+                                              style: const TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Color(0xFF909090)),
+                                            ),
+                                            Text(
+                                              value.productModel!
+                                                  .distributionPrice
+                                                  .toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0xFF363636)),
+                                            ),
+                                          ],
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .professionalPriceCaps,
+                                              style: const TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Color(0xFF909090)),
+                                            ),
+                                            Text(
+                                              value.productModel!
+                                                  .professionalPrice
+                                                  .toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0xFF363636)),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 12, right: 12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          AppLocalizations.of(context)!
+                                              .ofertaPriceCaps,
+                                          style: const TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xFF909090)),
+                                        ),
+                                        Text(
+                                          value.productModel!.offertaPrice
+                                              .toString(),
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFF363636)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  const Divider(),
+                                  const SizedBox(height: 10),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 12, right: 12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          "IN STOCK",
+                                          style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xFF909090)),
+                                        ),
+                                        getAvailability()
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                ],
                               ),
-                              Expanded(
-                                flex: 1,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      AppLocalizations.of(context)!
-                                          .quantityCaps,
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF909090)),
-                                    ),
-                                    Text(
-                                      widget.count.toString(),
-                                      style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF363636)),
-                                    ),
-                                    Text(
-                                      AppLocalizations.of(context)!.skuCaps,
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF909090)),
-                                    ),
-                                    Text(
-                                      widget.sku,
-                                      style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF363636)),
-                                    ),
-                                    Text(
-                                      AppLocalizations.of(context)!.eanCaps,
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF909090)),
-                                    ),
-                                    Text(
-                                      widget.ean,
-                                      style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF363636)),
-                                    )
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          const Divider(),
-                          const SizedBox(height: 10),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12, right: 12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      AppLocalizations.of(context)!.brandCaps,
-                                      style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF909090)),
-                                    ),
-                                    Text(
-                                      value.productModel!.brand,
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF363636)),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      AppLocalizations.of(context)!
-                                          .collectionCaps,
-                                      style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF909090)),
-                                    ),
-                                    Text(
-                                      value.productModel!.collection,
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF363636)),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      AppLocalizations.of(context)!.colorCaps,
-                                      style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF909090)),
-                                    ),
-                                    Text(
-                                      value.productModel!.color,
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF363636)),
-                                    ),
-                                  ],
-                                )
+                            );
+                          },
+                          error: (error, stacktrace) {
+                            return AlertDialog(
+                              title: Text(error.toString()),
+                              actions: [
+                                ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text("Ok"))
                               ],
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          const Divider(),
-                          const SizedBox(height: 10),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12, right: 12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  AppLocalizations.of(context)!.descriptionCaps,
-                                  style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xFF909090)),
+                            );
+                          },
+                          loading: () => const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.black,
                                 ),
-                                Text(
-                                  value.productModel!.description,
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF363636)),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          const Divider(),
-                          const SizedBox(height: 10),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12, right: 12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      AppLocalizations.of(context)!
-                                          .defaultPriceCaps,
-                                      style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF909090)),
-                                    ),
-                                    Text(
-                                      value.productModel!.commonPrice
-                                          .toString(),
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF363636)),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      AppLocalizations.of(context)!
-                                          .distributionPriceCaps,
-                                      style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF909090)),
-                                    ),
-                                    Text(
-                                      value.productModel!.distributionPrice
-                                          .toString(),
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF363636)),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      AppLocalizations.of(context)!
-                                          .professionalPriceCaps,
-                                      style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF909090)),
-                                    ),
-                                    Text(
-                                      value.productModel!.professionalPrice
-                                          .toString(),
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF363636)),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12, right: 12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  AppLocalizations.of(context)!.ofertaPriceCaps,
-                                  style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xFF909090)),
-                                ),
-                                Text(
-                                  value.productModel!.offertaPrice.toString(),
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF363636)),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          const Divider(),
-                          const SizedBox(height: 10),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12, right: 12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "IN STOCK",
-                                  style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xFF909090)),
-                                ),
-                                getAvailability()
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                        ],
-                      ),
-                    );
-                  },
-                  error: (error, stacktrace) {
-                    return AlertDialog(
-                      title: Text(error.toString()),
-                      actions: [
-                        ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text("Ok"))
-                      ],
-                    );
-                  },
-                  loading: () => const Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.black,
-                        ),
-                      )),
-            )
-          ],
-        ),
-      ),
-    );
+                              )),
+                )
+              ],
+            ),
+          ),
+        ));
   }
 
   Widget getAvailability() {

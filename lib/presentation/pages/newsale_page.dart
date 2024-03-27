@@ -112,487 +112,530 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false,
-      onPopInvoked: (didPop) async {
-        if (didPop) {
-          return;
-        }
-        final navigator = Navigator.of(context);
-
-        showDialog(
-            context: context,
-            builder: (context) {
-              return exitDialog(
-                  context, AppLocalizations.of(context)!.areYouSure);
-            }).then((returned) {
-          if (returned) {
-            ref.read(cartDataProvider).deleteOutcome();
-            navigator.pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomePage()),
-                (route) => false);
+        canPop: false,
+        onPopInvoked: (didPop) async {
+          if (didPop) {
+            return;
           }
-        });
-      },
-      child: Scaffold(
-        key: scaffoldKey,
-        resizeToAvoidBottomInset: false,
-        drawer: const AppDrawer(
-          isAbleToNavigate: false,
-          isAssembly: false,
-          isHomePage: false,
-        ),
-        bottomNavigationBar: SafeArea(
-          child: Container(
-            height: 80,
-            decoration: const BoxDecoration(
-                border: Border(
-                    top: BorderSide(color: Color(0xFFD9D9D9), width: 1))),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: InkWell(
-                    onTap: () {
-                      showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (context) => filtersBottomSheet(context));
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "assets/images/assortment_filter_icon.png",
-                          scale: 4,
+          final navigator = Navigator.of(context);
+
+          showDialog(
+              context: context,
+              builder: (context) {
+                return exitDialog(
+                    context, AppLocalizations.of(context)!.areYouSure);
+              }).then((returned) {
+            if (returned) {
+              ref.read(cartDataProvider).deleteOutcome();
+              navigator.pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                  (route) => false);
+            }
+          });
+        },
+        child: MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+              textScaler: MediaQuery.of(context).size.shortestSide > 650
+                  ? const TextScaler.linear(1.1)
+                  : const TextScaler.linear(1.0)),
+          child: Scaffold(
+            key: scaffoldKey,
+            resizeToAvoidBottomInset: false,
+            drawer: const AppDrawer(
+              isAbleToNavigate: false,
+              isAssembly: false,
+              isHomePage: false,
+            ),
+            bottomNavigationBar: SafeArea(
+              child: Container(
+                height: 80,
+                decoration: const BoxDecoration(
+                    border: Border(
+                        top: BorderSide(color: Color(0xFFD9D9D9), width: 1))),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 4,
+                      child: InkWell(
+                        onTap: () {
+                          showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (context) =>
+                                  filtersBottomSheet(context));
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/images/assortment_filter_icon.png",
+                              scale: 4,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              AppLocalizations.of(context)!.filters,
+                              style: const TextStyle(fontSize: 12),
+                            )
+                          ],
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          AppLocalizations.of(context)!.filters,
-                          style: const TextStyle(fontSize: 12),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Center(
-                    child: SizedBox(
-                      width: 65,
-                      height: 65,
-                      child: Stack(
-                        children: [
-                          roundButton(
-                              const Icon(
-                                Icons.shopping_cart,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                              60, () {
-                            showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                builder: (context) {
-                                  return cartBottomSheet();
-                                });
-                          }, true),
-                          ref.watch(cartDataProvider).cartData.isEmpty
-                              ? Container()
-                              : Align(
-                                  alignment: Alignment.topRight,
-                                  child: Container(
-                                    width: 26,
-                                    height: 26,
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(50),
-                                        border: Border.all(
-                                            color: Colors.black, width: 2)),
-                                    child: Center(
-                                      child: Text(
-                                        ref
-                                            .watch(cartDataProvider)
-                                            .cartData
-                                            .length
-                                            .toString(),
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 14),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                        ],
                       ),
                     ),
-                  ),
-                ),
-                Expanded(
-                  flex: 4,
-                  child: InkWell(
-                    onTap: () {
-                      ref.read(getAvailabilityProvider).changeSearchingState();
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "assets/images/assortment_search_icon.png",
-                          scale: 4,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          AppLocalizations.of(context)!.search,
-                          style: const TextStyle(fontSize: 12),
-                        )
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-        body: SafeArea(
-            child: ref.watch(getFiltersProvider).when(
-                data: (value2) {
-                  if (value2.errorModel != null) {
-                    ref.read(deleteAuthProvider).deleteAuth();
-                    Future.microtask(() => Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const AuthPage()),
-                        (route) => false));
-
-                    return Container();
-                  }
-                  filtersUseCase = value2;
-                  return GestureDetector(
-                    onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                top: 40, right: 40, left: 40, bottom: 10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    backButton(() {
-                                      showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return exitDialog(
-                                                context,
-                                                AppLocalizations.of(context)!
-                                                    .areYouSure);
-                                          }).then((returned) {
-                                        if (returned) {
-                                          ref
-                                              .read(cartDataProvider)
-                                              .deleteOutcome();
-                                          if (widget.isTransaction) {
+                    Expanded(
+                      flex: 2,
+                      child: Center(
+                        child: SizedBox(
+                          width: 65,
+                          height: 65,
+                          child: Stack(
+                            children: [
+                              roundButton(
+                                  const Icon(
+                                    Icons.shopping_cart,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
+                                  60, () {
+                                showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    builder: (context) {
+                                      return cartBottomSheet();
+                                    });
+                              }, true),
+                              ref.watch(cartDataProvider).cartData.isEmpty
+                                  ? Container()
+                                  : Align(
+                                      alignment: Alignment.topRight,
+                                      child: Container(
+                                        width: 26,
+                                        height: 26,
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            border: Border.all(
+                                                color: Colors.black, width: 2)),
+                                        child: Center(
+                                          child: Text(
                                             ref
-                                                .read(deleteAuthProvider)
-                                                .deleteAuth();
-                                            Future.microtask(() =>
+                                                .watch(cartDataProvider)
+                                                .cartData
+                                                .length
+                                                .toString(),
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 14),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 4,
+                      child: InkWell(
+                        onTap: () {
+                          ref
+                              .read(getAvailabilityProvider)
+                              .changeSearchingState();
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/images/assortment_search_icon.png",
+                              scale: 4,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              AppLocalizations.of(context)!.search,
+                              style: const TextStyle(fontSize: 12),
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            body: SafeArea(
+                child: ref.watch(getFiltersProvider).when(
+                    data: (value2) {
+                      if (value2.errorModel != null) {
+                        ref.read(deleteAuthProvider).deleteAuth();
+                        Future.microtask(() => Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const AuthPage()),
+                            (route) => false));
+
+                        return Container();
+                      }
+                      filtersUseCase = value2;
+                      return GestureDetector(
+                        onTap: () =>
+                            FocusManager.instance.primaryFocus?.unfocus(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 40, right: 40, left: 40, bottom: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        backButton(() {
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return exitDialog(
+                                                    context,
+                                                    AppLocalizations.of(
+                                                            context)!
+                                                        .areYouSure);
+                                              }).then((returned) {
+                                            if (returned) {
+                                              ref
+                                                  .read(cartDataProvider)
+                                                  .deleteOutcome();
+                                              if (widget.isTransaction) {
+                                                ref
+                                                    .read(deleteAuthProvider)
+                                                    .deleteAuth();
+                                                Future.microtask(() => Navigator
+                                                    .pushAndRemoveUntil(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                const AuthPage()),
+                                                        (route) => false));
+                                              } else {
                                                 Navigator.pushAndRemoveUntil(
                                                     context,
                                                     MaterialPageRoute(
                                                         builder: (context) =>
-                                                            const AuthPage()),
-                                                    (route) => false));
-                                          } else {
-                                            Navigator.pushAndRemoveUntil(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const HomePage()),
-                                                (route) => false);
-                                          }
-                                        }
-                                      });
-                                    }, AppLocalizations.of(context)!.cancelCaps,
-                                        false),
-                                    InkWell(
-                                      onTap: () {
-                                        scaffoldKey.currentState?.openDrawer();
-                                      },
-                                      child: Container(
-                                        width: 30,
-                                        height: 30,
-                                        decoration: BoxDecoration(
-                                            color: const Color(0xFF3C3C3C),
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        child: const Icon(
-                                          Icons.menu,
-                                          color: Colors.white,
+                                                            const HomePage()),
+                                                    (route) => false);
+                                              }
+                                            }
+                                          });
+                                        },
+                                            AppLocalizations.of(context)!
+                                                .cancelCaps,
+                                            false),
+                                        InkWell(
+                                          onTap: () {
+                                            scaffoldKey.currentState
+                                                ?.openDrawer();
+                                          },
+                                          child: Container(
+                                            width: 30,
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                                color: const Color(0xFF3C3C3C),
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
+                                            child: const Icon(
+                                              Icons.menu,
+                                              color: Colors.white,
+                                            ),
+                                          ),
                                         ),
+                                      ],
+                                    ),
+                                    const Spacer(),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 10),
+                                      child: Text(
+                                        AppLocalizations.of(context)!
+                                            .newSaleCaps,
+                                        style: const TextStyle(
+                                            fontSize: 24,
+                                            color: Color(0xFF909090),
+                                            height: 0.5),
                                       ),
+                                    ),
+                                    Text(
+                                      widget.currentStorehouse,
+                                      style: const TextStyle(
+                                          fontSize: 36,
+                                          color: Color(0xFF363636),
+                                          fontWeight: FontWeight.bold),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),
-                                const Spacer(),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 10),
-                                  child: Text(
-                                    AppLocalizations.of(context)!.newSaleCaps,
-                                    style: const TextStyle(
-                                        fontSize: 24,
-                                        color: Color(0xFF909090),
-                                        height: 0.5),
-                                  ),
-                                ),
-                                Text(
-                                  widget.currentStorehouse,
-                                  style: const TextStyle(
-                                      fontSize: 36,
-                                      color: Color(0xFF363636),
-                                      fontWeight: FontWeight.bold),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const Divider(),
-                        Expanded(
-                          flex: 8,
-                          child: Column(
-                            children: [
-                              ref.watch(getAvailabilityProvider).isSearching
-                                  ? Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 40, right: 40),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            flex: 6,
-                                            child: SizedBox(
-                                              height: 40,
-                                              child: TextFormField(
-                                                controller: searchCont,
-                                                cursorColor: Colors.black,
-                                                decoration: InputDecoration(
-                                                  contentPadding:
-                                                      EdgeInsets.zero,
-                                                  fillColor:
-                                                      const Color(0xFFFCFCFC),
-                                                  border: OutlineInputBorder(
-                                                      borderSide:
-                                                          const BorderSide(
-                                                              color: Color(
-                                                                  0xFFCFCFCF)),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5)),
-                                                  focusedBorder:
-                                                      OutlineInputBorder(
-                                                          borderSide:
-                                                              const BorderSide(
-                                                                  color: Colors
-                                                                      .black),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(5)),
-                                                  prefixIcon: const Icon(
-                                                    Icons.search,
-                                                    color: Color(0xFF5F5F5F),
-                                                  ),
-                                                  hintText: AppLocalizations.of(
-                                                          context)!
-                                                      .search,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            width: 20,
-                                          ),
-                                          Expanded(
-                                            flex: 1,
-                                            child: SizedBox(
-                                              height: 40,
-                                              child: ElevatedButton(
-                                                  onPressed: () {
-                                                    FocusManager
-                                                        .instance.primaryFocus
-                                                        ?.unfocus();
-                                                    setState(() {
-                                                      filters["name"] =
-                                                          searchCont.text;
-                                                    });
-                                                    ref
-                                                        .refresh(
-                                                            getAssortmentProvider(
-                                                                filters))
-                                                        .value;
-                                                  },
-                                                  style: ElevatedButton.styleFrom(
-                                                      padding: EdgeInsets.zero,
-                                                      elevation: 0,
-                                                      backgroundColor:
-                                                          Colors.black,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10))),
-                                                  child: const Icon(
-                                                    Icons.search,
-                                                    color: Colors.white,
-                                                  )),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  : Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          AppLocalizations.of(context)!
-                                              .viewCaps,
-                                          style: const TextStyle(
-                                              fontSize: 20,
-                                              color: Color(0xFFAAAAAA)),
-                                        ),
-                                        const SizedBox(
-                                          width: 20,
-                                        ),
-                                        InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              isGrid = false;
-                                            });
-                                          },
-                                          child: Image.asset(
-                                              "assets/images/assortment_text_icon.png",
-                                              scale: 4,
-                                              color: Colors.black.withOpacity(
-                                                  isGrid ? 0.3 : 1)),
-                                        ),
-                                        const SizedBox(
-                                          width: 20,
-                                        ),
-                                        InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              isGrid = true;
-                                            });
-                                          },
-                                          child: Image.asset(
-                                              "assets/images/assortment_grid_icon.png",
-                                              scale: 4,
-                                              color: Colors.black.withOpacity(
-                                                  !isGrid ? 0.3 : 1)),
-                                        ),
-                                        const SizedBox(
-                                          width: 20,
-                                        ),
-                                      ],
-                                    ),
-                              const SizedBox(height: 8),
-                              const Divider(
-                                height: 1,
                               ),
-                              ref.watch(getAssortmentProvider(filters)).when(
-                                  data: (value) {
-                                    if (value.assortmentModel != null &&
-                                        value.errorModel == null) {
-                                      ThemeData theme = Theme.of(context);
-
-                                      if (isGrid) {
-                                        return getProductGridWidget(
-                                            value.assortmentModel!);
-                                      } else {
-                                        return getProductListWidget(
-                                            theme, value.assortmentModel!);
-                                      }
-                                    }
-                                    if (value.errorModel!.statusCode == 401) {
-                                      ref.read(deleteAuthProvider).deleteAuth();
-                                      Future.microtask(() =>
-                                          Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const AuthPage()),
-                                              (route) => false));
-
-                                      return Container();
-                                    }
-                                    return AlertDialog(
-                                      title: Text(value.errorModel!.statusText),
-                                      actions: [
-                                        ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text("Ok"))
-                                      ],
-                                    );
-                                  },
-                                  error: (error, stacktrace) {
-                                    return AlertDialog(
-                                      title: Text(error.toString()),
-                                      actions: [
-                                        ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text("Ok"))
-                                      ],
-                                    );
-                                  },
-                                  loading: () => const Expanded(
-                                        flex: 5,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            CircularProgressIndicator(
-                                              color: Colors.black,
+                            ),
+                            const Divider(),
+                            Expanded(
+                              flex: 8,
+                              child: Column(
+                                children: [
+                                  AnimatedSwitcher(
+                                    duration: const Duration(seconds: 1),
+                                    child: ref
+                                            .watch(getAvailabilityProvider)
+                                            .isSearching
+                                        ? Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 40, right: 40),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  flex: 6,
+                                                  child: SizedBox(
+                                                    height: 40,
+                                                    child: TextFormField(
+                                                      controller: searchCont,
+                                                      textCapitalization:
+                                                          TextCapitalization
+                                                              .words,
+                                                      cursorColor: Colors.black,
+                                                      decoration:
+                                                          InputDecoration(
+                                                        contentPadding:
+                                                            EdgeInsets.zero,
+                                                        fillColor: const Color(
+                                                            0xFFFCFCFC),
+                                                        border: OutlineInputBorder(
+                                                            borderSide:
+                                                                const BorderSide(
+                                                                    color: Color(
+                                                                        0xFFCFCFCF)),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5)),
+                                                        focusedBorder: OutlineInputBorder(
+                                                            borderSide:
+                                                                const BorderSide(
+                                                                    color: Colors
+                                                                        .black),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5)),
+                                                        prefixIcon: const Icon(
+                                                          Icons.search,
+                                                          color:
+                                                              Color(0xFF5F5F5F),
+                                                        ),
+                                                        hintText:
+                                                            AppLocalizations.of(
+                                                                    context)!
+                                                                .search,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Expanded(
+                                                  flex: 1,
+                                                  child: SizedBox(
+                                                    height: 40,
+                                                    child: ElevatedButton(
+                                                        onPressed: () {
+                                                          FocusManager.instance
+                                                              .primaryFocus
+                                                              ?.unfocus();
+                                                          setState(() {
+                                                            filters["name"] =
+                                                                searchCont.text;
+                                                          });
+                                                          ref
+                                                              .refresh(
+                                                                  getAssortmentProvider(
+                                                                      filters))
+                                                              .value;
+                                                        },
+                                                        style: ElevatedButton.styleFrom(
+                                                            padding:
+                                                                EdgeInsets.zero,
+                                                            elevation: 0,
+                                                            backgroundColor:
+                                                                Colors.black,
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10))),
+                                                        child: const Icon(
+                                                          Icons.search,
+                                                          color: Colors.white,
+                                                        )),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                      ))
-                            ],
+                                          )
+                                        : SizedBox(
+                                            height: 40,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                Text(
+                                                  AppLocalizations.of(context)!
+                                                      .viewCaps,
+                                                  style: const TextStyle(
+                                                      fontSize: 20,
+                                                      color: Color(0xFFAAAAAA)),
+                                                ),
+                                                const SizedBox(
+                                                  width: 20,
+                                                ),
+                                                InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      isGrid = false;
+                                                    });
+                                                  },
+                                                  child: Image.asset(
+                                                      "assets/images/assortment_text_icon.png",
+                                                      scale: 4,
+                                                      color: Colors.black
+                                                          .withOpacity(isGrid
+                                                              ? 0.3
+                                                              : 1)),
+                                                ),
+                                                const SizedBox(
+                                                  width: 20,
+                                                ),
+                                                InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      isGrid = true;
+                                                    });
+                                                  },
+                                                  child: Image.asset(
+                                                      "assets/images/assortment_grid_icon.png",
+                                                      scale: 4,
+                                                      color: Colors.black
+                                                          .withOpacity(!isGrid
+                                                              ? 0.3
+                                                              : 1)),
+                                                ),
+                                                const SizedBox(
+                                                  width: 20,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const Divider(
+                                    height: 1,
+                                  ),
+                                  ref
+                                      .watch(getAssortmentProvider(filters))
+                                      .when(
+                                          data: (value) {
+                                            if (value.assortmentModel != null &&
+                                                value.errorModel == null) {
+                                              ThemeData theme =
+                                                  Theme.of(context);
+
+                                              if (isGrid) {
+                                                return getProductGridWidget(
+                                                    value.assortmentModel!);
+                                              } else {
+                                                return getProductListWidget(
+                                                    theme,
+                                                    value.assortmentModel!);
+                                              }
+                                            }
+                                            if (value.errorModel!.statusCode ==
+                                                401) {
+                                              ref
+                                                  .read(deleteAuthProvider)
+                                                  .deleteAuth();
+                                              Future.microtask(() =>
+                                                  Navigator.pushAndRemoveUntil(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              const AuthPage()),
+                                                      (route) => false));
+
+                                              return Container();
+                                            }
+                                            return AlertDialog(
+                                              title: Text(
+                                                  value.errorModel!.statusText),
+                                              actions: [
+                                                ElevatedButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: const Text("Ok"))
+                                              ],
+                                            );
+                                          },
+                                          error: (error, stacktrace) {
+                                            return AlertDialog(
+                                              title: Text(error.toString()),
+                                              actions: [
+                                                ElevatedButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: const Text("Ok"))
+                                              ],
+                                            );
+                                          },
+                                          loading: () => const Expanded(
+                                                flex: 5,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    CircularProgressIndicator(
+                                                      color: Colors.black,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ))
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                    error: (error, stacktrace) {
+                      return AlertDialog(
+                        title: Text(error.toString()),
+                        actions: [
+                          ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text("Ok"))
+                        ],
+                      );
+                    },
+                    loading: () => const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.black,
                           ),
-                        )
-                      ],
-                    ),
-                  );
-                },
-                error: (error, stacktrace) {
-                  return AlertDialog(
-                    title: Text(error.toString()),
-                    actions: [
-                      ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text("Ok"))
-                    ],
-                  );
-                },
-                loading: () => const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.black,
-                      ),
-                    ))),
-      ),
-    );
+                        ))),
+          ),
+        ));
   }
 
   Future<void> getAvailability(AssortmentModel e, BuildContext context) async {
@@ -2427,6 +2470,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
 
   Widget cartBottomSheet() {
     List<CartModel> data = ref.watch(cartDataProvider).cartData;
+    print(data.first.model.quantity);
     double sum = ref.watch(cartDataProvider).sum;
 
     return SafeArea(

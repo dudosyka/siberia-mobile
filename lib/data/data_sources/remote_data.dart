@@ -43,7 +43,7 @@ class RemoteData {
         }));
 
     if (res.statusCode == 200) {
-      final StockModel model = StockModel.fromJson(res.data["stockData"]);
+      final StockModel model = StockModel.fromJson(res.data);
 
       return model;
     } else {
@@ -353,21 +353,33 @@ class RemoteData {
           }
         }
 
-        curData.add(CartModel(
-            AssortmentModel(
-                element["product"]["id"],
-                element["product"]["name"].toString(),
-                element["product"]["vendorCode"].toString(),
-                element["product"]["commonPrice"],
-                element["product"]["photo"],
-                element["product"]["eanCode"].toString(),
-                double.parse(element["product"]["amountInBox"].toString())),
-            element["amount"].toInt(),
-            curPrice,
-            curPrice[curPrice.keys.first] * element["amount"]));
+        final res2 =
+            await dio.get("${baseUrl}product/${element["product"]["id"]}",
+                options: Options(validateStatus: (_) => true, headers: {
+                  "Content-Type": "application/json",
+                  "authorization": "Bearer $token",
+                }));
+
+        if (res2.statusCode == 200) {
+          curData.add(CartModel(
+              AssortmentModel(
+                  element["product"]["id"],
+                  element["product"]["name"].toString(),
+                  element["product"]["vendorCode"].toString(),
+                  element["product"]["commonPrice"],
+                  element["product"]["photo"],
+                  element["product"]["eanCode"].toString(),
+                  res2.data["quantity"]),
+              element["amount"].toInt(),
+              curPrice,
+              curPrice[curPrice.keys.first] * element["amount"]));
+
+          return CurrentStockModel(res.data["transactionData"]["id"],
+              res.data["transactionData"]["type"]["id"], curData);
+        } else {
+          return ErrorModel("auth error", 401, "Unauthorized");
+        }
       }
-      return CurrentStockModel(res.data["transactionData"]["id"],
-          res.data["transactionData"]["type"]["id"], curData);
     } else {
       return ErrorModel("auth error", 401, "Unauthorized");
     }
@@ -529,5 +541,14 @@ class RemoteData {
     } else {
       return ErrorModel("auth error", 401, "Unauthorized");
     }
+  }
+
+  Future<void> bugReport(String token, String description) async {
+    await dio.post("${baseUrl}bug/report",
+        data: {"description": description},
+        options: Options(validateStatus: (_) => true, headers: {
+          "Content-Type": "application/json",
+          "authorization": "Bearer $token",
+        }));
   }
 }

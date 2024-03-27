@@ -36,163 +36,175 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
   Widget build(BuildContext context) {
     bool isAllSelected = allSelected(widget.cartModels);
 
-    return Scaffold(
-        key: scaffoldKey,
-        resizeToAvoidBottomInset: false,
-        drawer: const AppDrawer(
-          isAbleToNavigate: false,
-          isAssembly: false,
-          isHomePage: false,
-        ),
-        bottomNavigationBar: SafeArea(
-          child: Container(
-              height: 80,
-              decoration: const BoxDecoration(
-                  border: Border(
-                      top: BorderSide(color: Color(0xFFD9D9D9), width: 1))),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Center(
-                    child: Opacity(
-                      opacity: isAllSelected ? 1.0 : 0.2,
-                      child: InkWell(
-                        onTap: isAllSelected
-                            ? () async {
-                                final data = await ref
-                                    .read(bulkProvider)
-                                    .getBulkSort(widget.ids);
-                                if (context.mounted) {
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => BulkApprovePage(
-                                                bulkModels: data,
-                                              )));
-                                }
-                              }
-                            : () {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: Text(AppLocalizations.of(context)!
-                                      .notAllProducts),
-                                ));
-                              },
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Center(
-                              child: Container(
-                                width: 68,
-                                height: 68,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(50),
-                                    color: const Color(0xFFDFDFDF)),
-                              ),
+    return MediaQuery(
+        data: MediaQuery.of(context).copyWith(
+            textScaler: MediaQuery.of(context).size.shortestSide > 650
+                ? const TextScaler.linear(1.1)
+                : const TextScaler.linear(1.0)),
+        child: Scaffold(
+            key: scaffoldKey,
+            resizeToAvoidBottomInset: false,
+            drawer: const AppDrawer(
+              isAbleToNavigate: false,
+              isAssembly: false,
+              isHomePage: false,
+            ),
+            bottomNavigationBar: SafeArea(
+              child: Container(
+                  height: 80,
+                  decoration: const BoxDecoration(
+                      border: Border(
+                          top: BorderSide(color: Color(0xFFD9D9D9), width: 1))),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Opacity(
+                          opacity: isAllSelected ? 1.0 : 0.2,
+                          child: InkWell(
+                            onTap: isAllSelected
+                                ? () async {
+                                    final data = await ref
+                                        .read(bulkProvider)
+                                        .getBulkSort(widget.ids);
+                                    if (context.mounted) {
+                                      Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  BulkApprovePage(
+                                                    bulkModels: data,
+                                                  )));
+                                    }
+                                  }
+                                : () {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      content: Text(
+                                          AppLocalizations.of(context)!
+                                              .notAllProducts),
+                                    ));
+                                  },
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Center(
+                                  child: Container(
+                                    width: 68,
+                                    height: 68,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(50),
+                                        color: const Color(0xFFDFDFDF)),
+                                  ),
+                                ),
+                                Center(
+                                  child: Container(
+                                      width: 60,
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          color: Colors.black),
+                                      child: Center(
+                                        child: Image.asset(
+                                          "assets/images/bulk_boxes_icon.png",
+                                          scale: 4,
+                                        ),
+                                      )),
+                                ),
+                              ],
                             ),
-                            Center(
-                              child: Container(
-                                  width: 60,
-                                  height: 60,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(50),
-                                      color: Colors.black),
-                                  child: Center(
-                                    child: Image.asset(
-                                      "assets/images/bulk_boxes_icon.png",
-                                      scale: 4,
-                                    ),
-                                  )),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ],
-              )),
-        ),
-        body: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      top: 40, right: 40, left: 40, bottom: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    ],
+                  )),
+            ),
+            body: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          top: 40, right: 40, left: 40, bottom: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          backButton(() {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return exitDialog(context,
-                                      AppLocalizations.of(context)!.areYouSure);
-                                }).then((returned) {
-                              if (returned) {
-                                Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const HomePage()),
-                                    (route) => false);
-                              }
-                            });
-                          }, AppLocalizations.of(context)!.cancelCaps, false),
-                          InkWell(
-                            onTap: () {
-                              scaffoldKey.currentState?.openDrawer();
-                            },
-                            child: Container(
-                              width: 30,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                  color: const Color(0xFF3C3C3C),
-                                  borderRadius: BorderRadius.circular(5)),
-                              child: const Icon(
-                                Icons.menu,
-                                color: Colors.white,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              backButton(() {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return exitDialog(
+                                          context,
+                                          AppLocalizations.of(context)!
+                                              .areYouSure);
+                                    }).then((returned) {
+                                  if (returned) {
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const HomePage()),
+                                        (route) => false);
+                                  }
+                                });
+                              }, AppLocalizations.of(context)!.cancelCaps,
+                                  false),
+                              InkWell(
+                                onTap: () {
+                                  scaffoldKey.currentState?.openDrawer();
+                                },
+                                child: Container(
+                                  width: 30,
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                      color: const Color(0xFF3C3C3C),
+                                      borderRadius: BorderRadius.circular(5)),
+                                  child: const Icon(
+                                    Icons.menu,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
+                          ),
+                          const Spacer(),
+                          const Text(
+                            "BULK ASSEMBLY",
+                            style: TextStyle(
+                                fontSize: 24,
+                                color: Color(0xFF909090),
+                                height: 0.5),
+                          ),
+                          Text(
+                            widget.currentStorehouse,
+                            style: const TextStyle(
+                                fontSize: 36,
+                                color: Color(0xFF363636),
+                                fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
-                      const Spacer(),
-                      const Text(
-                        "BULK ASSEMBLY",
-                        style: TextStyle(
-                            fontSize: 24,
-                            color: Color(0xFF909090),
-                            height: 0.5),
-                      ),
-                      Text(
-                        widget.currentStorehouse,
-                        style: const TextStyle(
-                            fontSize: 36,
-                            color: Color(0xFF363636),
-                            fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                  const Divider(
+                    height: 1,
+                  ),
+                  Expanded(
+                    flex: 6,
+                    child: getProductListWidget(
+                        Theme.of(context), widget.cartModels),
+                  ),
+                  const Center(child: VerticalDivider()),
+                ],
               ),
-              const Divider(
-                height: 1,
-              ),
-              Expanded(
-                flex: 6,
-                child:
-                    getProductListWidget(Theme.of(context), widget.cartModels),
-              ),
-              const Center(child: VerticalDivider()),
-            ],
-          ),
-        ));
+            )));
   }
 
   Widget getProductListWidget(ThemeData theme, List<CartModel> data) {

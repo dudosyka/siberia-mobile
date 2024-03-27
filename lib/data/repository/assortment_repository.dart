@@ -27,6 +27,11 @@ class AssortmentRepository extends AssortmentRepositoryImpl {
       if (data is List<AssortmentModel>) {
         return AssortmentUseCase(assortmentModel: data);
       }
+      if ((data as ErrorModel).type != "auth error") {
+        await remoteData.bugReport(authData.token,
+            "Endpoint: /product/search, Code: ${data
+                .statusCode}, description: ${data.statusText}");
+      }
       return AssortmentUseCase(errorModel: data);
     }
     return AssortmentUseCase(
@@ -38,10 +43,15 @@ class AssortmentRepository extends AssortmentRepositoryImpl {
     final authData = await localData.getAuthData();
     if (authData != null) {
       final data =
-          await remoteData.getProductAvailability(authData.token, productId);
+      await remoteData.getProductAvailability(authData.token, productId);
 
       if (data is List<AvailabilityModel>) {
         return AvailabilityUseCase(availabilityModel: data);
+      }
+      if ((data as ErrorModel).type != "auth error") {
+        await remoteData.bugReport(authData.token,
+            "Endpoint: product/$productId/availability, Code: ${data
+                .statusCode}, description: ${data.statusText}");
       }
       return AvailabilityUseCase(errorModel: data);
     }
@@ -80,6 +90,11 @@ class AssortmentRepository extends AssortmentRepositoryImpl {
 
       if (data is ProductInfoModel) {
         return ProductInfoUseCase(productModel: data);
+      }
+      if ((data as ErrorModel).type != "auth error") {
+        await remoteData.bugReport(authData.token,
+            "Endpoint: product/$productId, Code: ${data
+                .statusCode}, description: ${data.statusText}");
       }
       return ProductInfoUseCase(errorModel: data);
     }

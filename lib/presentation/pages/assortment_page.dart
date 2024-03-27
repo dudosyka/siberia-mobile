@@ -54,371 +54,401 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldKey,
-      resizeToAvoidBottomInset: false,
-      drawer: const AppDrawer(
-        isAbleToNavigate: true,
-        isAssembly: false,
-        isHomePage: false,
-      ),
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          height: 80,
-          decoration: const BoxDecoration(
-              border:
-                  Border(top: BorderSide(color: Color(0xFFD9D9D9), width: 1))),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              InkWell(
-                onTap: () {
-                  showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (context) => filtersBottomSheet(context));
-                },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      "assets/images/assortment_filter_icon.png",
-                      scale: 4,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      AppLocalizations.of(context)!.filters,
-                      style: const TextStyle(fontSize: 12),
-                    )
-                  ],
-                ),
-              ),
-              InkWell(
-                onTap: () {
-                  ref.read(getAvailabilityProvider).changeSearchingState();
-                },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      "assets/images/assortment_search_icon.png",
-                      scale: 4,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      AppLocalizations.of(context)!.search,
-                      style: const TextStyle(fontSize: 12),
-                    )
-                  ],
-                ),
-              )
-            ],
+    return MediaQuery(
+        data: MediaQuery.of(context).copyWith(
+            textScaler: MediaQuery.of(context).size.shortestSide > 650
+                ? const TextScaler.linear(1.1)
+                : const TextScaler.linear(1.0)),
+        child: Scaffold(
+          key: scaffoldKey,
+          resizeToAvoidBottomInset: false,
+          drawer: const AppDrawer(
+            isAbleToNavigate: true,
+            isAssembly: false,
+            isHomePage: false,
           ),
-        ),
-      ),
-      body: SafeArea(
-          child: ref.watch(getFiltersProvider).when(
-              data: (value2) {
-                if (value2.errorModel != null) {
-                  ref.read(deleteAuthProvider).deleteAuth();
-                  Future.microtask(() => Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => const AuthPage()),
-                      (route) => false));
+          bottomNavigationBar: SafeArea(
+            child: Container(
+              height: 80,
+              decoration: const BoxDecoration(
+                  border: Border(
+                      top: BorderSide(color: Color(0xFFD9D9D9), width: 1))),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (context) => filtersBottomSheet(context));
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          "assets/images/assortment_filter_icon.png",
+                          scale: 4,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          AppLocalizations.of(context)!.filters,
+                          style: const TextStyle(fontSize: 12),
+                        )
+                      ],
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      ref.read(getAvailabilityProvider).changeSearchingState();
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          "assets/images/assortment_search_icon.png",
+                          scale: 4,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          AppLocalizations.of(context)!.search,
+                          style: const TextStyle(fontSize: 12),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+          body: SafeArea(
+              child: ref.watch(getFiltersProvider).when(
+                  data: (value2) {
+                    if (value2.errorModel != null) {
+                      ref.read(deleteAuthProvider).deleteAuth();
+                      Future.microtask(() => Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AuthPage()),
+                          (route) => false));
 
-                  return Container();
-                }
-                filtersUseCase = value2;
-                return GestureDetector(
-                  onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              top: 40, right: 40, left: 40, bottom: 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                      return Container();
+                    }
+                    filtersUseCase = value2;
+                    return GestureDetector(
+                      onTap: () =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 40, right: 40, left: 40, bottom: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  backButton(
-                                      () => Navigator.pop(context),
-                                      AppLocalizations.of(context)!.backCaps,
-                                      true),
-                                  InkWell(
-                                    onTap: () {
-                                      scaffoldKey.currentState?.openDrawer();
-                                    },
-                                    child: Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                          color: const Color(0xFF3C3C3C),
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: const Icon(
-                                        Icons.menu,
-                                        color: Colors.white,
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      backButton(
+                                          () => Navigator.pop(context),
+                                          AppLocalizations.of(context)!
+                                              .backCaps,
+                                          true),
+                                      InkWell(
+                                        onTap: () {
+                                          scaffoldKey.currentState
+                                              ?.openDrawer();
+                                        },
+                                        child: Container(
+                                          width: 30,
+                                          height: 30,
+                                          decoration: BoxDecoration(
+                                              color: const Color(0xFF3C3C3C),
+                                              borderRadius:
+                                                  BorderRadius.circular(5)),
+                                          child: const Icon(
+                                            Icons.menu,
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                       ),
+                                    ],
+                                  ),
+                                  const Spacer(),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .assortmentCaps,
+                                      style: const TextStyle(
+                                          fontSize: 24,
+                                          color: Color(0xFF909090),
+                                          height: 0.5),
                                     ),
+                                  ),
+                                  Text(
+                                    widget.currentStorehouse,
+                                    style: const TextStyle(
+                                        fontSize: 36,
+                                        color: Color(0xFF363636),
+                                        fontWeight: FontWeight.bold),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
-                              const Spacer(),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10),
-                                child: Text(
-                                  AppLocalizations.of(context)!.assortmentCaps,
-                                  style: const TextStyle(
-                                      fontSize: 24,
-                                      color: Color(0xFF909090),
-                                      height: 0.5),
-                                ),
-                              ),
-                              Text(
-                                widget.currentStorehouse,
-                                style: const TextStyle(
-                                    fontSize: 36,
-                                    color: Color(0xFF363636),
-                                    fontWeight: FontWeight.bold),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const Divider(),
-                      Expanded(
-                        flex: 8,
-                        child: Column(
-                          children: [
-                            ref.watch(getAvailabilityProvider).isSearching
-                                ? Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 40, right: 40),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 6,
-                                          child: SizedBox(
-                                            height: 40,
-                                            child: TextFormField(
-                                              controller: searchCont,
-                                              cursorColor: Colors.black,
-                                              decoration: InputDecoration(
-                                                contentPadding: EdgeInsets.zero,
-                                                fillColor:
-                                                    const Color(0xFFFCFCFC),
-                                                border: OutlineInputBorder(
-                                                    borderSide:
-                                                        const BorderSide(
-                                                            color: Color(
-                                                                0xFFCFCFCF)),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5)),
-                                                focusedBorder:
-                                                    OutlineInputBorder(
-                                                        borderSide:
-                                                            const BorderSide(
-                                                                color: Colors
-                                                                    .black),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5)),
-                                                prefixIcon: const Icon(
-                                                  Icons.search,
-                                                  color: Color(0xFF5F5F5F),
-                                                ),
-                                                hintText: AppLocalizations.of(
-                                                        context)!
-                                                    .search,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          width: 20,
-                                        ),
-                                        Expanded(
-                                          flex: 1,
-                                          child: SizedBox(
-                                            height: 40,
-                                            child: ElevatedButton(
-                                                onPressed: () {
-                                                  FocusManager
-                                                      .instance.primaryFocus
-                                                      ?.unfocus();
-                                                  setState(() {
-                                                    filters["name"] =
-                                                        searchCont.text;
-                                                  });
-                                                  ref
-                                                      .refresh(
-                                                          getAssortmentProvider(
-                                                              filters))
-                                                      .value;
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                    padding: EdgeInsets.zero,
-                                                    elevation: 0,
-                                                    backgroundColor:
-                                                        Colors.black,
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10))),
-                                                child: const Icon(
-                                                  Icons.search,
-                                                  color: Colors.white,
-                                                )),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                : Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        AppLocalizations.of(context)!.viewCaps,
-                                        style: const TextStyle(
-                                            fontSize: 20,
-                                            color: Color(0xFFAAAAAA)),
-                                      ),
-                                      const SizedBox(
-                                        width: 20,
-                                      ),
-                                      InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            isGrid = false;
-                                          });
-                                        },
-                                        child: Image.asset(
-                                            "assets/images/assortment_text_icon.png",
-                                            scale: 4,
-                                            color: Colors.black
-                                                .withOpacity(isGrid ? 0.3 : 1)),
-                                      ),
-                                      const SizedBox(
-                                        width: 20,
-                                      ),
-                                      InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            isGrid = true;
-                                          });
-                                        },
-                                        child: Image.asset(
-                                            "assets/images/assortment_grid_icon.png",
-                                            scale: 4,
-                                            color: Colors.black.withOpacity(
-                                                !isGrid ? 0.3 : 1)),
-                                      ),
-                                      const SizedBox(
-                                        width: 20,
-                                      ),
-                                    ],
-                                  ),
-                            const SizedBox(height: 8),
-                            const Divider(
-                              height: 1,
                             ),
-                            ref.watch(getAssortmentProvider(filters)).when(
-                                data: (value) {
-                                  if (value.assortmentModel != null &&
-                                      value.errorModel == null) {
-                                    ThemeData theme = Theme.of(context);
-
-                                    if (isGrid) {
-                                      return getProductGridWidget(
-                                          value.assortmentModel!);
-                                    } else {
-                                      return getProductListWidget(
-                                          theme, value.assortmentModel!);
-                                    }
-                                  }
-                                  if (value.errorModel!.statusCode == 401) {
-                                    ref.read(deleteAuthProvider).deleteAuth();
-                                    Future.microtask(() =>
-                                        Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const AuthPage()),
-                                            (route) => false));
-
-                                    return Container();
-                                  }
-                                  return AlertDialog(
-                                    title: Text(value.errorModel!.statusText),
-                                    actions: [
-                                      ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text("Ok"))
-                                    ],
-                                  );
-                                },
-                                error: (error, stacktrace) {
-                                  return AlertDialog(
-                                    title: Text(error.toString()),
-                                    actions: [
-                                      ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text("Ok"))
-                                    ],
-                                  );
-                                },
-                                loading: () => const Expanded(
-                                      flex: 5,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          CircularProgressIndicator(
-                                            color: Colors.black,
+                          ),
+                          const Divider(),
+                          Expanded(
+                            flex: 8,
+                            child: Column(
+                              children: [
+                                AnimatedSwitcher(
+                                  duration: const Duration(seconds: 1),
+                                  child: ref
+                                          .watch(getAvailabilityProvider)
+                                          .isSearching
+                                      ? Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 40, right: 40),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                flex: 6,
+                                                child: SizedBox(
+                                                  height: 40,
+                                                  child: TextFormField(
+                                                    controller: searchCont,
+                                                    textCapitalization:
+                                                        TextCapitalization
+                                                            .words,
+                                                    cursorColor: Colors.black,
+                                                    decoration: InputDecoration(
+                                                      contentPadding:
+                                                          EdgeInsets.zero,
+                                                      fillColor: const Color(
+                                                          0xFFFCFCFC),
+                                                      border: OutlineInputBorder(
+                                                          borderSide:
+                                                              const BorderSide(
+                                                                  color: Color(
+                                                                      0xFFCFCFCF)),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5)),
+                                                      focusedBorder: OutlineInputBorder(
+                                                          borderSide:
+                                                              const BorderSide(
+                                                                  color: Colors
+                                                                      .black),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5)),
+                                                      prefixIcon: const Icon(
+                                                        Icons.search,
+                                                        color:
+                                                            Color(0xFF5F5F5F),
+                                                      ),
+                                                      hintText:
+                                                          AppLocalizations.of(
+                                                                  context)!
+                                                              .search,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 20,
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: SizedBox(
+                                                  height: 40,
+                                                  child: ElevatedButton(
+                                                      onPressed: () {
+                                                        FocusManager.instance
+                                                            .primaryFocus
+                                                            ?.unfocus();
+                                                        setState(() {
+                                                          filters["name"] =
+                                                              searchCont.text;
+                                                        });
+                                                        ref
+                                                            .refresh(
+                                                                getAssortmentProvider(
+                                                                    filters))
+                                                            .value;
+                                                      },
+                                                      style: ElevatedButton.styleFrom(
+                                                          padding:
+                                                              EdgeInsets.zero,
+                                                          elevation: 0,
+                                                          backgroundColor:
+                                                              Colors.black,
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10))),
+                                                      child: const Icon(
+                                                        Icons.search,
+                                                        color: Colors.white,
+                                                      )),
+                                                ),
+                                              ),
+                                            ],
                                           ),
+                                        )
+                                      : SizedBox(
+                                          height: 40,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              Text(
+                                                AppLocalizations.of(context)!
+                                                    .viewCaps,
+                                                style: const TextStyle(
+                                                    fontSize: 20,
+                                                    color: Color(0xFFAAAAAA)),
+                                              ),
+                                              const SizedBox(
+                                                width: 20,
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    isGrid = false;
+                                                  });
+                                                },
+                                                child: Image.asset(
+                                                    "assets/images/assortment_text_icon.png",
+                                                    scale: 4,
+                                                    color: Colors.black
+                                                        .withOpacity(
+                                                            isGrid ? 0.3 : 1)),
+                                              ),
+                                              const SizedBox(
+                                                width: 20,
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    isGrid = true;
+                                                  });
+                                                },
+                                                child: Image.asset(
+                                                    "assets/images/assortment_grid_icon.png",
+                                                    scale: 4,
+                                                    color: Colors.black
+                                                        .withOpacity(
+                                                            !isGrid ? 0.3 : 1)),
+                                              ),
+                                              const SizedBox(
+                                                width: 20,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                ),
+                                const SizedBox(height: 8),
+                                const Divider(
+                                  height: 1,
+                                ),
+                                ref.watch(getAssortmentProvider(filters)).when(
+                                    data: (value) {
+                                      if (value.assortmentModel != null &&
+                                          value.errorModel == null) {
+                                        ThemeData theme = Theme.of(context);
+
+                                        if (isGrid) {
+                                          return getProductGridWidget(
+                                              value.assortmentModel!);
+                                        } else {
+                                          return getProductListWidget(
+                                              theme, value.assortmentModel!);
+                                        }
+                                      }
+                                      if (value.errorModel!.statusCode == 401) {
+                                        ref
+                                            .read(deleteAuthProvider)
+                                            .deleteAuth();
+                                        Future.microtask(() =>
+                                            Navigator.pushAndRemoveUntil(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const AuthPage()),
+                                                (route) => false));
+
+                                        return Container();
+                                      }
+                                      return AlertDialog(
+                                        title:
+                                            Text(value.errorModel!.statusText),
+                                        actions: [
+                                          ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text("Ok"))
                                         ],
-                                      ),
-                                    ))
-                          ],
+                                      );
+                                    },
+                                    error: (error, stacktrace) {
+                                      return AlertDialog(
+                                        title: Text(error.toString()),
+                                        actions: [
+                                          ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text("Ok"))
+                                        ],
+                                      );
+                                    },
+                                    loading: () => const Expanded(
+                                          flex: 5,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              CircularProgressIndicator(
+                                                color: Colors.black,
+                                              ),
+                                            ],
+                                          ),
+                                        ))
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                  error: (error, stacktrace) {
+                    return AlertDialog(
+                      title: Text(error.toString()),
+                      actions: [
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text("Ok"))
+                      ],
+                    );
+                  },
+                  loading: () => const Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.black,
                         ),
-                      )
-                    ],
-                  ),
-                );
-              },
-              error: (error, stacktrace) {
-                return AlertDialog(
-                  title: Text(error.toString()),
-                  actions: [
-                    ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text("Ok"))
-                  ],
-                );
-              },
-              loading: () => const Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.black,
-                    ),
-                  ))),
-    );
+                      ))),
+        ));
   }
 
   Future<void> getAvailability(AssortmentModel e, BuildContext context) async {

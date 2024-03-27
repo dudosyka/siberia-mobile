@@ -45,6 +45,11 @@ class NewSaleRepository extends NewSaleRepositoryImpl {
       if (data is OutcomeModel) {
         return OutcomeUseCase(outcomeModel: data);
       }
+      if ((data as ErrorModel).type != "auth error") {
+        await remoteData.bugReport(authData.token,
+            "Endpoint: transaction/outcome/hidden, Code: ${data
+                .statusCode}, description: ${data.statusText}");
+      }
       return OutcomeUseCase(errorModel: data);
     }
     return OutcomeUseCase(
@@ -61,6 +66,11 @@ class NewSaleRepository extends NewSaleRepositoryImpl {
 
       if (data is bool) {
         return OutcomeUseCase();
+      }
+      if ((data as ErrorModel).type != "auth error") {
+        await remoteData.bugReport(authData.token,
+            "Endpoint: transaction/outcome/hidden/$transactionId, Code: ${data
+                .statusCode}, description: ${data.statusText}");
       }
       return OutcomeUseCase(errorModel: data);
     }
@@ -94,6 +104,11 @@ class NewSaleRepository extends NewSaleRepositoryImpl {
       if (data is bool) {
         return OutcomeUseCase();
       }
+      if ((data as ErrorModel).type != "auth error") {
+        await remoteData.bugReport(authData.token,
+            "Endpoint: transaction/outcome/$transactionId, Code: ${data
+                .statusCode}, description: ${data.statusText}");
+      }
       return OutcomeUseCase(errorModel: data);
     }
     return OutcomeUseCase(
@@ -126,6 +141,11 @@ class NewSaleRepository extends NewSaleRepositoryImpl {
       if (data is bool) {
         return OutcomeUseCase();
       }
+      if ((data as ErrorModel).type != "auth error") {
+        await remoteData.bugReport(authData.token,
+            "Endpoint: transaction/outcome/$transactionId/approve, Code: ${data
+                .statusCode}, description: ${data.statusText}");
+      }
       return OutcomeUseCase(errorModel: data);
     }
     return OutcomeUseCase(
@@ -140,6 +160,11 @@ class NewSaleRepository extends NewSaleRepositoryImpl {
 
       if (data is CurrentStockModel) {
         return CurrentStockUseCase(currentStock: data);
+      }
+      if ((data as ErrorModel).type != "auth error") {
+        await remoteData.bugReport(authData.token,
+            "Endpoint: auth/mobile/current-stock, Code: ${data
+                .statusCode}, description: ${data.statusText}");
       }
       return CurrentStockUseCase(errorModel: data);
     }

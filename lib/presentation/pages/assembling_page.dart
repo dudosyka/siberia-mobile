@@ -47,246 +47,263 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
     bool isAllSelected = allSelected(widget.cartData);
 
     return PopScope(
-      canPop: false,
-      onPopInvoked: (didPop) async {
-        if (didPop) {
-          return;
-        }
-        final navigator = Navigator.of(context);
-
-        showDialog(
-            context: context,
-            builder: (context) {
-              return exitDialog(
-                  context, AppLocalizations.of(context)!.areYouSure);
-            }).then((returned) {
-          if (returned) {
-            ref.read(cartDataProvider).deleteCart();
-            navigator.pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomePage()),
-                (route) => false);
+        canPop: false,
+        onPopInvoked: (didPop) async {
+          if (didPop) {
+            return;
           }
-        });
-      },
-      child: Scaffold(
-        key: scaffoldKey,
-        resizeToAvoidBottomInset: false,
-        drawer: const AppDrawer(
-          isAbleToNavigate: false,
-          isAssembly: true,
-          isHomePage: false,
-        ),
-        bottomNavigationBar: SafeArea(
-          child: Container(
-              height: 80,
-              decoration: const BoxDecoration(
-                  border: Border(
-                      top: BorderSide(color: Color(0xFFD9D9D9), width: 1))),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Center(
-                    child: Opacity(
-                      opacity: isAllSelected ? 1.0 : 0.2,
-                      child: InkWell(
-                        onTap: isAllSelected
-                            ? () {
-                                showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                          backgroundColor: Colors.white,
-                                          surfaceTintColor: Colors.transparent,
-                                          content: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Text(
-                                                AppLocalizations.of(context)!
-                                                    .wouldAddress,
-                                                style: const TextStyle(
-                                                    fontSize: 24,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                              const SizedBox(height: 10),
-                                              const Divider(),
-                                              const SizedBox(height: 10),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
+          final navigator = Navigator.of(context);
+
+          showDialog(
+              context: context,
+              builder: (context) {
+                return exitDialog(
+                    context, AppLocalizations.of(context)!.areYouSure);
+              }).then((returned) {
+            if (returned) {
+              ref.read(cartDataProvider).deleteCart();
+              navigator.pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                  (route) => false);
+            }
+          });
+        },
+        child: MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+              textScaler: MediaQuery.of(context).size.shortestSide > 650
+                  ? const TextScaler.linear(1.1)
+                  : const TextScaler.linear(1.0)),
+          child: Scaffold(
+            key: scaffoldKey,
+            resizeToAvoidBottomInset: false,
+            drawer: const AppDrawer(
+              isAbleToNavigate: false,
+              isAssembly: true,
+              isHomePage: false,
+            ),
+            bottomNavigationBar: SafeArea(
+              child: Container(
+                  height: 80,
+                  decoration: const BoxDecoration(
+                      border: Border(
+                          top: BorderSide(color: Color(0xFFD9D9D9), width: 1))),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Opacity(
+                          opacity: isAllSelected ? 1.0 : 0.2,
+                          child: InkWell(
+                            onTap: isAllSelected
+                                ? () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                              backgroundColor: Colors.white,
+                                              surfaceTintColor:
+                                                  Colors.transparent,
+                                              content: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
                                                 children: [
-                                                  outlinedGrayButton(() {
-                                                    showDialog(
-                                                        context: context,
-                                                        builder: (context) =>
-                                                            addressModal());
-                                                  },
-                                                      AppLocalizations.of(
-                                                              context)!
-                                                          .addAddressCaps),
-                                                  const SizedBox(
-                                                    width: 18,
+                                                  Text(
+                                                    AppLocalizations.of(
+                                                            context)!
+                                                        .wouldAddress,
+                                                    style: const TextStyle(
+                                                        fontSize: 24,
+                                                        fontWeight:
+                                                            FontWeight.w500),
+                                                    textAlign: TextAlign.center,
                                                   ),
-                                                  grayButton(() {
-                                                    ref
-                                                        .read(cartDataProvider)
-                                                        .approveAssembly();
-                                                    Navigator
-                                                        .pushAndRemoveUntil(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        SaleCompletePage(
-                                                                          isTransaction:
-                                                                              widget.isTransaction,
-                                                                        )),
-                                                            (route) => false);
-                                                  },
-                                                      AppLocalizations.of(
-                                                              context)!
-                                                          .endSaleCaps),
+                                                  const SizedBox(height: 10),
+                                                  const Divider(),
+                                                  const SizedBox(height: 10),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      outlinedGrayButton(() {
+                                                        showDialog(
+                                                            context: context,
+                                                            builder: (context) =>
+                                                                addressModal());
+                                                      },
+                                                          AppLocalizations.of(
+                                                                  context)!
+                                                              .addAddressCaps),
+                                                      const SizedBox(
+                                                        width: 18,
+                                                      ),
+                                                      grayButton(() {
+                                                        ref
+                                                            .read(
+                                                                cartDataProvider)
+                                                            .approveAssembly();
+                                                        Navigator
+                                                            .pushAndRemoveUntil(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            SaleCompletePage(
+                                                                              isTransaction: widget.isTransaction,
+                                                                            )),
+                                                                (route) =>
+                                                                    false);
+                                                      },
+                                                          AppLocalizations.of(
+                                                                  context)!
+                                                              .endSaleCaps),
+                                                    ],
+                                                  )
                                                 ],
-                                              )
-                                            ],
-                                          ),
-                                        ));
-                              }
-                            : () {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: Text(AppLocalizations.of(context)!
-                                      .notAllProducts),
-                                ));
-                              },
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Center(
-                              child: Container(
-                                width: 68,
-                                height: 68,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(50),
-                                    color: const Color(0xFFDFDFDF)),
-                              ),
+                                              ),
+                                            ));
+                                  }
+                                : () {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      content: Text(
+                                          AppLocalizations.of(context)!
+                                              .notAllProducts),
+                                    ));
+                                  },
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Center(
+                                  child: Container(
+                                    width: 68,
+                                    height: 68,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(50),
+                                        color: const Color(0xFFDFDFDF)),
+                                  ),
+                                ),
+                                Center(
+                                  child: Container(
+                                      width: 60,
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          color: Colors.black),
+                                      child: Center(
+                                        child: Image.asset(
+                                          "assets/images/approve_assembly_icon.png",
+                                          scale: 4,
+                                        ),
+                                      )),
+                                ),
+                              ],
                             ),
-                            Center(
-                              child: Container(
-                                  width: 60,
-                                  height: 60,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(50),
-                                      color: Colors.black),
-                                  child: Center(
-                                    child: Image.asset(
-                                      "assets/images/approve_assembly_icon.png",
-                                      scale: 4,
-                                    ),
-                                  )),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ],
-              )),
-        ),
-        body: SafeArea(
-            child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    top: 40, right: 40, left: 40, bottom: 10),
+                    ],
+                  )),
+            ),
+            body: SafeArea(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        top: 40, right: 40, left: 40, bottom: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        backButton(() {
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return exitDialog(context,
-                                    AppLocalizations.of(context)!.areYouSure);
-                              }).then((returned) {
-                            if (returned) {
-                              //ref.read(cartDataProvider).deleteAssembly(widget.transactionId);
-                              if (widget.isTransaction) {
-                                ref.read(deleteAuthProvider).deleteAuth();
-                                Future.microtask(() =>
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            backButton(() {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return exitDialog(
+                                        context,
+                                        AppLocalizations.of(context)!
+                                            .areYouSure);
+                                  }).then((returned) {
+                                if (returned) {
+                                  //ref.read(cartDataProvider).deleteAssembly(widget.transactionId);
+                                  if (widget.isTransaction) {
+                                    ref.read(deleteAuthProvider).deleteAuth();
+                                    Future.microtask(() =>
+                                        Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const AuthPage()),
+                                            (route) => false));
+                                  } else {
+                                    ref.read(cartDataProvider).deleteCart();
                                     Navigator.pushAndRemoveUntil(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                const AuthPage()),
-                                        (route) => false));
-                              } else {
-                                ref.read(cartDataProvider).deleteCart();
-                                Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const HomePage()),
-                                    (route) => false);
-                              }
-                            }
-                          });
-                        }, AppLocalizations.of(context)!.cancelCaps, false),
-                        InkWell(
-                          onTap: () {
-                            scaffoldKey.currentState?.openDrawer();
-                          },
-                          child: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                                color: const Color(0xFF3C3C3C),
-                                borderRadius: BorderRadius.circular(5)),
-                            child: const Icon(
-                              Icons.menu,
-                              color: Colors.white,
+                                                const HomePage()),
+                                        (route) => false);
+                                  }
+                                }
+                              });
+                            }, AppLocalizations.of(context)!.cancelCaps, false),
+                            InkWell(
+                              onTap: () {
+                                scaffoldKey.currentState?.openDrawer();
+                              },
+                              child: Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                    color: const Color(0xFF3C3C3C),
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: const Icon(
+                                  Icons.menu,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
+                        ),
+                        const Spacer(),
+                        Text(
+                          AppLocalizations.of(context)!.cartCaps,
+                          style: const TextStyle(
+                              fontSize: 24,
+                              color: Color(0xFF909090),
+                              height: 0.5),
+                        ),
+                        Text(
+                          AppLocalizations.of(context)!.assemblingCaps,
+                          style: const TextStyle(
+                              fontSize: 36,
+                              color: Color(0xFF363636),
+                              fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
-                    const Spacer(),
-                    Text(
-                      AppLocalizations.of(context)!.cartCaps,
-                      style: const TextStyle(
-                          fontSize: 24, color: Color(0xFF909090), height: 0.5),
-                    ),
-                    Text(
-                      AppLocalizations.of(context)!.assemblingCaps,
-                      style: const TextStyle(
-                          fontSize: 36,
-                          color: Color(0xFF363636),
-                          fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            const Divider(
-              height: 1,
-            ),
-            Expanded(
-              flex: 6,
-              child: getProductListWidget(Theme.of(context), widget.cartData),
-            ),
-            const Center(child: VerticalDivider())
-          ],
-        )),
-      ),
-    );
+                const Divider(
+                  height: 1,
+                ),
+                Expanded(
+                  flex: 6,
+                  child:
+                      getProductListWidget(Theme.of(context), widget.cartData),
+                ),
+                const Center(child: VerticalDivider())
+              ],
+            )),
+          ),
+        ));
   }
 
   Widget getProductListWidget(ThemeData theme, List<CartModel> data) {

@@ -45,6 +45,11 @@ class AuthRepository extends AuthRepositoryImpl {
       if (data is StockModel) {
         return StockUseCase(stockModel: data);
       }
+      if ((data as ErrorModel).type != "auth error") {
+        await remoteData.bugReport(authData.token,
+            "Endpoint: auth/mobile/current-stock, Code: ${data
+                .statusCode}, description: ${data.statusText}");
+      }
       return StockUseCase(errorModel: data);
     }
     return StockUseCase(

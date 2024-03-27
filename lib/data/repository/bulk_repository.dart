@@ -23,6 +23,11 @@ class BulkRepository extends BulkRepositoryImpl {
       if (data is List<AssemblyModel>) {
         return AssemblyUseCase(assemblyModels: data);
       }
+      if ((data as ErrorModel).type != "auth error") {
+        await remoteData.bugReport(authData.token,
+            "Endpoint: transaction/assembly, Code: ${data
+                .statusCode}, description: ${data.statusText}");
+      }
       return AssemblyUseCase(errorModel: data);
     }
     return AssemblyUseCase(
@@ -37,6 +42,11 @@ class BulkRepository extends BulkRepositoryImpl {
 
       if (data is List<CartModel>) {
         return BulkListUseCase(cartModels: data);
+      }
+      if ((data as ErrorModel).type != "auth error") {
+        await remoteData.bugReport(authData.token,
+            "Endpoint: transaction/assembly/products/list, Code: ${data
+                .statusCode}, description: ${data.statusText}");
       }
       return BulkListUseCase(errorModel: data);
     }
@@ -53,6 +63,11 @@ class BulkRepository extends BulkRepositoryImpl {
       if (data is List<BulkSortedModel>) {
         return BulkSortUseCase(sortedModels: data);
       }
+      if ((data as ErrorModel).type != "auth error") {
+        await remoteData.bugReport(authData.token,
+            "Endpoint: transaction/assembly/products/sorted, Code: ${data
+                .statusCode}, description: ${data.statusText}");
+      }
       return BulkSortUseCase(errorModel: data);
     }
     return BulkSortUseCase(
@@ -67,6 +82,11 @@ class BulkRepository extends BulkRepositoryImpl {
 
       if (data is bool) {
         return BulkSortUseCase();
+      }
+      if ((data as ErrorModel).type != "auth error") {
+        await remoteData.bugReport(authData.token,
+            "Endpoint: transaction/outcome/$id/approve, Code: ${data
+                .statusCode}, description: ${data.statusText}");
       }
       return BulkSortUseCase(errorModel: data);
     }
