@@ -1,37 +1,30 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_app_slb/data/models/cart_model.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:mobile_app_slb/data/models/stock_model.dart';
-import 'package:mobile_app_slb/presentation/pages/bulkapprove_page.dart';
+import 'package:mobile_app_slb/presentation/pages/auth_page.dart';
 import 'package:mobile_app_slb/presentation/pages/productinfo_page.dart';
-import 'package:mobile_app_slb/presentation/states/bulk_state.dart';
+import '../../data/models/cart_model.dart';
+import '../../data/models/stock_model.dart';
 import '../states/assortment_state.dart';
 import '../states/auth_state.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/backButton.dart';
 import '../widgets/exit_dialog.dart';
-import 'auth_page.dart';
-import 'home_page.dart';
 
-class BulkListPage extends ConsumerStatefulWidget {
-  const BulkListPage(
-      {super.key,
-      required this.currentStorehouse,
-      required this.cartModels,
-      required this.ids, required this.stockModel});
+class TransferAssemblyPage extends ConsumerStatefulWidget {
+  const TransferAssemblyPage(
+      {super.key, required this.stockModel, required this.cartModels});
 
-  final String currentStorehouse;
-  final List<CartModel> cartModels;
-  final List<int> ids;
   final StockModel stockModel;
+  final List<CartModel> cartModels;
 
   @override
-  ConsumerState<BulkListPage> createState() => _BulkListPageState();
+  ConsumerState<TransferAssemblyPage> createState() =>
+      _TransferAssemblyPageState();
 }
 
-class _BulkListPageState extends ConsumerState<BulkListPage> {
+class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage> {
   var scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -66,21 +59,7 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
                           opacity: isAllSelected ? 1.0 : 0.2,
                           child: InkWell(
                             onTap: isAllSelected
-                                ? () async {
-                                    final data = await ref
-                                        .read(bulkProvider)
-                                        .getBulkSort(widget.ids);
-                                    if (context.mounted) {
-                                      Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  BulkApprovePage(
-                                                    bulkModels: data,
-                                                    stockModel: widget.stockModel,
-                                                  )));
-                                    }
-                                  }
+                                ? () async {}
                                 : () {
                                     ScaffoldMessenger.of(context)
                                         .showSnackBar(SnackBar(
@@ -149,11 +128,12 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
                                               .areYouSure);
                                     }).then((returned) {
                                   if (returned) {
+                                    ref.read(deleteAuthProvider).deleteAuth();
                                     Navigator.pushAndRemoveUntil(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                const HomePage()),
+                                                const AuthPage()),
                                         (route) => false);
                                   }
                                 });
@@ -179,15 +159,15 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
                           ),
                           const Spacer(),
                           const Text(
-                            "BULK ASSEMBLY",
+                            "TRANSFER",
                             style: TextStyle(
                                 fontSize: 24,
                                 color: Color(0xFF909090),
                                 height: 0.5),
                           ),
-                          Text(
-                            widget.currentStorehouse,
-                            style: const TextStyle(
+                          const Text(
+                            "Transfer assembly",
+                            style: TextStyle(
                                 fontSize: 36,
                                 color: Color(0xFF363636),
                                 fontWeight: FontWeight.bold),
@@ -299,7 +279,7 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
                                   width: 20,
                                 ),
                                 Text(
-                                  e.model.name,
+                                  "TRANSFER ${e.model.id}",
                                   style: const TextStyle(
                                       fontSize: 16, color: Color(0xFF222222)),
                                 ),
@@ -341,7 +321,8 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
                                                         availabilityModel:
                                                             availability
                                                                 .availabilityModel!,
-                                                        stockModel: widget.stockModel,
+                                                        stockModel:
+                                                            widget.stockModel,
                                                       )));
                                         } else {
                                           ref

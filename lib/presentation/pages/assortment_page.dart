@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/data/models/assortment_model.dart';
 import 'package:mobile_app_slb/data/models/category_model.dart';
+import 'package:mobile_app_slb/data/models/stock_model.dart';
 import 'package:mobile_app_slb/domain/usecases/filters_usecase.dart';
 import 'package:mobile_app_slb/presentation/pages/auth_page.dart';
 import 'package:mobile_app_slb/presentation/pages/productinfo_page.dart';
@@ -19,9 +20,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../states/assortment_state.dart';
 
 class AssortmentPage extends ConsumerStatefulWidget {
-  const AssortmentPage({super.key, required this.currentStorehouse});
+  const AssortmentPage({super.key, required this.currentStorehouse, required this.stockModel});
 
   final String currentStorehouse;
+  final StockModel stockModel;
 
   @override
   ConsumerState<AssortmentPage> createState() => _AssortmentPageState();
@@ -62,10 +64,11 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
         child: Scaffold(
           key: scaffoldKey,
           resizeToAvoidBottomInset: false,
-          drawer: const AppDrawer(
+          drawer: AppDrawer(
             isAbleToNavigate: true,
             isAssembly: false,
             isHomePage: false,
+            stockModel: widget.stockModel,
           ),
           bottomNavigationBar: SafeArea(
             child: Container(
@@ -738,6 +741,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                         count: data[index].quantity ?? 0.0,
                                         availabilityModel:
                                             availability.availabilityModel!,
+                                    stockModel: widget.stockModel,
                                       )));
                         } else {
                           ref.read(deleteAuthProvider).deleteAuth();
@@ -935,6 +939,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                         count: data[index].quantity ?? 0.0,
                                         availabilityModel:
                                             availability.availabilityModel!,
+                                    stockModel: widget.stockModel,
                                       )));
                         } else {
                           ref.read(deleteAuthProvider).deleteAuth();

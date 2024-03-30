@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile_app_slb/data/models/stock_model.dart';
 import 'package:mobile_app_slb/presentation/pages/home_page.dart';
+import 'package:mobile_app_slb/presentation/pages/newtransfer_page.dart';
 import 'package:mobile_app_slb/presentation/widgets/exit_dialog.dart';
 import 'package:mobile_app_slb/presentation/widgets/round_button.dart';
 
@@ -14,11 +16,13 @@ class AppDrawer extends ConsumerStatefulWidget {
       {super.key,
       required this.isAbleToNavigate,
       required this.isAssembly,
-      required this.isHomePage});
+      required this.isHomePage,
+      required this.stockModel});
 
   final bool isAbleToNavigate;
   final bool isAssembly;
   final bool isHomePage;
+  final StockModel stockModel;
 
   @override
   ConsumerState<AppDrawer> createState() => _AppDrawerState();
@@ -144,7 +148,18 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                       "assets/images/transfer_screen_icon.png",
                       scale: 4,
                     ),
-                    onTap: () {},
+                    onTap: () {
+                      if (widget.stockModel.transfersManaging) {
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => NewTransferPage(
+                                    currentStorehouse: widget.stockModel.name,
+                                    storehouseId: widget.stockModel.id,
+                                    stockModel: widget.stockModel)),
+                            (route) => false);
+                      }
+                    },
                   ),
                   const Divider(),
                 ],

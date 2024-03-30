@@ -24,7 +24,7 @@ class _NoNetworkPageState extends State<NoNetworkPage> {
               WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                 Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => MyApp()),
+                    MaterialPageRoute(builder: (context) => const MyApp()),
                     (route) => false);
               });
             }

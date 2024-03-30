@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_app_slb/data/models/assembly_model.dart';
+import 'package:mobile_app_slb/data/models/stock_model.dart';
 import 'package:mobile_app_slb/presentation/states/bulk_state.dart';
 import '../states/auth_state.dart';
 import '../widgets/app_drawer.dart';
@@ -14,9 +15,11 @@ import 'bulklist_page.dart';
 import 'home_page.dart';
 
 class BulkPage extends ConsumerStatefulWidget {
-  const BulkPage({super.key, required this.currentStorehouse});
+  const BulkPage(
+      {super.key, required this.currentStorehouse, required this.stockModel});
 
   final String currentStorehouse;
+  final StockModel stockModel;
 
   @override
   ConsumerState<BulkPage> createState() => _BulkPageState();
@@ -38,10 +41,11 @@ class _BulkPageState extends ConsumerState<BulkPage> {
         child: Scaffold(
             key: scaffoldKey,
             resizeToAvoidBottomInset: false,
-            drawer: const AppDrawer(
+            drawer: AppDrawer(
               isAbleToNavigate: false,
               isAssembly: false,
               isHomePage: false,
+              stockModel: widget.stockModel,
             ),
             bottomNavigationBar: SafeArea(
               child: Container(
@@ -91,6 +95,7 @@ class _BulkPageState extends ConsumerState<BulkPage> {
                                                             .currentStorehouse,
                                                         cartModels: data,
                                                         ids: ids,
+                                                        stockModel: widget.stockModel,
                                                       )));
                                         }
                                       }

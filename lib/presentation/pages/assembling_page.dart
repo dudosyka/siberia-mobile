@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/presentation/pages/salecomplete_page.dart';
 import 'package:mobile_app_slb/presentation/states/newsale_state.dart';
 import '../../data/models/cart_model.dart';
+import '../../data/models/stock_model.dart';
 import '../states/auth_state.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/backButton.dart';
@@ -19,11 +20,12 @@ class AssemblingPage extends ConsumerStatefulWidget {
       {super.key,
       required this.transactionId,
       required this.cartData,
-      required this.isTransaction});
+      required this.isTransaction, required this.stockModel});
 
   final int transactionId;
   final List<CartModel> cartData;
   final bool isTransaction;
+  final StockModel stockModel;
 
   @override
   ConsumerState<AssemblingPage> createState() => _AssemblingPageState();
@@ -76,10 +78,11 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
           child: Scaffold(
             key: scaffoldKey,
             resizeToAvoidBottomInset: false,
-            drawer: const AppDrawer(
+            drawer: AppDrawer(
               isAbleToNavigate: false,
               isAssembly: true,
               isHomePage: false,
+              stockModel: widget.stockModel,
             ),
             bottomNavigationBar: SafeArea(
               child: Container(

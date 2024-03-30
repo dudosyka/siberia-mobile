@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile_app_slb/data/models/stock_model.dart';
 import 'package:mobile_app_slb/presentation/pages/bulkcomplete_page.dart';
 import 'package:mobile_app_slb/presentation/states/bulk_state.dart';
 import '../../data/models/bulksorted_model.dart';
@@ -13,9 +14,11 @@ import 'auth_page.dart';
 import 'home_page.dart';
 
 class BulkApprovePage extends ConsumerStatefulWidget {
-  const BulkApprovePage({super.key, required this.bulkModels});
+  const BulkApprovePage(
+      {super.key, required this.bulkModels, required this.stockModel});
 
   final List<BulkSortedModel> bulkModels;
+  final StockModel stockModel;
 
   @override
   ConsumerState<BulkApprovePage> createState() => _BulkApprovePageState();
@@ -34,10 +37,11 @@ class _BulkApprovePageState extends ConsumerState<BulkApprovePage> {
       child: Scaffold(
           key: scaffoldKey,
           resizeToAvoidBottomInset: false,
-          drawer: const AppDrawer(
+          drawer: AppDrawer(
             isAbleToNavigate: false,
             isAssembly: false,
             isHomePage: false,
+            stockModel: widget.stockModel,
           ),
           bottomNavigationBar: SafeArea(
             child: Container(

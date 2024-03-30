@@ -9,6 +9,7 @@ import 'package:mobile_app_slb/data/models/availability_model.dart';
 import 'package:mobile_app_slb/presentation/states/assortment_state.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../data/models/stock_model.dart';
 import '../../utils/constants.dart';
 import '../states/auth_state.dart';
 import '../widgets/app_drawer.dart';
@@ -24,7 +25,7 @@ class ProductInfoPage extends ConsumerStatefulWidget {
       required this.sku,
       required this.ean,
       required this.count,
-      required this.availabilityModel});
+      required this.availabilityModel, required this.stockModel});
 
   final int productId;
   final String name;
@@ -33,6 +34,7 @@ class ProductInfoPage extends ConsumerStatefulWidget {
   final String ean;
   final double count;
   final List<AvailabilityModel> availabilityModel;
+  final StockModel stockModel;
 
   @override
   ConsumerState<ProductInfoPage> createState() => _ProductInfoPageState();
@@ -52,10 +54,11 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
         child: Scaffold(
           key: scaffoldKey,
           resizeToAvoidBottomInset: false,
-          drawer: const AppDrawer(
+          drawer: AppDrawer(
             isAbleToNavigate: true,
             isAssembly: false,
             isHomePage: false,
+            stockModel: widget.stockModel,
           ),
           body: SafeArea(
             child: Column(

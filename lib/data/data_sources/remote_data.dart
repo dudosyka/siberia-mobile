@@ -543,6 +543,36 @@ class RemoteData {
     }
   }
 
+  Future<dynamic> createTransfer(
+      String token, List<CartModel> products, int storeId) async {
+    final res = await dio.post("${baseUrl}transaction/transfer",
+        data: {
+          "to": storeId,
+          "type": 3,
+          "products": products.map((e) {
+            return {
+              "productId": e.model.id,
+              "amount": e.quantity
+            };
+          }).toList()
+        },
+        options: Options(validateStatus: (_) => true, headers: {
+          "Content-Type": "application/json",
+          "authorization": "Bearer $token",
+        }));
+
+    if (res.statusCode == 200) {
+      print(res.data);
+      return true;
+    } else if (res.statusCode == 415) {
+      return ErrorModel("unsupported media", 415, "Unsupported Media Type");
+    } else if (res.statusCode == 403) {
+      return ErrorModel("forbidden", 403, "Stock forbidden");
+    } else {
+      return ErrorModel("auth error", 401, "Unauthorized");
+    }
+  }
+
   Future<void> bugReport(String token, String description) async {
     await dio.post("${baseUrl}bug/report",
         data: {"description": description},

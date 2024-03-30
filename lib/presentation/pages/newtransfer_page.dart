@@ -3,47 +3,44 @@ import 'package:collection/collection.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_app_slb/data/models/assortment_model.dart';
-import 'package:mobile_app_slb/data/models/category_model.dart';
-import 'package:mobile_app_slb/data/models/productinfo_model.dart';
-import 'package:mobile_app_slb/data/models/stock_model.dart';
-import 'package:mobile_app_slb/domain/usecases/filters_usecase.dart';
-import 'package:mobile_app_slb/presentation/pages/assembling_page.dart';
-import 'package:mobile_app_slb/presentation/pages/auth_page.dart';
-import 'package:mobile_app_slb/presentation/pages/home_page.dart';
 import 'package:mobile_app_slb/presentation/pages/productinfo_page.dart';
-import 'package:mobile_app_slb/presentation/states/auth_state.dart';
-import 'package:mobile_app_slb/presentation/states/newsale_state.dart';
-import 'package:mobile_app_slb/presentation/widgets/app_drawer.dart';
-import 'package:mobile_app_slb/presentation/widgets/backButton.dart';
-import 'package:mobile_app_slb/presentation/widgets/exit_dialog.dart';
-import 'package:mobile_app_slb/presentation/widgets/gray_button.dart';
-import 'package:mobile_app_slb/presentation/widgets/outlined_gray_button.dart';
+import 'package:mobile_app_slb/presentation/pages/transfercomplete_page.dart';
+import 'package:mobile_app_slb/presentation/states/transfer_state.dart';
 import 'package:mobile_app_slb/utils/constants.dart' as constants;
+import '../../data/models/assortment_model.dart';
+import '../../data/models/cart_model.dart';
+import '../../data/models/category_model.dart';
+import '../../data/models/productinfo_model.dart';
+import '../../data/models/stock_model.dart';
+import '../../domain/usecases/filters_usecase.dart';
+import '../states/assortment_state.dart';
+import '../states/auth_state.dart';
+import '../widgets/app_drawer.dart';
+import '../widgets/backButton.dart';
+import '../widgets/exit_dialog.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../../data/models/cart_model.dart';
-import '../states/assortment_state.dart';
-import '../widgets/round_button.dart';
+import '../widgets/gray_button.dart';
+import '../widgets/outlined_gray_button.dart';
+import 'auth_page.dart';
+import 'home_page.dart';
 
-class NewSalePage extends ConsumerStatefulWidget {
-  const NewSalePage(
+class NewTransferPage extends ConsumerStatefulWidget {
+  const NewTransferPage(
       {super.key,
       required this.currentStorehouse,
       required this.storehouseId,
-      required this.isTransaction,
       required this.stockModel});
 
   final String currentStorehouse;
   final int storehouseId;
-  final bool isTransaction;
   final StockModel stockModel;
 
   @override
-  ConsumerState<NewSalePage> createState() => _NewSalePageState();
+  ConsumerState<NewTransferPage> createState() => _NewTransferPageState();
 }
 
-class _NewSalePageState extends ConsumerState<NewSalePage>
+class _NewTransferPageState extends ConsumerState<NewTransferPage>
     with WidgetsBindingObserver {
   var scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController searchCont = TextEditingController();
@@ -94,19 +91,11 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                 context, AppLocalizations.of(context)!.areYouSure);
           }).then((returned) {
         if (returned) {
-          ref.read(cartDataProvider).deleteOutcome();
-          if (widget.isTransaction) {
-            ref.read(deleteAuthProvider).deleteAuth();
-            Future.microtask(() => Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const AuthPage()),
-                (route) => false));
-          } else {
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-                (route) => false);
-          }
+          ref.read(transferProvider).deleteCart();
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+              (route) => false);
         }
       });
     }
@@ -129,7 +118,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                     context, AppLocalizations.of(context)!.areYouSure);
               }).then((returned) {
             if (returned) {
-              ref.read(cartDataProvider).deleteOutcome();
+              ref.read(transferProvider).deleteCart();
               navigator.pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const HomePage()),
                   (route) => false);
@@ -194,21 +183,47 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                           height: 65,
                           child: Stack(
                             children: [
-                              roundButton(
-                                  const Icon(
-                                    Icons.shopping_cart,
-                                    color: Colors.white,
-                                    size: 30,
-                                  ),
-                                  60, () {
-                                showModalBottomSheet(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    builder: (context) {
-                                      return cartBottomSheet();
-                                    });
-                              }, true),
-                              ref.watch(cartDataProvider).cartData.isEmpty
+                              InkWell(
+                                onTap: () {
+                                  showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      builder: (context) {
+                                        return cartBottomSheet();
+                                      });
+                                },
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Center(
+                                      child: Container(
+                                        width: 68,
+                                        height: 68,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            color: const Color(0xFFDFDFDF)),
+                                      ),
+                                    ),
+                                    Center(
+                                      child: Container(
+                                          width: 60,
+                                          height: 60,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              color: Colors.black),
+                                          child: Center(
+                                            child: Image.asset(
+                                              "assets/images/bulk_boxes_icon.png",
+                                              scale: 4,
+                                            ),
+                                          )),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              ref.watch(transferProvider).cartData.isEmpty
                                   ? Container()
                                   : Align(
                                       alignment: Alignment.topRight,
@@ -224,7 +239,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                         child: Center(
                                           child: Text(
                                             ref
-                                                .watch(cartDataProvider)
+                                                .watch(transferProvider)
                                                 .cartData
                                                 .length
                                                 .toString(),
@@ -312,27 +327,14 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                               }).then((returned) {
                                             if (returned) {
                                               ref
-                                                  .read(cartDataProvider)
-                                                  .deleteOutcome();
-                                              if (widget.isTransaction) {
-                                                ref
-                                                    .read(deleteAuthProvider)
-                                                    .deleteAuth();
-                                                Future.microtask(() => Navigator
-                                                    .pushAndRemoveUntil(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                const AuthPage()),
-                                                        (route) => false));
-                                              } else {
-                                                Navigator.pushAndRemoveUntil(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const HomePage()),
-                                                    (route) => false);
-                                              }
+                                                  .read(transferProvider)
+                                                  .deleteCart();
+                                              Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const HomePage()),
+                                                  (route) => false);
                                             }
                                           });
                                         },
@@ -998,7 +1000,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                       ? InkWell(
                                           onTap: () async {
                                             final product = await ref
-                                                .read(cartDataProvider)
+                                                .read(transferProvider)
                                                 .getProductInfo(data[index].id);
                                             if (product.errorModel != null) {
                                               ref
@@ -1363,7 +1365,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                       ? InkWell(
                                           onTap: () async {
                                             final product = await ref
-                                                .read(cartDataProvider)
+                                                .read(transferProvider)
                                                 .getProductInfo(data[index].id);
                                             if (product.errorModel != null) {
                                               ref
@@ -2475,8 +2477,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
       ascending ? value1.compareTo(value2) : value2.compareTo(value1);
 
   Widget cartBottomSheet() {
-    List<CartModel> data = ref.watch(cartDataProvider).cartData;
-    double sum = ref.watch(cartDataProvider).sum;
+    List<CartModel> data = ref.watch(transferProvider).cartData;
 
     return SafeArea(
       child: Padding(
@@ -2510,12 +2511,10 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                             width: 18,
                           ),
                           grayButton(() {
-                            if (ref.watch(cartDataProvider).transactionId !=
-                                    null &&
-                                ref
-                                    .watch(cartDataProvider)
-                                    .cartData
-                                    .isNotEmpty) {
+                            if (ref
+                                .watch(transferProvider)
+                                .cartData
+                                .isNotEmpty) {
                               showDialog(
                                   context: context,
                                   builder: (context) {
@@ -2523,23 +2522,28 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                         context,
                                         AppLocalizations.of(context)!
                                             .areYouSureCart);
-                                  }).then((returned) {
+                                  }).then((returned) async {
                                 if (returned) {
-                                  ref.read(cartDataProvider).startAssembly();
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => AssemblingPage(
-                                                transactionId: ref
-                                                    .watch(cartDataProvider)
-                                                    .transactionId!,
-                                                cartData: ref
-                                                    .watch(cartDataProvider)
-                                                    .cartData,
-                                                isTransaction:
-                                                    widget.isTransaction,
-                                            stockModel: widget.stockModel,
-                                              )));
+                                  final data = await ref
+                                      .read(transferProvider)
+                                      .createTransfer(widget.storehouseId);
+                                  if (data.errorModel != null) {
+                                    ref.read(deleteAuthProvider).deleteAuth();
+                                    Future.microtask(() =>
+                                        Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const AuthPage()),
+                                            (route) => false));
+                                  }
+                                  Future.microtask(() =>
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const TransferCompletePage()),
+                                          (route) => false));
                                 }
                               });
                             } else {
@@ -2565,7 +2569,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                     );
                                   });
                             }
-                          }, AppLocalizations.of(context)!.startAssemblyCaps),
+                          }, "COMPLETE TRANSFER"),
                         ],
                       )
                     ],
@@ -2579,7 +2583,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                     children: [
                       Expanded(
                         flex: 1,
-                        child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20, right: 20),
                           child: Text(
                             AppLocalizations.of(context)!.nameCaps,
                             style: const TextStyle(
@@ -2600,17 +2605,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                 fontSize: 16),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Text(
-                          AppLocalizations.of(context)!.priceCaps,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                              fontSize: 16),
-                        ),
-                      ),
+                      )
                     ],
                   ),
                 ),
@@ -2630,7 +2625,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                       return InkWell(
                         onTap: () async {
                           final product = await ref
-                              .read(cartDataProvider)
+                              .read(transferProvider)
                               .getProductInfo(data[index].model.id);
                           if (product.errorModel != null) {
                             ref.read(deleteAuthProvider).deleteAuth();
@@ -2647,10 +2642,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                   return editCartModal(
                                       data[index], product.productModel!);
                                 }).then((value) {
-                              ref.read(cartDataProvider).getSum();
-                              setState(() {
-                                sum = ref.watch(cartDataProvider).sum;
-                              });
+                              setState(() {});
                             });
                           }
                         },
@@ -2687,25 +2679,6 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                       )
                                     ],
                                   ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 10),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          (data[index].curPrice).toString(),
-                                          style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Color(0xFF3A3A3A)),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
                                 )
                               ],
                             ),
@@ -2713,14 +2686,6 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                         ),
                       );
                     }).toList(),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Text(
-                    "${AppLocalizations.of(context)!.total} ${sum.toString()}",
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 )
               ],
@@ -2883,63 +2848,6 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                       ),
                       const SizedBox(height: 10),
                       const Divider(),
-                      const SizedBox(height: 10),
-                      Text(
-                        AppLocalizations.of(context)!.priceCaps,
-                        style: const TextStyle(
-                            fontSize: 16, color: Color(0xFF3A3A3A)),
-                      ),
-                      const SizedBox(height: 10),
-                      DropdownButton(
-                        value: curPrice,
-                        items: [
-                          const DropdownMenuItem(
-                            value: "Distribution",
-                            child: Text("Distribution"),
-                          ),
-                          const DropdownMenuItem(
-                            value: "Professional",
-                            child: Text("Professional"),
-                          ),
-                          DropdownMenuItem(
-                            value: "Oferta",
-                            enabled: productInfo.offertaPrice != 0.0,
-                            child: Text("Oferta",
-                                style: TextStyle(
-                                  color: productInfo.offertaPrice != 0.0
-                                      ? Colors.black
-                                      : const Color(0xFF969696),
-                                )),
-                          ),
-                        ],
-                        onChanged: (Object? value) {
-                          setState(() {
-                            curPrice = value.toString();
-                          });
-                        },
-                      ),
-                      Container(
-                        width: 195,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            color: const Color(0xFFFCFCFC),
-                            border: Border.all(color: const Color(0xFFC8C8C8)),
-                            borderRadius: BorderRadius.circular(6)),
-                        child: Center(
-                          child: Text(
-                              quantityCont.text == ""
-                                  ? pricesData[curPrice].toString()
-                                  : (pricesData[curPrice]! *
-                                          int.parse(quantityCont.text))
-                                      .toString(),
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  fontStyle: FontStyle.italic,
-                                  fontWeight: FontWeight.w300)),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      const Divider(),
                       const SizedBox(height: 30),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -2952,7 +2860,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                           ),
                           grayButton(() {
                             if (int.parse(quantityCont.text) > data.quantity!) {
-                              ref.read(cartDataProvider).addToCart(
+                              ref.read(transferProvider).addToCart(
                                   CartModel(
                                       data,
                                       data.quantity!.toInt(),
@@ -2963,7 +2871,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
 
                               Navigator.pop(context, true);
                             } else {
-                              ref.read(cartDataProvider).addToCart(
+                              ref.read(transferProvider).addToCart(
                                   CartModel(
                                       data,
                                       int.parse(quantityCont.text),
@@ -2971,7 +2879,6 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                       pricesData[curPrice]! *
                                           int.parse(quantityCont.text)),
                                   widget.storehouseId);
-                              ref.read(cartDataProvider).getSum();
                               Navigator.pop(context, true);
                             }
                           }, AppLocalizations.of(context)!.saveCaps),
@@ -3056,9 +2963,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      ref.read(cartDataProvider).deleteFromCart(
+                                      ref.read(transferProvider).deleteFromCart(
                                           data, widget.storehouseId);
-                                      ref.read(cartDataProvider).getSum();
                                       Navigator.pop(context);
                                     },
                                     child: Container(
@@ -3249,64 +3155,6 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                       ),
                       const SizedBox(height: 10),
                       const Divider(),
-                      const SizedBox(height: 10),
-                      Text(
-                        AppLocalizations.of(context)!.priceCaps,
-                        style: const TextStyle(
-                            fontSize: 16, color: Color(0xFF3A3A3A)),
-                      ),
-                      const SizedBox(height: 10),
-                      DropdownButton(
-                        value: curPrice,
-                        items: [
-                          const DropdownMenuItem(
-                            value: "Distribution",
-                            child: Text("Distribution"),
-                          ),
-                          const DropdownMenuItem(
-                            value: "Professional",
-                            child: Text("Professional"),
-                          ),
-                          DropdownMenuItem(
-                            value: "Oferta",
-                            enabled: productInfo.offertaPrice != 0.0,
-                            child: Text(
-                              "Oferta",
-                              style: TextStyle(
-                                  color: productInfo.offertaPrice != 0.0
-                                      ? Colors.black
-                                      : const Color(0xFF969696)),
-                            ),
-                          ),
-                        ],
-                        onChanged: (Object? value) {
-                          setState(() {
-                            curPrice = value.toString();
-                          });
-                        },
-                      ),
-                      Container(
-                        width: 195,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            color: const Color(0xFFFCFCFC),
-                            border: Border.all(color: const Color(0xFFC8C8C8)),
-                            borderRadius: BorderRadius.circular(6)),
-                        child: Center(
-                          child: Text(
-                              quantityCont.text == ""
-                                  ? pricesData[curPrice].toString()
-                                  : (pricesData[curPrice]! *
-                                          int.parse(quantityCont.text))
-                                      .toString(),
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  fontStyle: FontStyle.italic,
-                                  fontWeight: FontWeight.w300)),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      const Divider(),
                       const SizedBox(height: 30),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -3323,19 +3171,18 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                 int.parse(quantityCont.text);
                             if (int.parse(quantityCont.text) >
                                 data.model.quantity!) {
-                              ref.read(cartDataProvider).updateCartModel(
+                              ref.read(transferProvider).updateCartModel(
                                   data,
                                   false,
                                   data.model.quantity!.toInt(),
                                   widget.storehouseId);
                               Navigator.pop(context, true);
                             } else {
-                              ref.read(cartDataProvider).updateCartModel(
+                              ref.read(transferProvider).updateCartModel(
                                   data,
                                   false,
                                   int.parse(quantityCont.text),
                                   widget.storehouseId);
-                              ref.read(cartDataProvider).getSum();
                               Navigator.pop(context, true);
                             }
                           }, AppLocalizations.of(context)!.saveCaps),
