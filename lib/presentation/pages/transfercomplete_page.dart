@@ -2,16 +2,21 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile_app_slb/presentation/pages/auth_page.dart';
+import '../states/auth_state.dart';
 import 'home_page.dart';
 
-class TransferCompletePage extends StatefulWidget {
-  const TransferCompletePage({super.key});
+class TransferCompletePage extends ConsumerStatefulWidget {
+  const TransferCompletePage({super.key, required this.isQr});
+
+  final bool isQr;
 
   @override
-  State<TransferCompletePage> createState() => _TransferCompletePageState();
+  ConsumerState<TransferCompletePage> createState() => _TransferCompletePageState();
 }
 
-class _TransferCompletePageState extends State<TransferCompletePage> {
+class _TransferCompletePageState extends ConsumerState<TransferCompletePage> {
   Timer? _timer;
 
   @override
@@ -19,8 +24,14 @@ class _TransferCompletePageState extends State<TransferCompletePage> {
     super.initState();
 
     _timer = Timer(const Duration(seconds: 5), () {
-      Future.microtask(() => Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const HomePage())));
+      if (widget.isQr) {
+        ref.read(deleteAuthProvider).deleteAuth();
+        Future.microtask(() => Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const AuthPage())));
+      } else {
+        Future.microtask(() => Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const HomePage())));
+      }
     });
   }
 
@@ -103,10 +114,18 @@ class _TransferCompletePageState extends State<TransferCompletePage> {
                     padding: const EdgeInsets.only(bottom: 30),
                     child: InkWell(
                       onTap: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const HomePage()));
+                        if (widget.isQr) {
+                          ref.read(deleteAuthProvider).deleteAuth();
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const AuthPage()));
+                        } else {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const HomePage()));
+                        }
                       },
                       child: Container(
                           width: 152,
@@ -116,7 +135,9 @@ class _TransferCompletePageState extends State<TransferCompletePage> {
                               borderRadius: BorderRadius.circular(8)),
                           child: Center(
                             child: Text(
-                              AppLocalizations.of(context)!.homeCaps,
+                              widget.isQr
+                                  ? AppLocalizations.of(context)!.authCaps
+                                  : AppLocalizations.of(context)!.homeCaps,
                               style: const TextStyle(
                                   fontSize: 24,
                                   color: Colors.white,

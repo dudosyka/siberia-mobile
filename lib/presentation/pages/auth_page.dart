@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/data/repository/auth_repository.dart';
+import 'package:mobile_app_slb/presentation/pages/selectaddress_page.dart';
+import 'package:mobile_app_slb/presentation/states/home_state.dart';
 import 'package:mobile_app_slb/presentation/widgets/black_button.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
-import '../states/newsale_state.dart';
+import '../states/transfer_state.dart';
+import 'gettransfer_page.dart';
 import 'home_page.dart';
 import 'newsale_page.dart';
 
@@ -24,11 +27,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
   @override
   void initState() {
-    if (!cameraController.isStarting) {
-      cameraController.start();
-    } else {
-      cameraController.stop();
-    }
+    cameraController.stop();
     super.initState();
   }
 
@@ -82,6 +81,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                               if (value.errorModel == null &&
                                   value.authModel != null) {
                                 if (value.authModel!.type == "stock") {
+                                  ref.refresh(getHomeProvider).value;
                                   Future.microtask(() =>
                                       Navigator.pushAndRemoveUntil(
                                           context,
@@ -91,23 +91,75 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                           (route) => false));
                                 } else if (value.authModel!.type ==
                                     "transaction") {
-                                  ref.read(cartDataProvider).getCurrentStock();
                                   final data =
                                       await AuthRepository().getStock();
-                                  Future.microtask(
-                                      () => Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (builder) => NewSalePage(
-                                                    currentStorehouse:
-                                                        data.stockModel!.name,
-                                                    storehouseId:
-                                                        data.stockModel!.id,
-                                                    isTransaction: true,
-                                                    stockModel:
-                                                        data.stockModel!,
-                                                  )),
-                                          (route) => false));
+
+                                  if (data.stockModel != null) {
+                                    if (data.stockModel!.typeId == 3 &&
+                                        data.stockModel!.statusId == 2) {
+                                      final newData = await ref
+                                          .read(transferProvider)
+                                          .getCurrentStock();
+                                      if (newData.errorModel == null) {
+                                        Future.microtask(() =>
+                                            Navigator.pushAndRemoveUntil(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (builder) =>
+                                                        SelectAddressPage(
+                                                          stockModel:
+                                                              data.stockModel!,
+                                                          currentStock: newData
+                                                              .currentStock!,
+                                                        )),
+                                                (route) => false));
+                                      }
+                                    } else if (data.stockModel!.typeId == 3 &&
+                                        data.stockModel!.statusId == 4) {
+                                      final newData = await ref
+                                          .read(transferProvider)
+                                          .getCurrentStock();
+                                      if (newData.errorModel == null) {
+                                        Future.microtask(() =>
+                                            Navigator.pushAndRemoveUntil(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (builder) =>
+                                                        GetTransferPage(
+                                                          stockModel:
+                                                              data.stockModel!,
+                                                          cartModels: newData
+                                                              .currentStock!
+                                                              .cartModels,
+                                                          transactionId: newData
+                                                              .currentStock!.id,
+                                                          stockId: data
+                                                              .stockModel!.id,
+                                                        )),
+                                                (route) => false));
+                                      }
+                                    } else if (data.stockModel!.typeId == 2) {
+                                      Future.microtask(() =>
+                                          Navigator.pushAndRemoveUntil(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (builder) =>
+                                                      NewSalePage(
+                                                        currentStorehouse: data
+                                                            .stockModel!.name,
+                                                        storehouseId:
+                                                            data.stockModel!.id,
+                                                        isTransaction: true,
+                                                        stockModel:
+                                                            data.stockModel!,
+                                                      )),
+                                              (route) => false));
+                                    } else {
+                                      setState(() {
+                                        isError = true;
+                                      });
+                                    }
+                                  }
                                 }
                               } else {
                                 setState(() {
@@ -140,7 +192,10 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                 color: Colors.black,
                               ),
                             )
-                          : Container(),
+                          : const Text(
+                              "Scan auth code",
+                              style: TextStyle(fontSize: 17),
+                            ),
                       isError && !isLoading
                           ? const Padding(
                               padding: EdgeInsets.only(left: 50, right: 50),
@@ -206,11 +261,15 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                 builder: (context, state, child) {
                                   switch (state) {
                                     case TorchState.off:
-                                      return const Icon(Icons.flash_off,
-                                          color: Colors.grey);
+                                      return Image.asset(
+                                        "assets/images/torch_disabled_icon.png",
+                                        scale: 4,
+                                      );
                                     case TorchState.on:
-                                      return const Icon(Icons.flash_on,
-                                          color: Colors.white);
+                                      return Image.asset(
+                                        "assets/images/torch_enabled_white_icon.png",
+                                        scale: 4,
+                                      );
                                   }
                                 },
                               ), () {

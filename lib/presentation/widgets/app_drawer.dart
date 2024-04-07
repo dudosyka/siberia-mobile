@@ -10,6 +10,7 @@ import '../../data/repository/auth_repository.dart';
 import '../pages/auth_page.dart';
 import '../states/main_state.dart';
 import '../states/newsale_state.dart';
+import '../states/transfer_state.dart';
 
 class AppDrawer extends ConsumerStatefulWidget {
   const AppDrawer(
@@ -123,6 +124,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                                   "Are you sure? All data will be deleted");
                             }).then((returned) {
                           if (returned) {
+                            ref.read(transferProvider).deleteCart();
                             if (widget.isAssembly) {
                               ref.read(cartDataProvider).deleteCart();
                             } else {
@@ -149,15 +151,44 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                       scale: 4,
                     ),
                     onTap: () {
-                      if (widget.stockModel.transfersManaging) {
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => NewTransferPage(
-                                    currentStorehouse: widget.stockModel.name,
-                                    storehouseId: widget.stockModel.id,
-                                    stockModel: widget.stockModel)),
-                            (route) => false);
+                      if (widget.isAbleToNavigate) {
+                        if (widget.stockModel.transfersManaging) {
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => NewTransferPage(
+                                      currentStorehouse: widget.stockModel.name,
+                                      storehouseId: widget.stockModel.id,
+                                      stockModel: widget.stockModel)),
+                              (route) => false);
+                        }
+                      } else {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return exitDialog(context,
+                                  "Are you sure? All data will be deleted");
+                            }).then((returned) {
+                          if (returned) {
+                            ref.read(transferProvider).deleteCart();
+                            if (widget.isAssembly) {
+                              ref.read(cartDataProvider).deleteCart();
+                            } else {
+                              ref.read(cartDataProvider).deleteOutcome();
+                            }
+                            if (widget.stockModel.transfersManaging) {
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => NewTransferPage(
+                                          currentStorehouse:
+                                              widget.stockModel.name,
+                                          storehouseId: widget.stockModel.id,
+                                          stockModel: widget.stockModel)),
+                                  (route) => false);
+                            }
+                          }
+                        });
                       }
                     },
                   ),

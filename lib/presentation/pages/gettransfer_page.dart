@@ -1,43 +1,44 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_app_slb/data/models/cart_model.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:mobile_app_slb/data/models/stock_model.dart';
-import 'package:mobile_app_slb/presentation/pages/bulkapprove_page.dart';
+import 'package:mobile_app_slb/presentation/pages/auth_page.dart';
 import 'package:mobile_app_slb/presentation/pages/productinfo_page.dart';
-import 'package:mobile_app_slb/presentation/states/bulk_state.dart';
+import 'package:mobile_app_slb/presentation/pages/transfercomplete_page.dart';
+import 'package:mobile_app_slb/presentation/states/transfer_state.dart';
+import '../../data/models/cart_model.dart';
+import '../../data/models/stock_model.dart';
 import '../states/assortment_state.dart';
 import '../states/auth_state.dart';
-import '../widgets/app_drawer.dart';
+import '../widgets/app_drawer_qr.dart';
 import '../widgets/backButton.dart';
 import '../widgets/exit_dialog.dart';
-import 'auth_page.dart';
-import 'home_page.dart';
+import '../widgets/gray_button.dart';
+import '../widgets/outlined_gray_button.dart';
 
-class BulkListPage extends ConsumerStatefulWidget {
-  const BulkListPage(
+class GetTransferPage extends ConsumerStatefulWidget {
+  const GetTransferPage(
       {super.key,
-      required this.currentStorehouse,
+      required this.stockModel,
       required this.cartModels,
-      required this.ids,
-      required this.stockModel});
+      required this.transactionId,
+      required this.stockId});
 
-  final String currentStorehouse;
-  final List<CartModel> cartModels;
-  final List<int> ids;
   final StockModel stockModel;
+  final int transactionId;
+  final int stockId;
+  final List<CartModel> cartModels;
 
   @override
-  ConsumerState<BulkListPage> createState() => _BulkListPageState();
+  ConsumerState<GetTransferPage> createState() => _GetTransferPageState();
 }
 
-class _BulkListPageState extends ConsumerState<BulkListPage> {
+class _GetTransferPageState extends ConsumerState<GetTransferPage> {
   var scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
-    bool isAllSelected = allSelected(widget.cartModels);
+    bool isOneSelected = atLeastOneSelected(widget.cartModels);
 
     return MediaQuery(
         data: MediaQuery.of(context).copyWith(
@@ -47,10 +48,7 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
         child: Scaffold(
             key: scaffoldKey,
             resizeToAvoidBottomInset: false,
-            drawer: AppDrawer(
-              isAbleToNavigate: false,
-              isAssembly: false,
-              isHomePage: false,
+            drawer: AppDrawerQr(
               stockModel: widget.stockModel,
             ),
             bottomNavigationBar: SafeArea(
@@ -64,32 +62,65 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
                     children: [
                       Center(
                         child: Opacity(
-                          opacity: isAllSelected ? 1.0 : 0.2,
+                          opacity: isOneSelected ? 1.0 : 0.2,
                           child: InkWell(
-                            onTap: isAllSelected
+                            onTap: isOneSelected
                                 ? () async {
-                                    final data = await ref
-                                        .read(bulkProvider)
-                                        .getBulkSort(widget.ids);
-                                    if (context.mounted) {
-                                      Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  BulkApprovePage(
-                                                    bulkModels: data,
-                                                    stockModel:
-                                                        widget.stockModel,
-                                                  )));
+                                    bool isAllSelected =
+                                        allSelected(widget.cartModels);
+
+                                    if (isAllSelected) {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return exitDialog(context,
+                                                "Are you sure you want to proceed? You won't be able to cancel");
+                                          }).then((returned) async {
+                                        if (returned) {
+                                          final data = await ref
+                                              .read(transferProvider)
+                                              .getTransfer(
+                                                  widget.transactionId,
+                                                  widget.cartModels
+                                                      .map((e) => e.model.id)
+                                                      .toList(),
+                                                  "all");
+
+                                          if (data.errorModel == null) {
+                                            if (context.mounted) {
+                                              Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const TransferCompletePage(
+                                                              isQr: true)),
+                                                  (route) => false);
+                                            }
+                                          } else {
+                                            if (context.mounted) {
+                                              Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const AuthPage()),
+                                                  (route) => false);
+                                            }
+                                          }
+                                        }
+                                      });
+                                    } else {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return transferEndDialog();
+                                          });
                                     }
                                   }
                                 : () {
                                     ScaffoldMessenger.of(context)
-                                        .showSnackBar(SnackBar(
-                                      duration: const Duration(seconds: 1),
-                                      content: Text(
-                                          AppLocalizations.of(context)!
-                                              .notAllProducts),
+                                        .showSnackBar(const SnackBar(duration: Duration(seconds: 1),
+                                      content:
+                                          Text("Select at least one product"),
                                     ));
                                   },
                             child: Stack(
@@ -114,7 +145,7 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
                                           color: Colors.black),
                                       child: Center(
                                         child: Image.asset(
-                                          "assets/images/bulk_boxes_icon.png",
+                                          "assets/images/bulk_approve_icon.png",
                                           scale: 4,
                                         ),
                                       )),
@@ -152,46 +183,49 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
                                               .areYouSure);
                                     }).then((returned) {
                                   if (returned) {
+                                    ref.read(deleteAuthProvider).deleteAuth();
                                     Navigator.pushAndRemoveUntil(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                const HomePage()),
+                                                const AuthPage()),
                                         (route) => false);
                                   }
                                 });
                               }, AppLocalizations.of(context)!.cancelCaps,
                                   false),
-                              Builder(builder: (context) {
-                                return InkWell(
-                                  onTap: () {
-                                    Scaffold.of(context).openDrawer();
-                                  },
-                                  child: Container(
-                                    width: 30,
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                        color: const Color(0xFF3C3C3C),
-                                        borderRadius: BorderRadius.circular(5)),
-                                    child: const Icon(
-                                      Icons.menu,
-                                      color: Colors.white,
+                              Builder(
+                                builder: (context) {
+                                  return InkWell(
+                                    onTap: () {
+                                      Scaffold.of(context).openDrawer();
+                                    },
+                                    child: Container(
+                                      width: 30,
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                          color: const Color(0xFF3C3C3C),
+                                          borderRadius: BorderRadius.circular(5)),
+                                      child: const Icon(
+                                        Icons.menu,
+                                        color: Colors.white,
+                                      ),
                                     ),
-                                  ),
-                                );
-                              }),
+                                  );
+                                }
+                              ),
                             ],
                           ),
                           const Spacer(),
                           const Text(
-                            "BULK ASSEMBLY",
+                            "TRANSFER",
                             style: TextStyle(
                                 fontSize: 24,
                                 color: Color(0xFF909090),
                                 height: 0.5),
                           ),
                           Text(
-                            widget.currentStorehouse,
+                            widget.stockModel.name,
                             style: const TextStyle(
                                 fontSize: 36,
                                 color: Color(0xFF363636),
@@ -348,7 +382,7 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
                                                                 .availabilityModel!,
                                                         stockModel:
                                                             widget.stockModel,
-                                                        isQr: false,
+                                                        isQr: true,
                                                       )));
                                         } else {
                                           ref
@@ -379,6 +413,163 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
     );
   }
 
+  Widget transferEndDialog() {
+    return AlertDialog(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(12),
+        content: StatefulBuilder(builder: (context, setState) {
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Are you sure you want to end transfer?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF222222)),
+                ),
+                const Divider(),
+                Center(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      const Text(
+                        "Items chosen partly, do you want to proceed or end this transfer partly, or some items were missing",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 16, color: Color(0xFF3A3A3A)),
+                      ),
+                      const SizedBox(height: 30),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          outlinedGrayButton(() {
+                            Navigator.pop(context, false);
+                          }, "CONTINUE"),
+                          const SizedBox(
+                            width: 18,
+                          ),
+                          grayButton(() {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return exitDialog(context,
+                                      "Are you sure you want to proceed? You won't be able to cancel");
+                                }).then((returned) async {
+                              if (returned) {
+                                final data = await ref
+                                    .read(transferProvider)
+                                    .getTransfer(
+                                    widget.transactionId,
+                                    widget.cartModels
+                                        .map((e) => e.model.id)
+                                        .toList(),
+                                    "missing");
+
+                                if (data.errorModel == null) {
+                                  if (context.mounted) {
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                            const TransferCompletePage(
+                                                isQr: true)),
+                                            (route) => false);
+                                  }
+                                } else {
+                                  if (context.mounted) {
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                            const AuthPage()),
+                                            (route) => false);
+                                  }
+                                }
+                              }
+                            });
+                          }, "MISSING ITEMS"),
+                          const SizedBox(
+                            width: 18,
+                          ),
+                          InkWell(
+                            onTap: () async {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return exitDialog(context,
+                                        "Are you sure you want to proceed? You won't be able to cancel");
+                                  }).then((returned) async {
+                                if (returned) {
+                                  final selectedIds = <int>[];
+                                  for (var cartItem in widget.cartModels) {
+                                    if (cartItem.isSelected) {
+                                      selectedIds.add(cartItem.model.id);
+                                    }
+                                  }
+                                  final data = await ref
+                                      .read(transferProvider)
+                                      .getTransfer(
+                                      widget.transactionId,
+                                      selectedIds,
+                                      "partly");
+                                  
+                                  if (data.errorModel == null) {
+                                    if (context.mounted) {
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                              const TransferCompletePage(
+                                                  isQr: true)),
+                                              (route) => false);
+                                    }
+                                  } else {
+                                    if (context.mounted) {
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                              const AuthPage()),
+                                              (route) => false);
+                                    }
+                                  }
+                                }
+                              });
+                            },
+                            child: Container(
+                                decoration: BoxDecoration(
+                                    color: const Color(0xFF000000),
+                                    borderRadius: BorderRadius.circular(4)),
+                                child: const Padding(
+                                  padding:
+                                  EdgeInsets.only(left: 10, right: 10, top: 4, bottom: 4),
+                                  child: Center(
+                                    child: Text(
+                                      "END PARTLY",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                )),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          );
+        }));
+  }
+
   bool allSelected(List<CartModel> cartList) {
     for (var cartItem in cartList) {
       if (!cartItem.isSelected) {
@@ -386,5 +577,14 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
       }
     }
     return true;
+  }
+
+  bool atLeastOneSelected(List<CartModel> cartList) {
+    for (var cartItem in cartList) {
+      if (cartItem.isSelected) {
+        return true;
+      }
+    }
+    return false;
   }
 }

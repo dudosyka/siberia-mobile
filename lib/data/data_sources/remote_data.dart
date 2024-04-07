@@ -12,6 +12,7 @@ import 'package:mobile_app_slb/data/models/currentstock_model.dart';
 import 'package:mobile_app_slb/data/models/error_model.dart';
 import 'package:mobile_app_slb/data/models/outcome_model.dart';
 import 'package:mobile_app_slb/data/models/productinfo_model.dart';
+import 'package:mobile_app_slb/data/models/shop_model.dart';
 import 'package:mobile_app_slb/data/models/stock_model.dart';
 import 'package:mobile_app_slb/utils/constants.dart' as constants;
 
@@ -373,13 +374,12 @@ class RemoteData {
               element["amount"].toInt(),
               curPrice,
               curPrice[curPrice.keys.first] * element["amount"]));
-
-          return CurrentStockModel(res.data["transactionData"]["id"],
-              res.data["transactionData"]["type"]["id"], curData);
         } else {
           return ErrorModel("auth error", 401, "Unauthorized");
         }
       }
+      return CurrentStockModel(res.data["transactionData"]["id"],
+          res.data["transactionData"]["type"]["id"], curData);
     } else {
       return ErrorModel("auth error", 401, "Unauthorized");
     }
@@ -550,10 +550,7 @@ class RemoteData {
           "to": storeId,
           "type": 3,
           "products": products.map((e) {
-            return {
-              "productId": e.model.id,
-              "amount": e.quantity
-            };
+            return {"productId": e.model.id, "amount": e.quantity};
           }).toList()
         },
         options: Options(validateStatus: (_) => true, headers: {
@@ -562,7 +559,6 @@ class RemoteData {
         }));
 
     if (res.statusCode == 200) {
-      print(res.data);
       return true;
     } else if (res.statusCode == 415) {
       return ErrorModel("unsupported media", 415, "Unsupported Media Type");
@@ -570,6 +566,127 @@ class RemoteData {
       return ErrorModel("forbidden", 403, "Stock forbidden");
     } else {
       return ErrorModel("auth error", 401, "Unauthorized");
+    }
+  }
+
+  Future<dynamic> getAddresses(String token, String name) async {
+    final res = await dio.post("${baseUrl}stock/all",
+        data: {"filters": {
+          "name": name
+        }},
+        options: Options(validateStatus: (_) => true, headers: {
+          "Content-Type": "application/json",
+          "authorization": "Bearer $token",
+        }));
+
+    if (res.statusCode == 200) {
+      return (res.data as List).map((e) => ShopModel.fromJson(e)).toList();
+    } else if (res.statusCode == 415) {
+      return ErrorModel("unsupported media", 415, "Unsupported Media Type");
+    } else {
+      return ErrorModel("auth error", 401, "Unauthorized");
+    }
+  }
+
+  Future<dynamic> selectAddress(
+      String token, int transactionId, int stockId) async {
+    final res = await dio.get(
+        "$baseUrl/transaction/transfer/$transactionId/4/$stockId",
+        options: Options(validateStatus: (_) => true, headers: {
+          "Content-Type": "application/json",
+          "authorization": "Bearer $token",
+        }));
+
+    if (res.statusCode == 200) {
+      if(res.data as bool) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (res.statusCode == 415) {
+      return ErrorModel("unsupported media", 415, "Unsupported Media Type");
+    } else {
+      return ErrorModel("auth error", 401, "Unauthorized");
+    }
+  }
+
+  Future<dynamic> completeTransferAssembly(String token, int transactionId, int stockId) async {
+    final res = await dio.patch(
+        "$baseUrl/transaction/transfer/$transactionId/4/$stockId",
+        options: Options(validateStatus: (_) => true, headers: {
+          "Content-Type": "application/json",
+          "authorization": "Bearer $token",
+        }));
+
+    if (res.statusCode == 200) {
+      return true;
+    } else if (res.statusCode == 415) {
+      return ErrorModel("unsupported media", 415, "Unsupported Media Type");
+    } else {
+      return ErrorModel("auth error", 401, "Unauthorized");
+    }
+  }
+
+  Future<dynamic> getTransfer(String token, int transactionId, List<int> objects, String type) async {
+    if(type == "all") {
+      final res = await dio.patch(
+          "$baseUrl/transaction/transfer/$transactionId/6",
+          options: Options(validateStatus: (_) => true, headers: {
+            "Content-Type": "application/json",
+            "authorization": "Bearer $token",
+          }));
+
+      if (res.statusCode == 200) {
+        return true;
+      } else if (res.statusCode == 404) {
+        return ErrorModel("not found", 404, "Transaction not found");
+      } else if (res.statusCode == 400) {
+        return ErrorModel(
+            "bad transaction id", 400, "Transaction id must be INT");
+      } else if (res.statusCode == 403) {
+        return ErrorModel("forbidden", 403, "Stock forbidden");
+      } else {
+        return ErrorModel("auth error", 401, "Unauthorized");
+      }
+    } else if(type == "missing") {
+      final res = await dio.patch(
+          "$baseUrl/transaction/transfer/$transactionId/7",
+          options: Options(validateStatus: (_) => true, headers: {
+            "Content-Type": "application/json",
+            "authorization": "Bearer $token",
+          }));
+
+      if (res.statusCode == 200) {
+        return true;
+      } else if (res.statusCode == 404) {
+        return ErrorModel("not found", 404, "Transaction not found");
+      } else if (res.statusCode == 400) {
+        return ErrorModel(
+            "bad transaction id", 400, "Transaction id must be INT");
+      } else if (res.statusCode == 403) {
+        return ErrorModel("forbidden", 403, "Stock forbidden");
+      } else {
+        return ErrorModel("auth error", 401, "Unauthorized");
+      }
+    } else {
+      final res = await dio.patch(
+          "$baseUrl/transaction/transfer/$transactionId/partial",
+          data: objects,
+          options: Options(validateStatus: (_) => true, headers: {
+            "Content-Type": "application/json",
+            "authorization": "Bearer $token",
+          }));
+
+      if (res.statusCode == 200) {
+        return true;
+      } else if (res.statusCode == 404) {
+        return ErrorModel("not found", 404, "Transaction not found");
+      } else if (res.statusCode == 400) {
+        return ErrorModel(
+            "bad transaction id", 400, "Transaction id must be INT");
+      } else {
+        return ErrorModel("auth error", 401, "Unauthorized");
+      }
     }
   }
 

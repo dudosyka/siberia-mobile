@@ -1,13 +1,12 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:collection/collection.dart';
 import 'package:dots_indicator/dots_indicator.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/data/models/availability_model.dart';
 import 'package:mobile_app_slb/presentation/states/assortment_state.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:mobile_app_slb/presentation/widgets/app_drawer_qr.dart';
 
 import '../../data/models/stock_model.dart';
 import '../../utils/constants.dart';
@@ -25,7 +24,9 @@ class ProductInfoPage extends ConsumerStatefulWidget {
       required this.sku,
       required this.ean,
       required this.count,
-      required this.availabilityModel, required this.stockModel});
+      required this.availabilityModel,
+      required this.stockModel,
+      required this.isQr});
 
   final int productId;
   final String name;
@@ -35,6 +36,7 @@ class ProductInfoPage extends ConsumerStatefulWidget {
   final double count;
   final List<AvailabilityModel> availabilityModel;
   final StockModel stockModel;
+  final bool isQr;
 
   @override
   ConsumerState<ProductInfoPage> createState() => _ProductInfoPageState();
@@ -54,12 +56,14 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
         child: Scaffold(
           key: scaffoldKey,
           resizeToAvoidBottomInset: false,
-          drawer: AppDrawer(
-            isAbleToNavigate: true,
-            isAssembly: false,
-            isHomePage: false,
-            stockModel: widget.stockModel,
-          ),
+          drawer: widget.isQr
+              ? AppDrawerQr(stockModel: widget.stockModel)
+              : AppDrawer(
+                  isAbleToNavigate: true,
+                  isAssembly: false,
+                  isHomePage: false,
+                  stockModel: widget.stockModel,
+                ),
           body: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,22 +81,24 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                           children: [
                             backButton(() => Navigator.pop(context),
                                 AppLocalizations.of(context)!.backCaps, true),
-                            InkWell(
-                              onTap: () {
-                                scaffoldKey.currentState?.openDrawer();
-                              },
-                              child: Container(
-                                width: 30,
-                                height: 30,
-                                decoration: BoxDecoration(
-                                    color: const Color(0xFF3C3C3C),
-                                    borderRadius: BorderRadius.circular(5)),
-                                child: const Icon(
-                                  Icons.menu,
-                                  color: Colors.white,
+                            Builder(builder: (context) {
+                              return InkWell(
+                                onTap: () {
+                                  Scaffold.of(context).openDrawer();
+                                },
+                                child: Container(
+                                  width: 30,
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                      color: const Color(0xFF3C3C3C),
+                                      borderRadius: BorderRadius.circular(5)),
+                                  child: const Icon(
+                                    Icons.menu,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              ),
-                            ),
+                              );
+                            }),
                           ],
                         ),
                       ),
@@ -157,43 +163,84 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                                             children: [
                                               CarouselSlider(
                                                   items: widget.photos != null
-                                                      ? widget.photos!.map((e) {
-                                                          return Image.network(
-                                                            "${baseUrl}file/stream/$e",
-                                                            width: 160,
-                                                            height: 160,
-                                                            errorBuilder:
-                                                                (context, obj,
-                                                                    stacktrace) {
-                                                              return const Icon(
-                                                                Icons
-                                                                    .camera_alt,
-                                                                color: Color(
-                                                                    0xFF909090),
+                                                      ? widget.photos!
+                                                              .isNotEmpty
+                                                          ? widget.photos!
+                                                              .map((e) {
+                                                              return Image
+                                                                  .network(
+                                                                "${baseUrl}file/stream/$e",
+                                                                width: 160,
+                                                                height: 160,
+                                                                errorBuilder:
+                                                                    (context,
+                                                                        obj,
+                                                                        stacktrace) {
+                                                                  return const Icon(
+                                                                    Icons
+                                                                        .camera_alt,
+                                                                    color: Color(
+                                                                        0xFF909090),
+                                                                  );
+                                                                },
+                                                                loadingBuilder:
+                                                                    (context,
+                                                                        widget,
+                                                                        event) {
+                                                                  if (event ==
+                                                                      null) {
+                                                                    return widget;
+                                                                  }
+                                                                  return Center(
+                                                                    child: Text(
+                                                                      AppLocalizations.of(
+                                                                              context)!
+                                                                          .loading,
+                                                                      style: const TextStyle(
+                                                                          color:
+                                                                              Color(0xFF909090)),
+                                                                    ),
+                                                                  );
+                                                                },
+                                                                fit: BoxFit
+                                                                    .contain,
                                                               );
-                                                            },
-                                                            loadingBuilder:
-                                                                (context,
-                                                                    widget,
-                                                                    event) {
-                                                              if (event ==
-                                                                  null) {
-                                                                return widget;
-                                                              }
-                                                              return Center(
-                                                                child: Text(
-                                                                  AppLocalizations.of(
-                                                                          context)!
-                                                                      .loading,
-                                                                  style: const TextStyle(
-                                                                      color: Color(
-                                                                          0xFF909090)),
+                                                            }).toList()
+                                                          : [
+                                                              Image.network(
+                                                                "",
+                                                                errorBuilder: (context,
+                                                                        obj,
+                                                                        stacktrace) =>
+                                                                    const Icon(
+                                                                  Icons
+                                                                      .camera_alt,
+                                                                  color: Color(
+                                                                      0xFF909090),
                                                                 ),
-                                                              );
-                                                            },
-                                                            fit: BoxFit.contain,
-                                                          );
-                                                        }).toList()
+                                                                loadingBuilder:
+                                                                    (context,
+                                                                        widget,
+                                                                        event) {
+                                                                  if (event ==
+                                                                      null) {
+                                                                    return widget;
+                                                                  }
+                                                                  return Center(
+                                                                    child: Text(
+                                                                      AppLocalizations.of(
+                                                                              context)!
+                                                                          .loading,
+                                                                      style: const TextStyle(
+                                                                          color:
+                                                                              Color(0xFF909090)),
+                                                                    ),
+                                                                  );
+                                                                },
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                              )
+                                                            ]
                                                       : [
                                                           Image.network(
                                                             "",
@@ -241,10 +288,14 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                                                 alignment:
                                                     Alignment.bottomCenter,
                                                 child: DotsIndicator(
-                                                  dotsCount: widget.photos !=
-                                                          null
-                                                      ? widget.photos!.length
-                                                      : 1,
+                                                  dotsCount:
+                                                      widget.photos != null
+                                                          ? widget.photos!
+                                                                  .isNotEmpty
+                                                              ? widget.photos!
+                                                                  .length
+                                                              : 1
+                                                          : 1,
                                                   position: currentIndex,
                                                   decorator: DotsDecorator(
                                                     shape:

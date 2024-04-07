@@ -74,7 +74,6 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-
     super.dispose();
   }
 
@@ -341,41 +340,43 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                             AppLocalizations.of(context)!
                                                 .cancelCaps,
                                             false),
-                                        InkWell(
-                                          onTap: () {
-                                            scaffoldKey.currentState
-                                                ?.openDrawer();
-                                          },
-                                          child: Container(
-                                            width: 30,
-                                            height: 30,
-                                            decoration: BoxDecoration(
-                                                color: const Color(0xFF3C3C3C),
-                                                borderRadius:
-                                                    BorderRadius.circular(5)),
-                                            child: const Icon(
-                                              Icons.menu,
-                                              color: Colors.white,
+                                        Builder(builder: (context) {
+                                          return InkWell(
+                                            onTap: () {
+                                              scaffoldKey.currentState
+                                                  ?.openDrawer();
+                                            },
+                                            child: Container(
+                                              width: 30,
+                                              height: 30,
+                                              decoration: BoxDecoration(
+                                                  color:
+                                                      const Color(0xFF3C3C3C),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5)),
+                                              child: const Icon(
+                                                Icons.menu,
+                                                color: Colors.white,
+                                              ),
                                             ),
-                                          ),
-                                        ),
+                                          );
+                                        }),
                                       ],
                                     ),
                                     const Spacer(),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 10),
+                                    const Padding(
+                                      padding: EdgeInsets.only(top: 10),
                                       child: Text(
-                                        AppLocalizations.of(context)!
-                                            .newSaleCaps,
-                                        style: const TextStyle(
+                                        "TRANSFER",
+                                        style: TextStyle(
                                             fontSize: 24,
                                             color: Color(0xFF909090),
                                             height: 0.5),
                                       ),
                                     ),
-                                    Text(
-                                      widget.currentStorehouse,
-                                      style: const TextStyle(
+                                    const Text(
+                                      "NEW TRANSFER",
+                                      style: TextStyle(
                                           fontSize: 36,
                                           color: Color(0xFF363636),
                                           fontWeight: FontWeight.bold),
@@ -917,16 +918,16 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                               context,
                               MaterialPageRoute(
                                   builder: (context) => ProductInfoPage(
-                                        productId: data[index].id,
-                                        name: data[index].name,
-                                        photos: data[index].fileNames,
-                                        sku: data[index].vendorCode,
-                                        ean: data[index].eanCode,
-                                        count: data[index].quantity ?? 0.0,
-                                        availabilityModel:
-                                            availability.availabilityModel!,
-                                        stockModel: widget.stockModel,
-                                      )));
+                                      productId: data[index].id,
+                                      name: data[index].name,
+                                      photos: data[index].fileNames,
+                                      sku: data[index].vendorCode,
+                                      ean: data[index].eanCode,
+                                      count: data[index].quantity ?? 0.0,
+                                      availabilityModel:
+                                          availability.availabilityModel!,
+                                      stockModel: widget.stockModel,
+                                      isQr: false)));
                         } else {
                           ref.read(deleteAuthProvider).deleteAuth();
                           Future.microtask(() => Navigator.pushAndRemoveUntil(
@@ -996,63 +997,58 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                     style: const TextStyle(
                                         fontSize: 16, color: Color(0xFF222222)),
                                   ),
-                                  e.quantity != null
-                                      ? InkWell(
-                                          onTap: () async {
-                                            final product = await ref
-                                                .read(transferProvider)
-                                                .getProductInfo(data[index].id);
-                                            if (product.errorModel != null) {
-                                              ref
-                                                  .read(deleteAuthProvider)
-                                                  .deleteAuth();
-                                              Future.microtask(() =>
-                                                  Navigator.pushAndRemoveUntil(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              const AuthPage()),
-                                                      (route) => false));
-                                            }
-                                            if (mounted) {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return addToCartModal(
-                                                        data[index],
-                                                        product.productModel!);
-                                                  }).then((value) {
-                                                if (value) {
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(SnackBar(
-                                                    content: Text(
-                                                        AppLocalizations.of(
-                                                                context)!
-                                                            .addedToCart),
-                                                  ));
-                                                }
-                                              });
-                                            }
-                                          },
-                                          child: const Row(
-                                            children: [
-                                              SizedBox(
-                                                width: 18,
-                                              ),
-                                              Icon(
-                                                Icons.add,
-                                                color: Color(0xFF303030),
-                                                size: 18,
-                                              ),
-                                              Icon(
-                                                Icons.shopping_cart,
-                                                color: Color(0xFF303030),
-                                                size: 18,
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      : Container(),
+                                  InkWell(
+                                    onTap: () async {
+                                      final product = await ref
+                                          .read(transferProvider)
+                                          .getProductInfo(data[index].id);
+                                      if (product.errorModel != null) {
+                                        ref
+                                            .read(deleteAuthProvider)
+                                            .deleteAuth();
+                                        Future.microtask(() =>
+                                            Navigator.pushAndRemoveUntil(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const AuthPage()),
+                                                (route) => false));
+                                      }
+                                      if (mounted) {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return addToCartModal(data[index],
+                                                  product.productModel!);
+                                            }).then((value) {
+                                          if (value) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(const SnackBar(
+                                              duration: Duration(seconds: 1),
+                                              content:
+                                                  Text("Added to transfer"),
+                                            ));
+                                          }
+                                        });
+                                      }
+                                    },
+                                    child: Row(
+                                      children: [
+                                        const SizedBox(
+                                          width: 18,
+                                        ),
+                                        const Icon(
+                                          Icons.add,
+                                          color: Color(0xFF303030),
+                                          size: 18,
+                                        ),
+                                        Image.asset(
+                                          "assets/images/bulk_boxes_icon_dark.png",
+                                          scale: 8,
+                                        ),
+                                      ],
+                                    ),
+                                  )
                                 ],
                               ),
                             )
@@ -1171,16 +1167,16 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                               context,
                               MaterialPageRoute(
                                   builder: (context) => ProductInfoPage(
-                                        productId: data[index].id,
-                                        name: data[index].name,
-                                        photos: data[index].fileNames,
-                                        sku: data[index].vendorCode,
-                                        ean: data[index].eanCode,
-                                        count: data[index].quantity ?? 0.0,
-                                        availabilityModel:
-                                            availability.availabilityModel!,
-                                        stockModel: widget.stockModel,
-                                      )));
+                                      productId: data[index].id,
+                                      name: data[index].name,
+                                      photos: data[index].fileNames,
+                                      sku: data[index].vendorCode,
+                                      ean: data[index].eanCode,
+                                      count: data[index].quantity ?? 0.0,
+                                      availabilityModel:
+                                          availability.availabilityModel!,
+                                      stockModel: widget.stockModel,
+                                      isQr: false)));
                         } else {
                           ref.read(deleteAuthProvider).deleteAuth();
                           Future.microtask(() => Navigator.pushAndRemoveUntil(
@@ -1361,78 +1357,72 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                               color: Color(0xFF058E6E)),
                                         ),
                                   const SizedBox(height: 10),
-                                  element.quantity != null
-                                      ? InkWell(
-                                          onTap: () async {
-                                            final product = await ref
-                                                .read(transferProvider)
-                                                .getProductInfo(data[index].id);
-                                            if (product.errorModel != null) {
-                                              ref
-                                                  .read(deleteAuthProvider)
-                                                  .deleteAuth();
-                                              Future.microtask(() =>
-                                                  Navigator.pushAndRemoveUntil(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              const AuthPage()),
-                                                      (route) => false));
-                                            }
-                                            if (context.mounted) {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return addToCartModal(
-                                                        data[index],
-                                                        product.productModel!);
-                                                  }).then((value) {
-                                                if (value) {
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(SnackBar(
-                                                    content: Text(
-                                                        AppLocalizations.of(
-                                                                context)!
-                                                            .addedToCart),
-                                                  ));
-                                                }
-                                              });
-                                            }
-                                          },
-                                          child: Container(
-                                            width: double.infinity,
-                                            height: 20,
-                                            decoration: BoxDecoration(
-                                                color: Colors.black,
-                                                borderRadius:
-                                                    BorderRadius.circular(4)),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                const Icon(
-                                                  Icons.add,
-                                                  color: Colors.white,
-                                                  size: 12,
-                                                ),
-                                                const Icon(
-                                                  Icons.shopping_cart,
-                                                  color: Colors.white,
-                                                  size: 12,
-                                                ),
-                                                const SizedBox(width: 6),
-                                                Text(
-                                                  AppLocalizations.of(context)!
-                                                      .addToCartCaps,
-                                                  style: const TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.white),
-                                                )
-                                              ],
-                                            ),
+                                  InkWell(
+                                    onTap: () async {
+                                      final product = await ref
+                                          .read(transferProvider)
+                                          .getProductInfo(data[index].id);
+                                      if (product.errorModel != null) {
+                                        ref
+                                            .read(deleteAuthProvider)
+                                            .deleteAuth();
+                                        Future.microtask(() =>
+                                            Navigator.pushAndRemoveUntil(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const AuthPage()),
+                                                (route) => false));
+                                      }
+                                      if (context.mounted) {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return addToCartModal(data[index],
+                                                  product.productModel!);
+                                            }).then((value) {
+                                          if (value) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(const SnackBar(
+                                              duration: Duration(seconds: 1),
+                                              content:
+                                                  Text("Added to transfer"),
+                                            ));
+                                          }
+                                        });
+                                      }
+                                    },
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: 20,
+                                      decoration: BoxDecoration(
+                                          color: Colors.black,
+                                          borderRadius:
+                                              BorderRadius.circular(4)),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(
+                                            Icons.add,
+                                            color: Colors.white,
+                                            size: 12,
                                           ),
-                                        )
-                                      : Container(),
+                                          Image.asset(
+                                            "assets/images/bulk_boxes_icon.png",
+                                            scale: 8,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          const Text(
+                                            "TRANSFER",
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.white),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  )
                                 ],
                               ),
                             ),
@@ -2497,9 +2487,9 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        AppLocalizations.of(context)!.cartCaps,
-                        style: const TextStyle(
+                      const Text(
+                        "TRANSFER",
+                        style: TextStyle(
                             fontSize: 24, fontWeight: FontWeight.w500),
                       ),
                       Row(
@@ -2537,12 +2527,14 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                                     const AuthPage()),
                                             (route) => false));
                                   }
+                                  ref.read(transferProvider).deleteCart();
                                   Future.microtask(() =>
                                       Navigator.pushAndRemoveUntil(
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const TransferCompletePage()),
+                                                  const TransferCompletePage(
+                                                      isQr: false)),
                                           (route) => false));
                                 }
                               });
@@ -2708,9 +2700,9 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
     return AlertDialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
-        title: Text(
-          AppLocalizations.of(context)!.cartItemEditCaps,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+        title: const Text(
+          "TRANSFER ITEM EDIT",
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
         ),
         content: StatefulBuilder(builder: (context, setState) {
           return SingleChildScrollView(
@@ -2817,12 +2809,9 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                               if (quantityCont.text == "") {
                                 quantityCont.text = "1";
                               } else {
-                                if (int.parse(quantityCont.text) <
-                                    data.quantity!) {
-                                  quantityCont.text =
-                                      (int.parse(quantityCont.text) + 1)
-                                          .toString();
-                                }
+                                quantityCont.text =
+                                    (int.parse(quantityCont.text) + 1)
+                                        .toString();
                               }
                               setState(() {});
                             },
@@ -2859,28 +2848,15 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                             width: 18,
                           ),
                           grayButton(() {
-                            if (int.parse(quantityCont.text) > data.quantity!) {
-                              ref.read(transferProvider).addToCart(
-                                  CartModel(
-                                      data,
-                                      data.quantity!.toInt(),
-                                      {curPrice: pricesData[curPrice]!},
-                                      pricesData[curPrice]! *
-                                          int.parse(quantityCont.text)),
-                                  widget.storehouseId);
-
-                              Navigator.pop(context, true);
-                            } else {
-                              ref.read(transferProvider).addToCart(
-                                  CartModel(
-                                      data,
-                                      int.parse(quantityCont.text),
-                                      {curPrice: pricesData[curPrice]!},
-                                      pricesData[curPrice]! *
-                                          int.parse(quantityCont.text)),
-                                  widget.storehouseId);
-                              Navigator.pop(context, true);
-                            }
+                            ref.read(transferProvider).addToCart(
+                                CartModel(
+                                    data,
+                                    int.parse(quantityCont.text),
+                                    {curPrice: pricesData[curPrice]!},
+                                    pricesData[curPrice]! *
+                                        int.parse(quantityCont.text)),
+                                widget.storehouseId);
+                            Navigator.pop(context, true);
                           }, AppLocalizations.of(context)!.saveCaps),
                         ],
                       )
@@ -2912,10 +2888,9 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
           children: [
             SizedBox(
               width: MediaQuery.of(context).size.shortestSide > 650 ? 400 : 200,
-              child: Text(
-                AppLocalizations.of(context)!.cartItemEditCaps,
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+              child: const Text(
+                "TRANSFER ITEM EDIT",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -3124,12 +3099,9 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                               if (quantityCont.text == "") {
                                 quantityCont.text = "1";
                               } else {
-                                if (int.parse(quantityCont.text) <
-                                    data.model.quantity!) {
-                                  quantityCont.text =
-                                      (int.parse(quantityCont.text) + 1)
-                                          .toString();
-                                }
+                                quantityCont.text =
+                                    (int.parse(quantityCont.text) + 1)
+                                        .toString();
                               }
                               setState(() {});
                             },
@@ -3169,22 +3141,12 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                             data.priceType = {curPrice: pricesData[curPrice]};
                             data.curPrice = pricesData[curPrice]! *
                                 int.parse(quantityCont.text);
-                            if (int.parse(quantityCont.text) >
-                                data.model.quantity!) {
-                              ref.read(transferProvider).updateCartModel(
-                                  data,
-                                  false,
-                                  data.model.quantity!.toInt(),
-                                  widget.storehouseId);
-                              Navigator.pop(context, true);
-                            } else {
-                              ref.read(transferProvider).updateCartModel(
-                                  data,
-                                  false,
-                                  int.parse(quantityCont.text),
-                                  widget.storehouseId);
-                              Navigator.pop(context, true);
-                            }
+                            ref.read(transferProvider).updateCartModel(
+                                data,
+                                false,
+                                int.parse(quantityCont.text),
+                                widget.storehouseId);
+                            Navigator.pop(context, true);
                           }, AppLocalizations.of(context)!.saveCaps),
                         ],
                       )

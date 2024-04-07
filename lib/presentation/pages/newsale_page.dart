@@ -15,6 +15,7 @@ import 'package:mobile_app_slb/presentation/pages/productinfo_page.dart';
 import 'package:mobile_app_slb/presentation/states/auth_state.dart';
 import 'package:mobile_app_slb/presentation/states/newsale_state.dart';
 import 'package:mobile_app_slb/presentation/widgets/app_drawer.dart';
+import 'package:mobile_app_slb/presentation/widgets/app_drawer_qr.dart';
 import 'package:mobile_app_slb/presentation/widgets/backButton.dart';
 import 'package:mobile_app_slb/presentation/widgets/exit_dialog.dart';
 import 'package:mobile_app_slb/presentation/widgets/gray_button.dart';
@@ -144,12 +145,14 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
           child: Scaffold(
             key: scaffoldKey,
             resizeToAvoidBottomInset: false,
-            drawer: AppDrawer(
-              isAbleToNavigate: false,
-              isAssembly: false,
-              isHomePage: false,
-              stockModel: widget.stockModel,
-            ),
+            drawer: widget.isTransaction
+                ? AppDrawerQr(stockModel: widget.stockModel)
+                : AppDrawer(
+                    isAbleToNavigate: false,
+                    isAssembly: false,
+                    isHomePage: false,
+                    stockModel: widget.stockModel,
+                  ),
             bottomNavigationBar: SafeArea(
               child: Container(
                 height: 80,
@@ -339,24 +342,27 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                             AppLocalizations.of(context)!
                                                 .cancelCaps,
                                             false),
-                                        InkWell(
-                                          onTap: () {
-                                            scaffoldKey.currentState
-                                                ?.openDrawer();
-                                          },
-                                          child: Container(
-                                            width: 30,
-                                            height: 30,
-                                            decoration: BoxDecoration(
-                                                color: const Color(0xFF3C3C3C),
-                                                borderRadius:
-                                                    BorderRadius.circular(5)),
-                                            child: const Icon(
-                                              Icons.menu,
-                                              color: Colors.white,
+                                        Builder(builder: (context) {
+                                          return InkWell(
+                                            onTap: () {
+                                              scaffoldKey.currentState
+                                                  ?.openDrawer();
+                                            },
+                                            child: Container(
+                                              width: 30,
+                                              height: 30,
+                                              decoration: BoxDecoration(
+                                                  color:
+                                                      const Color(0xFF3C3C3C),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5)),
+                                              child: const Icon(
+                                                Icons.menu,
+                                                color: Colors.white,
+                                              ),
                                             ),
-                                          ),
-                                        ),
+                                          );
+                                        }),
                                       ],
                                     ),
                                     const Spacer(),
@@ -915,16 +921,16 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                               context,
                               MaterialPageRoute(
                                   builder: (context) => ProductInfoPage(
-                                        productId: data[index].id,
-                                        name: data[index].name,
-                                        photos: data[index].fileNames,
-                                        sku: data[index].vendorCode,
-                                        ean: data[index].eanCode,
-                                        count: data[index].quantity ?? 0.0,
-                                        availabilityModel:
-                                            availability.availabilityModel!,
-                                        stockModel: widget.stockModel,
-                                      )));
+                                      productId: data[index].id,
+                                      name: data[index].name,
+                                      photos: data[index].fileNames,
+                                      sku: data[index].vendorCode,
+                                      ean: data[index].eanCode,
+                                      count: data[index].quantity ?? 0.0,
+                                      availabilityModel:
+                                          availability.availabilityModel!,
+                                      stockModel: widget.stockModel,
+                                      isQr: widget.isTransaction)));
                         } else {
                           ref.read(deleteAuthProvider).deleteAuth();
                           Future.microtask(() => Navigator.pushAndRemoveUntil(
@@ -1023,6 +1029,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                                 if (value) {
                                                   ScaffoldMessenger.of(context)
                                                       .showSnackBar(SnackBar(
+                                                    duration: const Duration(
+                                                        seconds: 1),
                                                     content: Text(
                                                         AppLocalizations.of(
                                                                 context)!
@@ -1169,16 +1177,16 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                               context,
                               MaterialPageRoute(
                                   builder: (context) => ProductInfoPage(
-                                        productId: data[index].id,
-                                        name: data[index].name,
-                                        photos: data[index].fileNames,
-                                        sku: data[index].vendorCode,
-                                        ean: data[index].eanCode,
-                                        count: data[index].quantity ?? 0.0,
-                                        availabilityModel:
-                                            availability.availabilityModel!,
-                                        stockModel: widget.stockModel,
-                                      )));
+                                      productId: data[index].id,
+                                      name: data[index].name,
+                                      photos: data[index].fileNames,
+                                      sku: data[index].vendorCode,
+                                      ean: data[index].eanCode,
+                                      count: data[index].quantity ?? 0.0,
+                                      availabilityModel:
+                                          availability.availabilityModel!,
+                                      stockModel: widget.stockModel,
+                                      isQr: widget.isTransaction)));
                         } else {
                           ref.read(deleteAuthProvider).deleteAuth();
                           Future.microtask(() => Navigator.pushAndRemoveUntil(
@@ -1388,6 +1396,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                                 if (value) {
                                                   ScaffoldMessenger.of(context)
                                                       .showSnackBar(SnackBar(
+                                                    duration: const Duration(
+                                                        seconds: 1),
                                                     content: Text(
                                                         AppLocalizations.of(
                                                                 context)!
@@ -2538,7 +2548,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                                     .cartData,
                                                 isTransaction:
                                                     widget.isTransaction,
-                                            stockModel: widget.stockModel,
+                                                stockModel: widget.stockModel,
                                               )));
                                 }
                               });

@@ -103,7 +103,7 @@ class _BulkPageState extends ConsumerState<BulkPage> {
                                   }
                                 : () {
                                     ScaffoldMessenger.of(context)
-                                        .showSnackBar(const SnackBar(
+                                        .showSnackBar(const SnackBar(duration: Duration(seconds: 1),
                                       content:
                                           Text("Select at least one product"),
                                     ));
@@ -194,22 +194,26 @@ class _BulkPageState extends ConsumerState<BulkPage> {
                                       });
                                     }, AppLocalizations.of(context)!.cancelCaps,
                                         false),
-                                    InkWell(
-                                      onTap: () {
-                                        scaffoldKey.currentState?.openDrawer();
-                                      },
-                                      child: Container(
-                                        width: 30,
-                                        height: 30,
-                                        decoration: BoxDecoration(
-                                            color: const Color(0xFF3C3C3C),
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        child: const Icon(
-                                          Icons.menu,
-                                          color: Colors.white,
-                                        ),
-                                      ),
+                                    Builder(
+                                      builder: (context) {
+                                        return InkWell(
+                                          onTap: () {
+                                            Scaffold.of(context).openDrawer();
+                                          },
+                                          child: Container(
+                                            width: 30,
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                                color: const Color(0xFF3C3C3C),
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
+                                            child: const Icon(
+                                              Icons.menu,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        );
+                                      }
                                     ),
                                   ],
                                 ),

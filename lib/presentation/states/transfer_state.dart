@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/data/repository/transfer_repository.dart';
 import 'package:mobile_app_slb/domain/usecases/outcome_usecase.dart';
+import 'package:mobile_app_slb/domain/usecases/shops_usecase.dart';
 
 import '../../data/models/cart_model.dart';
 import '../../data/repository/assortment_repository.dart';
@@ -19,11 +20,7 @@ class TransferNotifier extends ChangeNotifier {
     bool flag = false;
     for (var element in cartData) {
       if (element.model.id == newModel.model.id) {
-        if (element.quantity + newModel.quantity <= element.model.quantity!) {
-          element.quantity += newModel.quantity;
-        } else {
-          element.quantity = element.model.quantity!.toInt();
-        }
+        element.quantity += newModel.quantity;
         flag = true;
         break;
       }
@@ -77,9 +74,32 @@ class TransferNotifier extends ChangeNotifier {
     return data;
   }
 
+  Future<ShopsUseCase> selectAddress(int transactionId, int stockId) async {
+    final data =
+        await TransferRepository().selectAddress(transactionId, stockId);
+    return data;
+  }
+
+  Future<ShopsUseCase> completeTransferAssembly(int transactionId, int stockId) async {
+    final data =
+    await TransferRepository().completeTransferAssembly(transactionId, stockId);
+    return data;
+  }
+
+  Future<ShopsUseCase> getTransfer(int transactionId, List<int> objects, String type) async {
+    final data =
+    await TransferRepository().getTransfer(transactionId, objects, type);
+    return data;
+  }
+
   Future<void> deleteCart() async {
     transactionId = null;
     cartData = [];
     notifyListeners();
   }
 }
+
+final getAddressesProvider = FutureProvider.family<ShopsUseCase, String>((ref, name) async {
+  final data = await TransferRepository().getAddresses(name);
+  return data;
+});

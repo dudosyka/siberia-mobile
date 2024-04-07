@@ -4,19 +4,27 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mobile_app_slb/presentation/pages/auth_page.dart';
 import 'package:mobile_app_slb/presentation/pages/productinfo_page.dart';
+import 'package:mobile_app_slb/presentation/pages/transfercomplete_page.dart';
+import 'package:mobile_app_slb/presentation/states/transfer_state.dart';
+import 'package:mobile_app_slb/presentation/widgets/app_drawer_qr.dart';
 import '../../data/models/cart_model.dart';
 import '../../data/models/stock_model.dart';
 import '../states/assortment_state.dart';
 import '../states/auth_state.dart';
-import '../widgets/app_drawer.dart';
 import '../widgets/backButton.dart';
 import '../widgets/exit_dialog.dart';
 
 class TransferAssemblyPage extends ConsumerStatefulWidget {
   const TransferAssemblyPage(
-      {super.key, required this.stockModel, required this.cartModels});
+      {super.key,
+      required this.stockModel,
+      required this.cartModels,
+      required this.transactionId,
+      required this.stockId});
 
   final StockModel stockModel;
+  final int transactionId;
+  final int stockId;
   final List<CartModel> cartModels;
 
   @override
@@ -39,10 +47,7 @@ class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage> {
         child: Scaffold(
             key: scaffoldKey,
             resizeToAvoidBottomInset: false,
-            drawer: AppDrawer(
-              isAbleToNavigate: false,
-              isAssembly: false,
-              isHomePage: false,
+            drawer: AppDrawerQr(
               stockModel: widget.stockModel,
             ),
             bottomNavigationBar: SafeArea(
@@ -59,10 +64,36 @@ class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage> {
                           opacity: isAllSelected ? 1.0 : 0.2,
                           child: InkWell(
                             onTap: isAllSelected
-                                ? () async {}
+                                ? () async {
+                                    final data = await ref
+                                        .read(transferProvider)
+                                        .completeTransferAssembly(
+                                            widget.transactionId,
+                                            widget.stockId);
+                                    if (data.errorModel == null) {
+                                      if (context.mounted) {
+                                        Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const TransferCompletePage(
+                                                        isQr: true)),
+                                            (route) => false);
+                                      }
+                                    } else {
+                                      if (context.mounted) {
+                                        Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const AuthPage()),
+                                            (route) => false);
+                                      }
+                                    }
+                                  }
                                 : () {
                                     ScaffoldMessenger.of(context)
-                                        .showSnackBar(SnackBar(
+                                        .showSnackBar(SnackBar(duration: const Duration(seconds: 1),
                                       content: Text(
                                           AppLocalizations.of(context)!
                                               .notAllProducts),
@@ -139,21 +170,25 @@ class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage> {
                                 });
                               }, AppLocalizations.of(context)!.cancelCaps,
                                   false),
-                              InkWell(
-                                onTap: () {
-                                  scaffoldKey.currentState?.openDrawer();
-                                },
-                                child: Container(
-                                  width: 30,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                      color: const Color(0xFF3C3C3C),
-                                      borderRadius: BorderRadius.circular(5)),
-                                  child: const Icon(
-                                    Icons.menu,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                              Builder(
+                                builder: (context) {
+                                  return InkWell(
+                                    onTap: () {
+                                      Scaffold.of(context).openDrawer();
+                                    },
+                                    child: Container(
+                                      width: 30,
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                          color: const Color(0xFF3C3C3C),
+                                          borderRadius: BorderRadius.circular(5)),
+                                      child: const Icon(
+                                        Icons.menu,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  );
+                                }
                               ),
                             ],
                           ),
@@ -279,7 +314,7 @@ class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage> {
                                   width: 20,
                                 ),
                                 Text(
-                                  "TRANSFER ${e.model.id}",
+                                  e.model.name,
                                   style: const TextStyle(
                                       fontSize: 16, color: Color(0xFF222222)),
                                 ),
@@ -323,6 +358,7 @@ class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage> {
                                                                 .availabilityModel!,
                                                         stockModel:
                                                             widget.stockModel,
+                                                        isQr: true,
                                                       )));
                                         } else {
                                           ref

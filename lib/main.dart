@@ -3,15 +3,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/presentation/pages/auth_page.dart';
+import 'package:mobile_app_slb/presentation/pages/gettransfer_page.dart';
 import 'package:mobile_app_slb/presentation/pages/home_page.dart';
 import 'package:mobile_app_slb/presentation/pages/newsale_page.dart';
 import 'package:mobile_app_slb/presentation/pages/nonetwork_page.dart';
-import 'package:mobile_app_slb/presentation/pages/transferassembly_page.dart';
+import 'package:mobile_app_slb/presentation/pages/selectaddress_page.dart';
 import 'package:mobile_app_slb/presentation/states/auth_state.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mobile_app_slb/presentation/states/main_state.dart';
 import 'package:mobile_app_slb/presentation/states/network_state.dart';
-import 'package:mobile_app_slb/presentation/states/transfer_state.dart';
 import 'package:provider/provider.dart' as provider;
 
 Future<void> main() async {
@@ -72,10 +72,11 @@ class _MyAppState extends ConsumerState<MyApp> {
             builder: (context, snapshot) {
               if (snapshot.data == NetworkStatus.offline) {
                 WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                  Navigator.push(
+                  Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const NoNetworkPage()));
+                          builder: (context) => const NoNetworkPage()),
+                      (route) => false);
                 });
               }
               return MediaQuery(
@@ -85,42 +86,38 @@ class _MyAppState extends ConsumerState<MyApp> {
                         : const TextScaler.linear(1.0)),
                 child: Scaffold(
                   body: ref.watch(loadAuthProvider).when(data: (value) {
-                    if (value.authModel == null) {
+                    if (value.$1.authModel == null ||
+                        value.$2.errorModel != null ||
+                        value.$3.errorModel != null) {
                       return const AuthPage();
                     } else {
-                      if (value.authModel!.type == "stock") {
+                      if (value.$1.authModel!.type == "stock") {
                         return const HomePage();
-                      } else if (value.authModel!.type == "transaction") {
-                        final data =
-                            ref.read(localeChangeProvider).getCurrentStock();
-                        data.then((value) {
-                          if (value.errorModel != null) {
-                            return const AuthPage();
-                          }
-                          if (value.stockModel!.typeId == 3 &&
-                              value.stockModel!.statusId == 2) {
-                            ref
-                                .read(transferProvider)
-                                .getCurrentStock()
-                                .then((value2) {
-                              if (value2.errorModel != null) {
-                                return const AuthPage();
-                              }
-                              return TransferAssemblyPage(
-                                stockModel: value.stockModel!,
-                                cartModels: value2.currentStock!.cartModels,
-                              );
-                            });
-                          }
-                          return NewSalePage(
-                            currentStorehouse: value.stockModel!.name,
-                            storehouseId: value.stockModel!.id,
-                            isTransaction: true,
-                            stockModel: value.stockModel!,
+                      } else if (value.$1.authModel!.type == "transaction") {
+                        if (value.$2.stockModel!.statusId == 2 &&
+                            value.$2.stockModel!.typeId == 3) {
+                          return SelectAddressPage(
+                            stockModel: value.$2.stockModel!,
+                            currentStock: value.$3.currentStock!,
                           );
-                        });
+                        } else if (value.$2.stockModel!.typeId == 3 &&
+                            value.$2.stockModel!.statusId == 4) {
+                          return GetTransferPage(
+                            stockModel: value.$2.stockModel!,
+                            cartModels: value.$3.currentStock!.cartModels,
+                            transactionId: value.$3.currentStock!.id,
+                            stockId: value.$2.stockModel!.id,
+                          );
+                        } else if (value.$2.stockModel!.typeId == 2) {
+                          return NewSalePage(
+                            currentStorehouse: value.$2.stockModel!.name,
+                            storehouseId: value.$2.stockModel!.id,
+                            isTransaction: true,
+                            stockModel: value.$2.stockModel!,
+                          );
+                        }
                       } else {
-                        return Container();
+                        return const AuthPage();
                       }
                     }
                     return const AuthPage();

@@ -20,7 +20,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../states/assortment_state.dart';
 
 class AssortmentPage extends ConsumerStatefulWidget {
-  const AssortmentPage({super.key, required this.currentStorehouse, required this.stockModel});
+  const AssortmentPage(
+      {super.key, required this.currentStorehouse, required this.stockModel});
 
   final String currentStorehouse;
   final StockModel stockModel;
@@ -162,24 +163,26 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                           AppLocalizations.of(context)!
                                               .backCaps,
                                           true),
-                                      InkWell(
-                                        onTap: () {
-                                          scaffoldKey.currentState
-                                              ?.openDrawer();
-                                        },
-                                        child: Container(
-                                          width: 30,
-                                          height: 30,
-                                          decoration: BoxDecoration(
-                                              color: const Color(0xFF3C3C3C),
-                                              borderRadius:
-                                                  BorderRadius.circular(5)),
-                                          child: const Icon(
-                                            Icons.menu,
-                                            color: Colors.white,
+                                      Builder(builder: (context) {
+                                        return InkWell(
+                                          onTap: () {
+                                            scaffoldKey.currentState
+                                                ?.openDrawer();
+                                          },
+                                          child: Container(
+                                            width: 30,
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                                color: const Color(0xFF3C3C3C),
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
+                                            child: const Icon(
+                                              Icons.menu,
+                                              color: Colors.white,
+                                            ),
                                           ),
-                                        ),
-                                      ),
+                                        );
+                                      }),
                                     ],
                                   ),
                                   const Spacer(),
@@ -733,16 +736,16 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => ProductInfoPage(
-                                        productId: data[index].id,
-                                        name: data[index].name,
-                                        photos: data[index].fileNames,
-                                        sku: data[index].vendorCode,
-                                        ean: data[index].eanCode,
-                                        count: data[index].quantity ?? 0.0,
-                                        availabilityModel:
-                                            availability.availabilityModel!,
-                                    stockModel: widget.stockModel,
-                                      )));
+                                      productId: data[index].id,
+                                      name: data[index].name,
+                                      photos: data[index].fileNames,
+                                      sku: data[index].vendorCode,
+                                      ean: data[index].eanCode,
+                                      count: data[index].quantity ?? 0.0,
+                                      availabilityModel:
+                                          availability.availabilityModel!,
+                                      stockModel: widget.stockModel,
+                                      isQr: false)));
                         } else {
                           ref.read(deleteAuthProvider).deleteAuth();
                           Future.microtask(() => Navigator.pushAndRemoveUntil(
@@ -931,16 +934,16 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => ProductInfoPage(
-                                        productId: data[index].id,
-                                        name: data[index].name,
-                                        photos: data[index].fileNames,
-                                        sku: data[index].vendorCode,
-                                        ean: data[index].eanCode,
-                                        count: data[index].quantity ?? 0.0,
-                                        availabilityModel:
-                                            availability.availabilityModel!,
-                                    stockModel: widget.stockModel,
-                                      )));
+                                      productId: data[index].id,
+                                      name: data[index].name,
+                                      photos: data[index].fileNames,
+                                      sku: data[index].vendorCode,
+                                      ean: data[index].eanCode,
+                                      count: data[index].quantity ?? 0.0,
+                                      availabilityModel:
+                                          availability.availabilityModel!,
+                                      stockModel: widget.stockModel,
+                                      isQr: false)));
                         } else {
                           ref.read(deleteAuthProvider).deleteAuth();
                           Future.microtask(() => Navigator.pushAndRemoveUntil(

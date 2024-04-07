@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/data/repository/auth_repository.dart';
+import 'package:mobile_app_slb/domain/usecases/currentstock_usecase.dart';
+import '../../data/repository/newsale_repository.dart';
 import '../../domain/usecases/auth_usecase.dart';
 
 final authProvider =
@@ -13,7 +15,19 @@ final authProvider =
 
 final loadAuthProvider = FutureProvider((ref) async {
   final data = await AuthRepository().getAuthData();
-  return data;
+  final data2 = await AuthRepository().getStock();
+  if (data2.errorModel == null) {
+    if (data2.stockModel!.typeId == 3 || data2.stockModel!.typeId == 2) {
+      final data3 = await NewSaleRepository().getCurrentStock();
+      return (data, data2, data3);
+    }
+  }
+  return (
+    data,
+    data2,
+    CurrentStockUseCase(
+        errorModel: null)
+  );
 });
 
 final deleteAuthProvider =
