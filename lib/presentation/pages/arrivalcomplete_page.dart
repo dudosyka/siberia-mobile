@@ -1,17 +1,18 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'home_page.dart';
 
-class BulkCompletePage extends StatefulWidget {
-  const BulkCompletePage({super.key});
+class ArrivalCompletePage extends ConsumerStatefulWidget {
+  const ArrivalCompletePage({super.key});
 
   @override
-  State<BulkCompletePage> createState() => _BulkCompletePageState();
+  ConsumerState<ArrivalCompletePage> createState() =>
+      _ArrivalCompletePageState();
 }
 
-class _BulkCompletePageState extends State<BulkCompletePage> {
+class _ArrivalCompletePageState extends ConsumerState<ArrivalCompletePage> {
   Timer? _timer;
 
   @override
@@ -19,8 +20,8 @@ class _BulkCompletePageState extends State<BulkCompletePage> {
     super.initState();
 
     _timer = Timer(const Duration(seconds: 5), () {
-      Future.microtask(() => Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const HomePage())));
+      Future.microtask(() => Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (context) => const HomePage())));
     });
   }
 
@@ -78,7 +79,7 @@ class _BulkCompletePageState extends State<BulkCompletePage> {
                         ),
                         const SizedBox(height: 36),
                         Text(
-                          AppLocalizations.of(context)!.assemblingCompletedCaps,
+                          AppLocalizations.of(context)!.newArrivalCompletedCaps,
                           style: const TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.w600,
@@ -115,8 +116,7 @@ class _BulkCompletePageState extends State<BulkCompletePage> {
                               color: const Color(0xFF3C3C3C),
                               borderRadius: BorderRadius.circular(8)),
                           child: Center(
-                            child: Text(
-                              AppLocalizations.of(context)!.homeCaps,
+                            child: Text(AppLocalizations.of(context)!.homeCaps,
                               style: const TextStyle(
                                   fontSize: 24,
                                   color: Colors.white,

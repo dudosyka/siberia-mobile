@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:collection/collection.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/data/models/assortment_model.dart';
 import 'package:mobile_app_slb/data/models/category_model.dart';
@@ -22,10 +23,10 @@ import 'package:mobile_app_slb/presentation/widgets/gray_button.dart';
 import 'package:mobile_app_slb/presentation/widgets/outlined_gray_button.dart';
 import 'package:mobile_app_slb/utils/constants.dart' as constants;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 import '../../data/models/cart_model.dart';
 import '../states/assortment_state.dart';
 import '../widgets/round_button.dart';
+import 'dart:io' show Platform;
 
 class NewSalePage extends ConsumerStatefulWidget {
   const NewSalePage(
@@ -72,6 +73,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
   @override
   void initState() {
     super.initState();
+    ref.read(cartDataProvider).getCurrentStock();
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -115,6 +117,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+
     return PopScope(
         canPop: false,
         onPopInvoked: (didPop) async {
@@ -171,7 +175,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                               context: context,
                               isScrollControlled: true,
                               builder: (context) =>
-                                  filtersBottomSheet(context));
+                                  filtersBottomSheet(context, width));
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -208,7 +212,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                     context: context,
                                     isScrollControlled: true,
                                     builder: (context) {
-                                      return cartBottomSheet();
+                                      return cartBottomSheet(width);
                                     });
                               }, true),
                               ref.watch(cartDataProvider).cartData.isEmpty
@@ -562,11 +566,13 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
 
                                               if (isGrid) {
                                                 return getProductGridWidget(
-                                                    value.assortmentModel!);
+                                                    value.assortmentModel!,
+                                                    width);
                                               } else {
                                                 return getProductListWidget(
                                                     theme,
-                                                    value.assortmentModel!);
+                                                    value.assortmentModel!,
+                                                    width);
                                               }
                                             }
                                             if (value.errorModel!.statusCode ==
@@ -597,16 +603,28 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                             );
                                           },
                                           error: (error, stacktrace) {
-                                            return AlertDialog(
-                                              title: Text(error.toString()),
-                                              actions: [
-                                                ElevatedButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: const Text("Ok"))
-                                              ],
-                                            );
+                                            if (Platform.isAndroid) {
+                                              return AlertDialog(
+                                                title: Text(error.toString()),
+                                                actions: [
+                                                  ElevatedButton(
+                                                      onPressed: () {
+                                                        //Navigator.pop(context);
+                                                        SystemChannels.platform
+                                                            .invokeMethod(
+                                                                'SystemNavigator.pop');
+                                                      },
+                                                      child: const Text("Ok"))
+                                                ],
+                                              );
+                                            } else {
+                                              return AlertDialog(
+                                                title: Text(
+                                                  AppLocalizations.of(context)!.smtWentWrongReload,
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              );
+                                            }
                                           },
                                           loading: () => const Expanded(
                                                 flex: 5,
@@ -628,16 +646,27 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                       );
                     },
                     error: (error, stacktrace) {
-                      return AlertDialog(
-                        title: Text(error.toString()),
-                        actions: [
-                          ElevatedButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text("Ok"))
-                        ],
-                      );
+                      if (Platform.isAndroid) {
+                        return AlertDialog(
+                          title: Text(error.toString()),
+                          actions: [
+                            ElevatedButton(
+                                onPressed: () {
+                                  //Navigator.pop(context);
+                                  SystemChannels.platform
+                                      .invokeMethod('SystemNavigator.pop');
+                                },
+                                child: const Text("Ok"))
+                          ],
+                        );
+                      } else {
+                        return AlertDialog(
+                          title: Text(
+                            AppLocalizations.of(context)!.smtWentWrongReload,
+                            textAlign: TextAlign.center,
+                          ),
+                        );
+                      }
                     },
                     loading: () => const Center(
                           child: CircularProgressIndicator(
@@ -648,172 +677,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
         ));
   }
 
-  Future<void> getAvailability(AssortmentModel e, BuildContext context) async {
-    final data = await ref.read(getAvailabilityProvider).getAvailability(e.id);
-    if (data.availabilityModel != null && data.errorModel == null) {
-      if (context.mounted) {
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                backgroundColor: Colors.white,
-                surfaceTintColor: Colors.transparent,
-                title: Text(
-                  AppLocalizations.of(context)!.inStockCaps,
-                  style: const TextStyle(fontSize: 24),
-                ),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    RichText(
-                      text: TextSpan(
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF6F6F6F),
-                        ),
-                        children: <TextSpan>[
-                          TextSpan(text: e.name),
-                          TextSpan(
-                              text:
-                                  AppLocalizations.of(context)!.isInStockInThis,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.normal)),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    SizedBox(
-                      width: double.maxFinite,
-                      height: 300,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Expanded(
-                            child: ListView(
-                              shrinkWrap: true,
-                              children: data.availabilityModel!
-                                  .mapIndexed((index, e) => Column(
-                                        children: [
-                                          const Divider(
-                                            height: 1,
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(10),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                const Padding(
-                                                  padding:
-                                                      EdgeInsets.only(top: 6),
-                                                  child: Icon(
-                                                    Icons.place,
-                                                    color: Colors.black,
-                                                    size: 16,
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                  width: 10,
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    SizedBox(
-                                                      width: 200,
-                                                      child: Text(
-                                                        e.name,
-                                                        style: const TextStyle(
-                                                            fontSize: 16),
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      e.address,
-                                                      style: const TextStyle(
-                                                          fontSize: 16,
-                                                          color: Color(
-                                                              0xFF969696)),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    )
-                                                  ],
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          index ==
-                                                  data.availabilityModel!
-                                                          .length -
-                                                      1
-                                              ? const Divider(
-                                                  height: 1,
-                                                )
-                                              : Container()
-                                        ],
-                                      ))
-                                  .toList(),
-                            ),
-                          ),
-                          const Spacer(),
-                          SizedBox(
-                            height: 30,
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    elevation: 0,
-                                    backgroundColor: const Color(0xFF3C3C3C),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(4))),
-                                child: Text(
-                                  AppLocalizations.of(context)!.backCaps,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16,
-                                      color: Colors.white),
-                                )),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              );
-            });
-      }
-    } else {
-      if (data.errorModel!.statusCode == 401) {
-        ref.read(deleteAuthProvider).deleteAuth().then((value) {
-          Future.microtask(() => Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const AuthPage()),
-              (route) => false));
-        });
-      } else {
-        if (context.mounted) {
-          showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                    title: Text(data.errorModel!.statusText),
-                    actions: [
-                      ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text("Ok"))
-                    ],
-                  ));
-        }
-      }
-    }
-  }
-
-  Widget getProductListWidget(ThemeData theme, List<AssortmentModel> data) {
+  Widget getProductListWidget(
+      ThemeData theme, List<AssortmentModel> data, double width) {
     return Expanded(
       child: Column(
         children: [
@@ -981,10 +846,15 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                   const SizedBox(
                                     width: 20,
                                   ),
-                                  Text(
-                                    e.name,
-                                    style: const TextStyle(
-                                        fontSize: 16, color: Color(0xFF222222)),
+                                  SizedBox(
+                                    width: width / 2 - 20 - 31,
+                                    child: Text(
+                                      e.name,
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Color(0xFF222222)),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -995,10 +865,15 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    e.vendorCode,
-                                    style: const TextStyle(
-                                        fontSize: 16, color: Color(0xFF222222)),
+                                  SizedBox(
+                                    width: width / 2 - 18 - 3 * 18,
+                                    child: Text(
+                                      e.vendorCode,
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Color(0xFF222222)),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                   e.quantity != null
                                       ? InkWell(
@@ -1074,7 +949,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
     );
   }
 
-  Widget getProductGridWidget(List<AssortmentModel> data) {
+  Widget getProductGridWidget(List<AssortmentModel> data, double width) {
     return Expanded(
         child: Padding(
       padding: const EdgeInsets.only(top: 10, left: 30, right: 30, bottom: 20),
@@ -1340,16 +1215,25 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    element.name,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
+                                  SizedBox(
+                                    width: 120,
+                                    child: Text(
+                                      element.name,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                  Text(
-                                    element.vendorCode,
-                                    style: const TextStyle(
-                                        fontSize: 13, color: Color(0xFF909090)),
+                                  SizedBox(
+                                    width: 120,
+                                    child: Text(
+                                      element.vendorCode,
+                                      style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Color(0xFF909090)),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                   element.quantity == null
                                       ? Text(
@@ -1429,12 +1313,18 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                                   size: 12,
                                                 ),
                                                 const SizedBox(width: 6),
-                                                Text(
-                                                  AppLocalizations.of(context)!
-                                                      .addToCartCaps,
-                                                  style: const TextStyle(
-                                                      fontSize: 12,
-                                                      color: Colors.white),
+                                                SizedBox(
+                                                  width: 90,
+                                                  child: Text(
+                                                    AppLocalizations.of(
+                                                            context)!
+                                                        .addToCartCaps,
+                                                    style: const TextStyle(
+                                                        fontSize: 12,
+                                                        color: Colors.white),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
                                                 )
                                               ],
                                             ),
@@ -1456,17 +1346,17 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
     ));
   }
 
-  Widget filtersBottomSheet(BuildContext context) {
+  Widget filtersBottomSheet(BuildContext context, double width) {
     return SafeArea(
       child: Padding(
         padding:
             EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
         child: StatefulBuilder(builder: (context, setState) {
-          return SingleChildScrollView(
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-              ),
+          return Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+            ),
+            child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -1495,14 +1385,6 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                   "category": null
                                 };
                               });
-                              // resetSelection(filtersUseCase!.categoryModels!);
-                              // for (var element
-                              //     in filtersUseCase!.collectionModels!) {
-                              //   element.isSelected = false;
-                              // }
-                              // for (var element in filtersUseCase!.brandModels!) {
-                              //   element.isSelected = false;
-                              // }
                               ref.refresh(getFiltersProvider).value;
                             }, AppLocalizations.of(context)!.clearAllCaps),
                             const SizedBox(
@@ -1722,7 +1604,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                         filteredList,
                                         brandCont,
                                         AppLocalizations.of(context)!.brand,
-                                        filtersUseCase!.brandModels!);
+                                        filtersUseCase!.brandModels!,
+                                        width);
                                   }).then((value) => setState(() {
                                     selectedBrands = [];
                                     for (var element
@@ -1825,7 +1708,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                         collectionCont,
                                         AppLocalizations.of(context)!
                                             .collection,
-                                        filtersUseCase!.collectionModels!);
+                                        filtersUseCase!.collectionModels!,
+                                        width);
                                   }).then((value) => setState(() {
                                     selectedCollections = [];
                                     for (var element
@@ -1928,7 +1812,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                         filteredList,
                                         categoryCont,
                                         AppLocalizations.of(context)!.category,
-                                        filtersUseCase!.categoryModels!);
+                                        filtersUseCase!.categoryModels!,
+                                        width);
                                   }).then((value) => setState(() {
                                     selectedCategories = [];
                                     for (var element
@@ -2010,7 +1895,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
   }
 
   Widget selectFiltersModal(BuildContext context, List filteredList,
-      TextEditingController cont, String title, List models) {
+      TextEditingController cont, String title, List models, double width) {
     return AlertDialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -2135,10 +2020,14 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            element.name,
-                                            style:
-                                                const TextStyle(fontSize: 16),
+                                          SizedBox(
+                                            width: width - 16 - 36 - 110,
+                                            child: Text(
+                                              element.name,
+                                              style:
+                                                  const TextStyle(fontSize: 16),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
                                           filteredList[index].isSelected
                                               ? const Icon(
@@ -2185,7 +2074,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
   }
 
   Widget selectCategoriesModal(BuildContext context, List filteredList,
-      TextEditingController cont, String title, List models) {
+      TextEditingController cont, String title, List models, double width) {
     return AlertDialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -2284,7 +2173,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                   SizedBox(
                       width: double.maxFinite,
                       height: 400,
-                      child: listOfCategories(filteredList, -3, true, null)),
+                      child: listOfCategories(
+                          filteredList, -3, true, null, width)),
                   const SizedBox(height: 20),
                   SizedBox(
                     height: 30,
@@ -2312,8 +2202,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
         }));
   }
 
-  Widget listOfCategories(
-      List filteredList, double padding, bool isFirst, Color? prevColor) {
+  Widget listOfCategories(List filteredList, double padding, bool isFirst,
+      Color? prevColor, double width) {
     padding = padding + 11;
     return StatefulBuilder(builder: (context, setState) {
       return ListView(
@@ -2360,9 +2250,13 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                     ),
                                   )
                                 : Container(),
-                            Text(
-                              element.name,
-                              style: const TextStyle(fontSize: 16),
+                            SizedBox(
+                              width: width - padding - 44 - 18 - 110,
+                              child: Text(
+                                element.name,
+                                style: const TextStyle(fontSize: 16),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                             const Spacer(),
                             filteredList[index].isSelected
@@ -2385,7 +2279,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                         ? const Color(0xFFF6F6F6)
                                         : Colors.white
                                     : prevColor
-                                : prevColor)
+                                : prevColor,
+                            width)
                         : Container()
                     : Container(),
                 isFirst
@@ -2484,7 +2379,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
   int compareString(bool ascending, String value1, String value2) =>
       ascending ? value1.compareTo(value2) : value2.compareTo(value1);
 
-  Widget cartBottomSheet() {
+  Widget cartBottomSheet(double width) {
     List<CartModel> data = ref.watch(cartDataProvider).cartData;
     double sum = ref.watch(cartDataProvider).sum;
 
@@ -2686,34 +2581,26 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                 ),
                                 Expanded(
                                   flex: 1,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        data[index].quantity.toString(),
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            color: Color(0xFF3A3A3A)),
-                                      )
-                                    ],
+                                  child: Center(
+                                    child: Text(
+                                      data[index].quantity.toString(),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Color(0xFF3A3A3A)),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                 ),
                                 Expanded(
                                   flex: 1,
                                   child: Padding(
                                     padding: const EdgeInsets.only(left: 10),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          (data[index].curPrice).toString(),
-                                          style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Color(0xFF3A3A3A)),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
+                                    child: Text(
+                                      (data[index].curPrice).toString(),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Color(0xFF3A3A3A)),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 )
@@ -2731,6 +2618,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                     "${AppLocalizations.of(context)!.total} ${sum.toString()}",
                     style: const TextStyle(
                         fontSize: 24, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 )
               ],

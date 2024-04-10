@@ -6,6 +6,7 @@
   "newArrival": "+ Новое поступление",
   "ok": "Ok",
   "assortment": "Ассортимент",
+  "smtWentWrongReload": "Что-то пошло не так:(\nПожалуйста перезагрузите приложение",
 
   "filters": "Фильтры",
   "search": "Поиск",
@@ -84,5 +85,68 @@
   "region": "Регион",
   "address": "Адрес",
   "person": "Получатель",
-  "endSaleCaps": "ЗАВЕРШИТЬ"
+  "endSaleCaps": "ЗАВЕРШИТЬ",
+
+  "homeScreen": "Главная",
+  "transfer": "Трансфер",
+  "logout": "Выход",
+
+  "no": "Нет",
+  "yes": "Да",
+
+  "newArrivalCompletedCaps": "НОВОЕ ПОСТУПЛЕНИЕ УСПЕШНО!",
+
+  "areYouSureReturn": "Вы уверены? Вы не сможете вернуться",
+  "selectAtList": "Выберите хотя бы один продукт",
+  "bulkAssemblyCaps": "МАССОВАЯ СБОРКА",
+  "operations": "Операции",
+  "dateCaps": "ДАТА",
+  "saleCaps": "ПРОДАЖА",
+
+  "orders": "Заказы",
+  "orderCaps": "ЗАКАЗ ",
+
+  "assemblingCompletedCaps": "ЗАКАЗ СФОРМИРОВАН!",
+
+  "areYouSureProceed": "Вы уверены, что хотите продолжить? Вы не сможете отменить",
+  "transferCaps": "ТРАНСФЕР",
+  "areYouSureTransfer": "Вы уверены, что хотите завершить трансфер?",
+  "itemChosen": "Элементы выбраны частично. Вы хотите продолжить или частично завершить перенос, или некоторые элементы отсутствуют.",
+  "missingItemsCaps": "ОТСУТСТВУЮЩИЕ ПУНКТЫ",
+  "endPartlyCaps": "ЧАСТИЧНО",
+  "continueCaps": "ПРОДОЛЖИТЬ",
+
+  "youDontTab": "Нет доступа к этому разделу",
+
+  "anErrorOccured": "Произошла ошибка. Пожалуйста, попробуйте еще раз",
+  "scan": "Сканирование",
+  "newArrivalCaps": "НОВОЕ ПОСТУПЛЕНИЕ",
+  "arrivalList": "Список поступления",
+  "noItemsYetCaps": "ТОВАРОВ ПОКА НЕТ",
+  "startWith": "Начните со сканирования ниже",
+  "distribution": "Distribution",
+  "professional": "Professional",
+  "oferta": "Oferta",
+  "other": "Другая",
+
+  "newTransferCaps": "НОВЫЙ ТРАНСФЕР",
+  "addedToTransfer": "добавлено в трансфер",
+  "completeTransferCaps": "ТРАНСФЕР ЗАВЕРШЕН",
+  "transferItemEdit": "ТРАНСФЕР РЕДАКТИРОВАНИЕ",
+
+  "inStockCaps": "НАЛИЧИЕ",
+
+  "selectProduct": "Выберите продукт",
+  "scanProduct": "Сканировать код продукта",
+  "reScan": "Что-то пошло не так. Попробуйте повторить сканирование еще раз",
+
+  "adressCaps": "АДРЕС",
+  "selectAdress": "Выберите адрес",
+  "areYouSureStore": "Вы уверены, что хотите продолжить работу с выбранным магазином?",
+
+  "transferAssembly": "Сборка трансфера",
+
+  "transferAssemblingCompCaps": "СБОРКА ТРАНСФЕРА ЗАВЕРШЕНА!"
+
+
 }

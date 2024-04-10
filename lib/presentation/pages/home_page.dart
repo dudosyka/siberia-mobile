@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/presentation/pages/assortment_page.dart';
 import 'package:mobile_app_slb/presentation/pages/bulk_page.dart';
@@ -14,6 +15,7 @@ import '../states/auth_state.dart';
 import '../states/network_state.dart';
 import 'auth_page.dart';
 import 'nonetwork_page.dart';
+import 'dart:io' show Platform;
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -183,7 +185,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                           opacity:
                                               value.stockModel!.salesManaging
                                                   ? 1.0
-                                                  : 0.0,
+                                                  : 0.5,
                                           child: homeCard(
                                               "assets/images/calculator_icon.png",
                                               AppLocalizations.of(context)!
@@ -212,9 +214,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                                                       ScaffoldMessenger.of(
                                                               context)
                                                           .showSnackBar(
-                                                              const SnackBar(
+                                                              SnackBar(
                                                         content: Text(
-                                                            "You don't have access to this tab"),
+                                                            AppLocalizations.of(context)!.youDontTab),
                                                       ));
                                                     }),
                                         );
@@ -223,7 +225,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                           opacity:
                                               value.stockModel!.salesManaging
                                                   ? 1.0
-                                                  : 0.0,
+                                                  : 0.5,
                                           child: homeCard(
                                               "assets/images/bulk_icon.png",
                                               AppLocalizations.of(context)!
@@ -252,9 +254,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                                                       ScaffoldMessenger.of(
                                                               context)
                                                           .showSnackBar(
-                                                              const SnackBar(
+                                                              SnackBar(
                                                         content: Text(
-                                                            "You don't have access to this tab"),
+                                                            AppLocalizations.of(context)!.youDontTab),
                                                       ));
                                                     }),
                                         );
@@ -263,32 +265,32 @@ class _HomePageState extends ConsumerState<HomePage> {
                                           opacity:
                                               value.stockModel!.arrivalsManaging
                                                   ? 1.0
-                                                  : 0.0,
+                                                  : 0.5,
                                           child: homeCard(
                                               "assets/images/monitor_icon.png",
                                               AppLocalizations.of(context)!
                                                   .newArrival,
                                               value.stockModel!.arrivalsManaging
                                                   ? () {
-                                                Navigator
-                                                    .pushAndRemoveUntil(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder:
-                                                            (builder) =>
-                                                            NewArrivalPage(
-                                                              stockModel:
-                                                              value.stockModel!,
-                                                            )),
-                                                        (route) => false);
-                                              }
+                                                      Navigator
+                                                          .pushAndRemoveUntil(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (builder) =>
+                                                                          NewArrivalPage(
+                                                                            stockModel:
+                                                                                value.stockModel!,
+                                                                          )),
+                                                              (route) => false);
+                                                    }
                                                   : () {
                                                       ScaffoldMessenger.of(
                                                               context)
                                                           .showSnackBar(
-                                                              const SnackBar(
+                                                              SnackBar(
                                                         content: Text(
-                                                            "You don't have access to this tab"),
+                                                            AppLocalizations.of(context)!.youDontTab),
                                                       ));
                                                     }),
                                         );
@@ -310,18 +312,31 @@ class _HomePageState extends ConsumerState<HomePage> {
             }
           },
           error: (error, stacktrace) {
-            return Scaffold(
-              body: AlertDialog(
-                title: Text(error.toString()),
-                actions: [
-                  ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text(AppLocalizations.of(context)!.ok))
-                ],
-              ),
-            );
+            if (Platform.isAndroid) {
+              return Scaffold(
+                body: AlertDialog(
+                  title: Text(error.toString()),
+                  actions: [
+                    ElevatedButton(
+                        onPressed: () {
+                          //Navigator.pop(context);
+                          SystemChannels.platform
+                              .invokeMethod('SystemNavigator.pop');
+                        },
+                        child: const Text("Ok"))
+                  ],
+                ),
+              );
+            } else {
+              return Scaffold(
+                body: AlertDialog(
+                  title: Text(
+                    AppLocalizations.of(context)!.smtWentWrongReload,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+            }
           },
           loading: () => const Scaffold(
                 body: Center(

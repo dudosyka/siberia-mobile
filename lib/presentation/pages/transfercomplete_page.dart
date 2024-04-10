@@ -13,7 +13,8 @@ class TransferCompletePage extends ConsumerStatefulWidget {
   final bool isQr;
 
   @override
-  ConsumerState<TransferCompletePage> createState() => _TransferCompletePageState();
+  ConsumerState<TransferCompletePage> createState() =>
+      _TransferCompletePageState();
 }
 
 class _TransferCompletePageState extends ConsumerState<TransferCompletePage> {
@@ -88,9 +89,9 @@ class _TransferCompletePageState extends ConsumerState<TransferCompletePage> {
                           ],
                         ),
                         const SizedBox(height: 36),
-                        const Text(
-                          "TRANSFER ASSEMBLING COMPLETED!",
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)!.transferAssemblingCompCaps,
+                          style: const TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFF424242)),

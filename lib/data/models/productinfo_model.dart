@@ -1,5 +1,10 @@
 class ProductInfoModel {
   final int id;
+  final String name;
+  final List? photos;
+  final String vendorCode;
+  final String eanCode;
+  final double quantity;
   final String description;
   final String brand;
   final String collection;
@@ -13,6 +18,11 @@ class ProductInfoModel {
   factory ProductInfoModel.fromJson(Map<String, dynamic> json) {
     return ProductInfoModel(
         json["id"],
+        json["name"],
+        json["photo"],
+        json["vendorCode"],
+        json["eanCode"],
+        json["quantity"],
         json["description"],
         json["brand"]["name"],
         json["collection"]["name"],
@@ -26,6 +36,11 @@ class ProductInfoModel {
 
   ProductInfoModel(
       this.id,
+      this.name,
+      this.photos,
+      this.vendorCode,
+      this.eanCode,
+      this.quantity,
       this.description,
       this.brand,
       this.collection,

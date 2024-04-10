@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 @override
 Widget exitDialog(BuildContext context, String text) {
@@ -11,17 +12,17 @@ Widget exitDialog(BuildContext context, String text) {
           onPressed: () {
             Navigator.pop(context, false);
           },
-          child: const Text(
-            "No",
-            style: TextStyle(color: Colors.black),
+          child: Text(
+            AppLocalizations.of(context)!.no,
+            style: const TextStyle(color: Colors.black),
           )),
       TextButton(
           onPressed: () {
             Navigator.pop(context, true);
           },
-          child: const Text(
-            "Yes",
-            style: TextStyle(color: Colors.redAccent),
+          child: Text(
+            AppLocalizations.of(context)!.yes,
+            style: const TextStyle(color: Colors.redAccent),
           ))
     ],
   );

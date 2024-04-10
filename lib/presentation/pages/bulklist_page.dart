@@ -38,6 +38,7 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
   @override
   Widget build(BuildContext context) {
     bool isAllSelected = allSelected(widget.cartModels);
+    double width = MediaQuery.of(context).size.width;
 
     return MediaQuery(
         data: MediaQuery.of(context).copyWith(
@@ -183,9 +184,9 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
                             ],
                           ),
                           const Spacer(),
-                          const Text(
-                            "BULK ASSEMBLY",
-                            style: TextStyle(
+                          Text(
+                            AppLocalizations.of(context)!.bulkAssemblyCaps,
+                            style: const TextStyle(
                                 fontSize: 24,
                                 color: Color(0xFF909090),
                                 height: 0.5),
@@ -207,8 +208,7 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
                   ),
                   Expanded(
                     flex: 6,
-                    child: getProductListWidget(
-                        Theme.of(context), widget.cartModels),
+                    child: getProductListWidget(widget.cartModels, width),
                   ),
                   const Center(child: VerticalDivider()),
                 ],
@@ -216,7 +216,7 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
             )));
   }
 
-  Widget getProductListWidget(ThemeData theme, List<CartModel> data) {
+  Widget getProductListWidget(List<CartModel> data, double width) {
     return Column(
       children: [
         Container(
@@ -303,10 +303,14 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
                                 const SizedBox(
                                   width: 20,
                                 ),
-                                Text(
-                                  e.model.name,
-                                  style: const TextStyle(
-                                      fontSize: 16, color: Color(0xFF222222)),
+                                SizedBox(
+                                  width: width / 2 - 18 - 20 - 20,
+                                  child: Text(
+                                    e.model.name,
+                                    style: const TextStyle(
+                                        fontSize: 16, color: Color(0xFF222222)),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ],
                             ),
@@ -317,10 +321,14 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  e.quantity.toString(),
-                                  style: const TextStyle(
-                                      fontSize: 16, color: Color(0xFF222222)),
+                                SizedBox(
+                                  width: width / 2 - 66,
+                                  child: Text(
+                                    e.quantity.toString(),
+                                    style: const TextStyle(
+                                        fontSize: 16, color: Color(0xFF222222)),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                                 IconButton(
                                     onPressed: () async {

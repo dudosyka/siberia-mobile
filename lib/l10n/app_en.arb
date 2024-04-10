@@ -6,6 +6,7 @@
   "newArrival": "+ New arrival",
   "ok": "Ok",
   "assortment": "Assortment",
+  "smtWentWrongReload": "Something went wrong:(\nPlease reload app",
 
   "filters": "Filters",
   "search": "Search",
@@ -84,5 +85,71 @@
   "region": "Region",
   "address": "Address",
   "person": "Person",
-  "endSaleCaps": "END SALE"
+  "endSaleCaps": "END SALE",
+
+  "homeScreen": "Home screen",
+  "transfer": "Transfer",
+  "logout": "Log out",
+
+  "no": "No",
+  "yes": "Yes",
+
+  "newArrivalCompletedCaps": "NEW ARRIVAL COMPLETED!",
+
+  "areYouSureReturn": "Are you sure? You wouldn't be able to return",
+  "selectAtList": "Select at least one product",
+  "bulkAssemblyCaps": "BULK ASSEMBLY",
+  "operations": "Operations",
+  "dateCaps": "DATE",
+  "saleCaps": "SALE",
+
+  "orders": "Orders",
+  "orderCaps": "ORDER ",
+
+  "assemblingCompletedCaps": "ASSEMBLING COMPLETED!",
+
+  "areYouSureProceed": "Are you sure you want to proceed? You won't be able to cancel",
+  "transferCaps": "TRANSFER",
+  "areYouSureTransfer": "Are you sure you want to end transfer?",
+  "itemChosen": "Items chosen partly, do you want to proceed or end this transfer partly, or some items were missing",
+  "missingItemsCaps": "MISSING ITEMS",
+  "endPartlyCaps": "END PARTLY",
+  "continueCaps": "CONTINUE",
+
+  "youDontTab": "You don't have access to this tab",
+
+  "anErrorOccured": "An error occured. Please try again",
+  "scan": "Scan",
+  "newArrivalCaps": "NEW ARRIVAL",
+  "arrivalList": "Arrival list",
+  "noItemsYetCaps": "NO ITEMS YET",
+  "startWith": "Start with scanning below",
+  "distribution": "Distribution",
+  "professional": "Professional",
+  "oferta": "Oferta",
+  "other": "Other",
+
+  "newTransferCaps": "NEW TRANSFER",
+  "addedToTransfer": "Added to transfer",
+  "completeTransferCaps": "COMPLETE TRANSFER",
+  "transferItemEdit": "TRANSFER ITEM EDIT",
+
+  "inStockCaps": "IN STOCK",
+
+  "selectProduct": "Select product",
+  "scanProduct": "Scan product code",
+  "reScan": "Something went wrong. Try to re-scan again",
+
+  "adressCaps": "ADDRESS",
+  "selectAdress": "Select address",
+  "areYouSureStore": "Are you sure you want continue with selected store",
+
+  "transferAssembly": "Transfer assembly",
+
+  "transferAssemblingCompCaps": "TRANSFER ASSEMBLING COMPLETED!"
+
+
+
+
+
 }

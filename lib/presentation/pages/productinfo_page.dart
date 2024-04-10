@@ -2,18 +2,21 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:collection/collection.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:marquee/marquee.dart';
 import 'package:mobile_app_slb/data/models/availability_model.dart';
+import 'package:mobile_app_slb/data/models/productinfo_model.dart';
 import 'package:mobile_app_slb/presentation/states/assortment_state.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mobile_app_slb/presentation/widgets/app_drawer_qr.dart';
-
 import '../../data/models/stock_model.dart';
 import '../../utils/constants.dart';
 import '../states/auth_state.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/backButton.dart';
 import 'auth_page.dart';
+import 'dart:io' show Platform;
 
 class ProductInfoPage extends ConsumerStatefulWidget {
   const ProductInfoPage(
@@ -48,6 +51,8 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+
     return MediaQuery(
         data: MediaQuery.of(context).copyWith(
             textScaler: MediaQuery.of(context).size.shortestSide > 650
@@ -74,8 +79,7 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding:
-                            const EdgeInsets.only(top: 40, right: 40, left: 40),
+                        padding: const EdgeInsets.only(top: 40, right: 40, left: 40),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -90,8 +94,9 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                                   width: 30,
                                   height: 30,
                                   decoration: BoxDecoration(
-                                      color: const Color(0xFF3C3C3C),
-                                      borderRadius: BorderRadius.circular(5)),
+                                    color: const Color(0xFF3C3C3C),
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
                                   child: const Icon(
                                     Icons.menu,
                                     color: Colors.white,
@@ -111,17 +116,28 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                             Text(
                               AppLocalizations.of(context)!.singleProductCaps,
                               style: const TextStyle(
-                                  fontSize: 24,
-                                  color: Color(0xFF909090),
-                                  height: 0.5),
+                                fontSize: 24,
+                                color: Color(0xFF909090),
+                                height: 0.5,
+                              ),
                             ),
-                            Text(
-                              widget.name,
-                              style: const TextStyle(
+                            SizedBox(
+                              width: double.infinity,
+                              height: 70,
+                              child: Marquee(
+                                text: widget.name,
+                                style: const TextStyle(
                                   fontSize: 36,
                                   color: Color(0xFF363636),
-                                  fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.ellipsis,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                blankSpace: width - 80,
+                                scrollAxis: Axis.horizontal,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                velocity: 45.0,
+                                pauseAfterRound: const Duration(seconds: 3),
+                                fadingEdgeEndFraction: 0.1,
+                              ),
                             ),
                           ],
                         ),
@@ -132,511 +148,473 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                 ),
                 Expanded(
                   flex: 6,
-                  child:
-                      ref.watch(getProductInfoProvider(widget.productId)).when(
-                          data: (value) {
-                            if (value.errorModel != null) {
-                              ref.read(deleteAuthProvider).deleteAuth();
-                              Future.microtask(() =>
-                                  Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const AuthPage()),
-                                      (route) => false));
+                  child: ref.watch(getProductInfoProvider(widget.productId)).when(
+                    data: (value) {
+                      if (value.errorModel != null) {
+                        ref.read(deleteAuthProvider).deleteAuth();
+                        Future.microtask(() =>
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(builder: (context) => const AuthPage()),
+                                  (route) => false,
+                            ),
+                        );
 
-                              return Container();
-                            }
+                        return Container();
+                      }
 
-                            return SingleChildScrollView(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: SizedBox(
-                                          width: 170,
-                                          height: 190,
-                                          child: Stack(
-                                            children: [
-                                              CarouselSlider(
-                                                  items: widget.photos != null
-                                                      ? widget.photos!
-                                                              .isNotEmpty
-                                                          ? widget.photos!
-                                                              .map((e) {
-                                                              return Image
-                                                                  .network(
-                                                                "${baseUrl}file/stream/$e",
-                                                                width: 160,
-                                                                height: 160,
-                                                                errorBuilder:
-                                                                    (context,
-                                                                        obj,
-                                                                        stacktrace) {
-                                                                  return const Icon(
-                                                                    Icons
-                                                                        .camera_alt,
-                                                                    color: Color(
-                                                                        0xFF909090),
-                                                                  );
-                                                                },
-                                                                loadingBuilder:
-                                                                    (context,
-                                                                        widget,
-                                                                        event) {
-                                                                  if (event ==
-                                                                      null) {
-                                                                    return widget;
-                                                                  }
-                                                                  return Center(
-                                                                    child: Text(
-                                                                      AppLocalizations.of(
-                                                                              context)!
-                                                                          .loading,
-                                                                      style: const TextStyle(
-                                                                          color:
-                                                                              Color(0xFF909090)),
-                                                                    ),
-                                                                  );
-                                                                },
-                                                                fit: BoxFit
-                                                                    .contain,
-                                                              );
-                                                            }).toList()
-                                                          : [
-                                                              Image.network(
-                                                                "",
-                                                                errorBuilder: (context,
-                                                                        obj,
-                                                                        stacktrace) =>
-                                                                    const Icon(
-                                                                  Icons
-                                                                      .camera_alt,
-                                                                  color: Color(
-                                                                      0xFF909090),
-                                                                ),
-                                                                loadingBuilder:
-                                                                    (context,
-                                                                        widget,
-                                                                        event) {
-                                                                  if (event ==
-                                                                      null) {
-                                                                    return widget;
-                                                                  }
-                                                                  return Center(
-                                                                    child: Text(
-                                                                      AppLocalizations.of(
-                                                                              context)!
-                                                                          .loading,
-                                                                      style: const TextStyle(
-                                                                          color:
-                                                                              Color(0xFF909090)),
-                                                                    ),
-                                                                  );
-                                                                },
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                              )
-                                                            ]
-                                                      : [
-                                                          Image.network(
-                                                            "",
-                                                            errorBuilder: (context,
-                                                                    obj,
-                                                                    stacktrace) =>
-                                                                const Icon(
-                                                              Icons.camera_alt,
-                                                              color: Color(
-                                                                  0xFF909090),
-                                                            ),
-                                                            loadingBuilder:
-                                                                (context,
-                                                                    widget,
-                                                                    event) {
-                                                              if (event ==
-                                                                  null) {
-                                                                return widget;
-                                                              }
-                                                              return Center(
-                                                                child: Text(
-                                                                  AppLocalizations.of(
-                                                                          context)!
-                                                                      .loading,
-                                                                  style: const TextStyle(
-                                                                      color: Color(
-                                                                          0xFF909090)),
-                                                                ),
-                                                              );
-                                                            },
-                                                            fit: BoxFit.cover,
-                                                          )
-                                                        ],
-                                                  options: CarouselOptions(
-                                                    viewportFraction: 1,
-                                                    height: 170,
-                                                    onPageChanged:
-                                                        (index, reason) {
-                                                      setState(() {
-                                                        currentIndex = index;
-                                                      });
-                                                    },
-                                                  )),
-                                              Align(
-                                                alignment:
-                                                    Alignment.bottomCenter,
-                                                child: DotsIndicator(
-                                                  dotsCount:
-                                                      widget.photos != null
-                                                          ? widget.photos!
-                                                                  .isNotEmpty
-                                                              ? widget.photos!
-                                                                  .length
-                                                              : 1
-                                                          : 1,
-                                                  position: currentIndex,
-                                                  decorator: DotsDecorator(
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        15.0)),
-                                                    activeShape:
-                                                        RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        15.0)),
-                                                    size: const Size(6, 6),
-                                                  ),
-                                                ),
-                                              )
-                                            ],
-                                          ),
+                      return productInfoWidget(value.productModel!, width);
+                    },
+                    error: (error, stacktrace) {
+                      if (Platform.isAndroid) {
+                        return AlertDialog(
+                          title: Text(error.toString()),
+                          actions: [
+                            ElevatedButton(
+                              onPressed: () {
+                                SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+                              },
+                              child: const Text("Ok"),
+                            ),
+                          ],
+                        );
+                      } else {
+                        return AlertDialog(
+                          title: Text(
+                            AppLocalizations.of(context)!.smtWentWrongReload,
+                            textAlign: TextAlign.center,
+                          ),
+                        );
+                      }
+                    },
+                    loading: () => const Center(
+                      child: CircularProgressIndicator(color: Colors.black),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+        ));
+  }
+
+  Widget productInfoWidget(ProductInfoModel productInfoModel, double width) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: SizedBox(
+                  width: 170,
+                  height: 190,
+                  child: Stack(
+                    children: [
+                      CarouselSlider(
+                          items: widget.photos != null
+                              ? widget.photos!.isNotEmpty
+                                  ? widget.photos!.map((e) {
+                                      return Image.network(
+                                        "${baseUrl}file/stream/$e",
+                                        width: 160,
+                                        height: 160,
+                                        errorBuilder:
+                                            (context, obj, stacktrace) {
+                                          return const Icon(
+                                            Icons.camera_alt,
+                                            color: Color(0xFF909090),
+                                          );
+                                        },
+                                        loadingBuilder:
+                                            (context, widget, event) {
+                                          if (event == null) {
+                                            return widget;
+                                          }
+                                          return Center(
+                                            child: Text(
+                                              AppLocalizations.of(context)!
+                                                  .loading,
+                                              style: const TextStyle(
+                                                  color: Color(0xFF909090)),
+                                            ),
+                                          );
+                                        },
+                                        fit: BoxFit.contain,
+                                      );
+                                    }).toList()
+                                  : [
+                                      Image.network(
+                                        "",
+                                        errorBuilder:
+                                            (context, obj, stacktrace) =>
+                                                const Icon(
+                                          Icons.camera_alt,
+                                          color: Color(0xFF909090),
                                         ),
-                                      ),
-                                      Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
+                                        loadingBuilder:
+                                            (context, widget, event) {
+                                          if (event == null) {
+                                            return widget;
+                                          }
+                                          return Center(
+                                            child: Text(
                                               AppLocalizations.of(context)!
-                                                  .quantityCaps,
+                                                  .loading,
                                               style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
                                                   color: Color(0xFF909090)),
                                             ),
-                                            Text(
-                                              widget.count.toString(),
-                                              style: const TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Color(0xFF363636)),
-                                            ),
-                                            Text(
-                                              AppLocalizations.of(context)!
-                                                  .skuCaps,
-                                              style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xFF909090)),
-                                            ),
-                                            Text(
-                                              widget.sku,
-                                              style: const TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Color(0xFF363636)),
-                                            ),
-                                            Text(
-                                              AppLocalizations.of(context)!
-                                                  .eanCaps,
-                                              style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xFF909090)),
-                                            ),
-                                            Text(
-                                              widget.ean,
-                                              style: const TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Color(0xFF363636)),
-                                            )
-                                          ],
-                                        ),
+                                          );
+                                        },
+                                        fit: BoxFit.cover,
                                       )
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  const Divider(),
-                                  const SizedBox(height: 10),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 12, right: 12),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              AppLocalizations.of(context)!
-                                                  .brandCaps,
-                                              style: const TextStyle(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xFF909090)),
-                                            ),
-                                            Text(
-                                              value.productModel!.brand,
-                                              style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Color(0xFF363636)),
-                                            ),
-                                          ],
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              AppLocalizations.of(context)!
-                                                  .collectionCaps,
-                                              style: const TextStyle(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xFF909090)),
-                                            ),
-                                            Text(
-                                              value.productModel!.collection,
-                                              style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Color(0xFF363636)),
-                                            ),
-                                          ],
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              AppLocalizations.of(context)!
-                                                  .colorCaps,
-                                              style: const TextStyle(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xFF909090)),
-                                            ),
-                                            Text(
-                                              value.productModel!.color,
-                                              style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Color(0xFF363636)),
-                                            ),
-                                          ],
-                                        )
-                                      ],
+                                    ]
+                              : [
+                                  Image.network(
+                                    "",
+                                    errorBuilder: (context, obj, stacktrace) =>
+                                        const Icon(
+                                      Icons.camera_alt,
+                                      color: Color(0xFF909090),
                                     ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  const Divider(),
-                                  const SizedBox(height: 10),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 12, right: 12),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          AppLocalizations.of(context)!
-                                              .descriptionCaps,
+                                    loadingBuilder: (context, widget, event) {
+                                      if (event == null) {
+                                        return widget;
+                                      }
+                                      return Center(
+                                        child: Text(
+                                          AppLocalizations.of(context)!.loading,
                                           style: const TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w500,
                                               color: Color(0xFF909090)),
                                         ),
-                                        Text(
-                                          value.productModel!.description,
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Color(0xFF363636)),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  const Divider(),
-                                  const SizedBox(height: 10),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 12, right: 12),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              AppLocalizations.of(context)!
-                                                  .defaultPriceCaps,
-                                              style: const TextStyle(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xFF909090)),
-                                            ),
-                                            Text(
-                                              value.productModel!.commonPrice
-                                                  .toString(),
-                                              style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Color(0xFF363636)),
-                                            ),
-                                          ],
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              AppLocalizations.of(context)!
-                                                  .distributionPriceCaps,
-                                              style: const TextStyle(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xFF909090)),
-                                            ),
-                                            Text(
-                                              value.productModel!
-                                                  .distributionPrice
-                                                  .toString(),
-                                              style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Color(0xFF363636)),
-                                            ),
-                                          ],
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              AppLocalizations.of(context)!
-                                                  .professionalPriceCaps,
-                                              style: const TextStyle(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xFF909090)),
-                                            ),
-                                            Text(
-                                              value.productModel!
-                                                  .professionalPrice
-                                                  .toString(),
-                                              style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Color(0xFF363636)),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 12, right: 12),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          AppLocalizations.of(context)!
-                                              .ofertaPriceCaps,
-                                          style: const TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color(0xFF909090)),
-                                        ),
-                                        Text(
-                                          value.productModel!.offertaPrice
-                                              .toString(),
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Color(0xFF363636)),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  const Divider(),
-                                  const SizedBox(height: 10),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 12, right: 12),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          "IN STOCK",
-                                          style: TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color(0xFF909090)),
-                                        ),
-                                        getAvailability()
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                ],
-                              ),
-                            );
-                          },
-                          error: (error, stacktrace) {
-                            return AlertDialog(
-                              title: Text(error.toString()),
-                              actions: [
-                                ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
+                                      );
                                     },
-                                    child: const Text("Ok"))
-                              ],
-                            );
-                          },
-                          loading: () => const Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.black,
-                                ),
-                              )),
+                                    fit: BoxFit.cover,
+                                  )
+                                ],
+                          options: CarouselOptions(
+                            viewportFraction: 1,
+                            height: 170,
+                            onPageChanged: (index, reason) {
+                              setState(() {
+                                currentIndex = index;
+                              });
+                            },
+                          )),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: DotsIndicator(
+                          dotsCount: widget.photos != null
+                              ? widget.photos!.isNotEmpty
+                                  ? widget.photos!.length
+                                  : 1
+                              : 1,
+                          position: currentIndex,
+                          decorator: DotsDecorator(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0)),
+                            activeShape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0)),
+                            size: const Size(6, 6),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.quantityCaps,
+                      style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF909090)),
+                    ),
+                    Text(
+                      widget.count.toString(),
+                      style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF363636)),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      AppLocalizations.of(context)!.skuCaps,
+                      style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF909090)),
+                    ),
+                    Text(
+                      widget.sku,
+                      style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF363636)),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      AppLocalizations.of(context)!.eanCaps,
+                      style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF909090)),
+                    ),
+                    Text(
+                      widget.ean,
+                      style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF363636)),
+                      overflow: TextOverflow.ellipsis,
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+          const SizedBox(height: 10),
+          const Divider(),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.only(left: 12, right: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.brandCaps,
+                      style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF909090)),
+                    ),
+                    SizedBox(
+                      width: width / 3 - 12,
+                      child: Text(
+                        productInfoModel.brand,
+                        style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF363636)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.collectionCaps,
+                      style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF909090)),
+                    ),
+                    SizedBox(
+                      width: width / 3 - 12,
+                      child: Text(
+                        productInfoModel.collection,
+                        style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF363636)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.colorCaps,
+                      style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF909090)),
+                    ),
+                    SizedBox(
+                      width: width / 3 - 12,
+                      child: Text(
+                        productInfoModel.color,
+                        style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF363636)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 )
               ],
             ),
           ),
-        ));
+          const SizedBox(height: 10),
+          const Divider(),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.only(left: 12, right: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.descriptionCaps,
+                  style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF909090)),
+                ),
+                Text(
+                  productInfoModel.description,
+                  style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF363636)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Divider(),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.only(left: 12, right: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.defaultPriceCaps,
+                      style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF909090)),
+                    ),
+                    SizedBox(
+                      width: width / 3 - 12,
+                      child: Text(
+                        productInfoModel.commonPrice.toString(),
+                        style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF363636)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.distributionPriceCaps,
+                      style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF909090)),
+                    ),
+                    SizedBox(
+                      width: width / 3 - 12,
+                      child: Text(
+                        productInfoModel.distributionPrice.toString(),
+                        style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF363636)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.professionalPriceCaps,
+                      style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF909090)),
+                    ),
+                    SizedBox(
+                      width: width / 3 - 12,
+                      child: Text(
+                        productInfoModel.professionalPrice.toString(),
+                        style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF363636)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.only(left: 12, right: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.ofertaPriceCaps,
+                  style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF909090)),
+                ),
+                Text(
+                  productInfoModel.offertaPrice.toString(),
+                  style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF363636)),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Divider(),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.only(left: 12, right: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.inStockCaps,
+                  style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF909090)),
+                ),
+                getAvailability(width)
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
   }
 
-  Widget getAvailability() {
+  Widget getAvailability(double width) {
     return SizedBox(
       height: widget.availabilityModel.length * 75,
       child: ListView(
@@ -668,22 +646,21 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(
-                                width:
-                                    MediaQuery.of(context).size.shortestSide >
-                                            650
-                                        ? 500
-                                        : 300,
+                                width: width - 10 - 16 - 44,
                                 child: Text(
                                   e.name,
                                   style: const TextStyle(fontSize: 16),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              Text(
-                                e.address,
-                                style: const TextStyle(
-                                    fontSize: 16, color: Color(0xFF969696)),
-                                overflow: TextOverflow.ellipsis,
+                              SizedBox(
+                                width: width - 10 - 16 - 44,
+                                child: Text(
+                                  e.address,
+                                  style: const TextStyle(
+                                      fontSize: 16, color: Color(0xFF969696)),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               )
                             ],
                           )

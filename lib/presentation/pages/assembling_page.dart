@@ -20,7 +20,8 @@ class AssemblingPage extends ConsumerStatefulWidget {
       {super.key,
       required this.transactionId,
       required this.cartData,
-      required this.isTransaction, required this.stockModel});
+      required this.isTransaction,
+      required this.stockModel});
 
   final int transactionId;
   final List<CartModel> cartData;
@@ -47,6 +48,7 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
   @override
   Widget build(BuildContext context) {
     bool isAllSelected = allSelected(widget.cartData);
+    double width = MediaQuery.of(context).size.width;
 
     return PopScope(
         canPop: false,
@@ -168,7 +170,8 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                                   }
                                 : () {
                                     ScaffoldMessenger.of(context)
-                                        .showSnackBar(SnackBar(duration: const Duration(seconds: 1),
+                                        .showSnackBar(SnackBar(
+                                      duration: const Duration(seconds: 1),
                                       content: Text(
                                           AppLocalizations.of(context)!
                                               .notAllProducts),
@@ -234,7 +237,6 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                                             .areYouSure);
                                   }).then((returned) {
                                 if (returned) {
-                                  //ref.read(cartDataProvider).deleteAssembly(widget.transactionId);
                                   if (widget.isTransaction) {
                                     ref.read(deleteAuthProvider).deleteAuth();
                                     Future.microtask(() =>
@@ -256,26 +258,24 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                                 }
                               });
                             }, AppLocalizations.of(context)!.cancelCaps, false),
-                            Builder(
-                              builder: (context) {
-                                return InkWell(
-                                  onTap: () {
-                                    Scaffold.of(context).openDrawer();
-                                  },
-                                  child: Container(
-                                    width: 30,
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                        color: const Color(0xFF3C3C3C),
-                                        borderRadius: BorderRadius.circular(5)),
-                                    child: const Icon(
-                                      Icons.menu,
-                                      color: Colors.white,
-                                    ),
+                            Builder(builder: (context) {
+                              return InkWell(
+                                onTap: () {
+                                  Scaffold.of(context).openDrawer();
+                                },
+                                child: Container(
+                                  width: 30,
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                      color: const Color(0xFF3C3C3C),
+                                      borderRadius: BorderRadius.circular(5)),
+                                  child: const Icon(
+                                    Icons.menu,
+                                    color: Colors.white,
                                   ),
-                                );
-                              }
-                            ),
+                                ),
+                              );
+                            }),
                           ],
                         ),
                         const Spacer(),
@@ -285,6 +285,7 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                               fontSize: 24,
                               color: Color(0xFF909090),
                               height: 0.5),
+                          overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           AppLocalizations.of(context)!.assemblingCaps,
@@ -303,8 +304,7 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                 ),
                 Expanded(
                   flex: 6,
-                  child:
-                      getProductListWidget(Theme.of(context), widget.cartData),
+                  child: getProductListWidget(widget.cartData, width),
                 ),
                 const Center(child: VerticalDivider())
               ],
@@ -313,7 +313,7 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
         ));
   }
 
-  Widget getProductListWidget(ThemeData theme, List<CartModel> data) {
+  Widget getProductListWidget(List<CartModel> data, double width) {
     return Column(
       children: [
         Container(
@@ -400,10 +400,14 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                                 const SizedBox(
                                   width: 20,
                                 ),
-                                Text(
-                                  e.model.name,
-                                  style: const TextStyle(
-                                      fontSize: 16, color: Color(0xFF222222)),
+                                SizedBox(
+                                  width: width / 2 - 18 - 20 - 20,
+                                  child: Text(
+                                    e.model.name,
+                                    style: const TextStyle(
+                                        fontSize: 16, color: Color(0xFF222222)),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ],
                             ),
@@ -411,15 +415,16 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                           const VerticalDivider(),
                           Expanded(
                             flex: 1,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
+                            child: SizedBox(
+                              width: width / 2 - 20,
+                              child: Center(
+                                child: Text(
                                   e.quantity.toString(),
                                   style: const TextStyle(
                                       fontSize: 16, color: Color(0xFF222222)),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ],
+                              ),
                             ),
                           )
                         ],

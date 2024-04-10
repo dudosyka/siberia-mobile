@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/data/models/stock_model.dart';
 import 'package:mobile_app_slb/presentation/widgets/round_button.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../data/repository/auth_repository.dart';
 import '../pages/auth_page.dart';
@@ -92,9 +93,9 @@ class _AppDrawerState extends ConsumerState<AppDrawerQr> {
             const Divider(),
             ListTile(
               horizontalTitleGap: 0,
-              title: const Text(
-                'Log out',
-                style: TextStyle(fontSize: 24, color: Color(0xFF5A5A5A)),
+              title: Text(
+                AppLocalizations.of(context)!.logout,
+                style: const TextStyle(fontSize: 24, color: Color(0xFF5A5A5A)),
               ),
               leading: Image.asset(
                 "assets/images/logout_icon.png",

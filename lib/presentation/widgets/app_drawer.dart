@@ -5,10 +5,12 @@ import 'package:mobile_app_slb/presentation/pages/home_page.dart';
 import 'package:mobile_app_slb/presentation/pages/newtransfer_page.dart';
 import 'package:mobile_app_slb/presentation/widgets/exit_dialog.dart';
 import 'package:mobile_app_slb/presentation/widgets/round_button.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../data/repository/auth_repository.dart';
 import '../pages/auth_page.dart';
 import '../states/main_state.dart';
+import '../states/newarrival_state.dart';
 import '../states/newsale_state.dart';
 import '../states/transfer_state.dart';
 
@@ -98,9 +100,9 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                       )),
                   const Divider(),
                   ListTile(
-                    title: const Text(
-                      'Home screen',
-                      style: TextStyle(fontSize: 24),
+                    title: Text(
+                      AppLocalizations.of(context)!.homeScreen,
+                      style: const TextStyle(fontSize: 24),
                     ),
                     leading: Image.asset(
                       "assets/images/home_screen_icon.png",
@@ -121,10 +123,11 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                             context: context,
                             builder: (context) {
                               return exitDialog(context,
-                                  "Are you sure? All data will be deleted");
+                                  AppLocalizations.of(context)!.areYouSure);
                             }).then((returned) {
                           if (returned) {
                             ref.read(transferProvider).deleteCart();
+                            ref.read(newArrivalProvider).deleteCart();
                             if (widget.isAssembly) {
                               ref.read(cartDataProvider).deleteCart();
                             } else {
@@ -142,9 +145,9 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   ),
                   const Divider(),
                   ListTile(
-                    title: const Text(
-                      'Transfer',
-                      style: TextStyle(fontSize: 24),
+                    title: Text(
+                      AppLocalizations.of(context)!.transfer,
+                      style: const TextStyle(fontSize: 24),
                     ),
                     leading: Image.asset(
                       "assets/images/transfer_screen_icon.png",
@@ -167,10 +170,11 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                             context: context,
                             builder: (context) {
                               return exitDialog(context,
-                                  "Are you sure? All data will be deleted");
+                                  AppLocalizations.of(context)!.areYouSure);
                             }).then((returned) {
                           if (returned) {
                             ref.read(transferProvider).deleteCart();
+                            ref.read(newArrivalProvider).deleteCart();
                             if (widget.isAssembly) {
                               ref.read(cartDataProvider).deleteCart();
                             } else {
@@ -200,9 +204,9 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
             const Divider(),
             ListTile(
               horizontalTitleGap: 0,
-              title: const Text(
-                'Log out',
-                style: TextStyle(fontSize: 24, color: Color(0xFF5A5A5A)),
+              title: Text(
+                AppLocalizations.of(context)!.logout,
+                style: const TextStyle(fontSize: 24, color: Color(0xFF5A5A5A)),
               ),
               leading: Image.asset(
                 "assets/images/logout_icon.png",

@@ -28,8 +28,12 @@ class CartDataNotifier extends ChangeNotifier {
       if (element.model.id == newModel.model.id) {
         if (element.quantity + newModel.quantity <= element.model.quantity!) {
           element.quantity += newModel.quantity;
+          element.curPrice =
+              element.quantity * (newModel.curPrice / newModel.quantity);
         } else {
           element.quantity = element.model.quantity!.toInt();
+          element.curPrice =
+              element.quantity * (newModel.curPrice / newModel.quantity);
         }
         flag = true;
         break;

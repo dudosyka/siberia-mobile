@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:collection/collection.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/presentation/pages/productinfo_page.dart';
 import 'package:mobile_app_slb/presentation/pages/transfercomplete_page.dart';
@@ -19,11 +20,11 @@ import '../widgets/app_drawer.dart';
 import '../widgets/backButton.dart';
 import '../widgets/exit_dialog.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 import '../widgets/gray_button.dart';
 import '../widgets/outlined_gray_button.dart';
 import 'auth_page.dart';
 import 'home_page.dart';
+import 'dart:io' show Platform;
 
 class NewTransferPage extends ConsumerStatefulWidget {
   const NewTransferPage(
@@ -102,6 +103,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+
     return PopScope(
         canPop: false,
         onPopInvoked: (didPop) async {
@@ -156,7 +159,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                               context: context,
                               isScrollControlled: true,
                               builder: (context) =>
-                                  filtersBottomSheet(context));
+                                  filtersBottomSheet(context, width));
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -364,19 +367,19 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                       ],
                                     ),
                                     const Spacer(),
-                                    const Padding(
-                                      padding: EdgeInsets.only(top: 10),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 10),
                                       child: Text(
-                                        "TRANSFER",
-                                        style: TextStyle(
+                                        AppLocalizations.of(context)!.transferCaps,
+                                        style: const TextStyle(
                                             fontSize: 24,
                                             color: Color(0xFF909090),
                                             height: 0.5),
                                       ),
                                     ),
-                                    const Text(
-                                      "NEW TRANSFER",
-                                      style: TextStyle(
+                                    Text(
+                                      AppLocalizations.of(context)!.newTransferCaps,
+                                      style: const TextStyle(
                                           fontSize: 36,
                                           color: Color(0xFF363636),
                                           fontWeight: FontWeight.bold),
@@ -554,16 +557,14 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                           data: (value) {
                                             if (value.assortmentModel != null &&
                                                 value.errorModel == null) {
-                                              ThemeData theme =
-                                                  Theme.of(context);
-
                                               if (isGrid) {
                                                 return getProductGridWidget(
-                                                    value.assortmentModel!);
+                                                    value.assortmentModel!,
+                                                    width);
                                               } else {
                                                 return getProductListWidget(
-                                                    theme,
-                                                    value.assortmentModel!);
+                                                    value.assortmentModel!,
+                                                    width);
                                               }
                                             }
                                             if (value.errorModel!.statusCode ==
@@ -594,16 +595,28 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                             );
                                           },
                                           error: (error, stacktrace) {
-                                            return AlertDialog(
-                                              title: Text(error.toString()),
-                                              actions: [
-                                                ElevatedButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: const Text("Ok"))
-                                              ],
-                                            );
+                                            if (Platform.isAndroid) {
+                                              return AlertDialog(
+                                                title: Text(error.toString()),
+                                                actions: [
+                                                  ElevatedButton(
+                                                      onPressed: () {
+                                                        //Navigator.pop(context);
+                                                        SystemChannels.platform
+                                                            .invokeMethod(
+                                                                'SystemNavigator.pop');
+                                                      },
+                                                      child: const Text("Ok"))
+                                                ],
+                                              );
+                                            } else {
+                                              return AlertDialog(
+                                                title: Text(
+                                                  AppLocalizations.of(context)!.smtWentWrongReload,
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              );
+                                            }
                                           },
                                           loading: () => const Expanded(
                                                 flex: 5,
@@ -625,16 +638,27 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                       );
                     },
                     error: (error, stacktrace) {
-                      return AlertDialog(
-                        title: Text(error.toString()),
-                        actions: [
-                          ElevatedButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text("Ok"))
-                        ],
-                      );
+                      if (Platform.isAndroid) {
+                        return AlertDialog(
+                          title: Text(error.toString()),
+                          actions: [
+                            ElevatedButton(
+                                onPressed: () {
+                                  //Navigator.pop(context);
+                                  SystemChannels.platform
+                                      .invokeMethod('SystemNavigator.pop');
+                                },
+                                child: const Text("Ok"))
+                          ],
+                        );
+                      } else {
+                        return AlertDialog(
+                          title: Text(
+                            AppLocalizations.of(context)!.smtWentWrongReload,
+                            textAlign: TextAlign.center,
+                          ),
+                        );
+                      }
                     },
                     loading: () => const Center(
                           child: CircularProgressIndicator(
@@ -645,172 +669,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
         ));
   }
 
-  Future<void> getAvailability(AssortmentModel e, BuildContext context) async {
-    final data = await ref.read(getAvailabilityProvider).getAvailability(e.id);
-    if (data.availabilityModel != null && data.errorModel == null) {
-      if (context.mounted) {
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                backgroundColor: Colors.white,
-                surfaceTintColor: Colors.transparent,
-                title: Text(
-                  AppLocalizations.of(context)!.inStockCaps,
-                  style: const TextStyle(fontSize: 24),
-                ),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    RichText(
-                      text: TextSpan(
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF6F6F6F),
-                        ),
-                        children: <TextSpan>[
-                          TextSpan(text: e.name),
-                          TextSpan(
-                              text:
-                                  AppLocalizations.of(context)!.isInStockInThis,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.normal)),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    SizedBox(
-                      width: double.maxFinite,
-                      height: 300,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Expanded(
-                            child: ListView(
-                              shrinkWrap: true,
-                              children: data.availabilityModel!
-                                  .mapIndexed((index, e) => Column(
-                                        children: [
-                                          const Divider(
-                                            height: 1,
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(10),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                const Padding(
-                                                  padding:
-                                                      EdgeInsets.only(top: 6),
-                                                  child: Icon(
-                                                    Icons.place,
-                                                    color: Colors.black,
-                                                    size: 16,
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                  width: 10,
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    SizedBox(
-                                                      width: 200,
-                                                      child: Text(
-                                                        e.name,
-                                                        style: const TextStyle(
-                                                            fontSize: 16),
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      e.address,
-                                                      style: const TextStyle(
-                                                          fontSize: 16,
-                                                          color: Color(
-                                                              0xFF969696)),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    )
-                                                  ],
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          index ==
-                                                  data.availabilityModel!
-                                                          .length -
-                                                      1
-                                              ? const Divider(
-                                                  height: 1,
-                                                )
-                                              : Container()
-                                        ],
-                                      ))
-                                  .toList(),
-                            ),
-                          ),
-                          const Spacer(),
-                          SizedBox(
-                            height: 30,
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    elevation: 0,
-                                    backgroundColor: const Color(0xFF3C3C3C),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(4))),
-                                child: Text(
-                                  AppLocalizations.of(context)!.backCaps,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16,
-                                      color: Colors.white),
-                                )),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              );
-            });
-      }
-    } else {
-      if (data.errorModel!.statusCode == 401) {
-        ref.read(deleteAuthProvider).deleteAuth().then((value) {
-          Future.microtask(() => Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const AuthPage()),
-              (route) => false));
-        });
-      } else {
-        if (context.mounted) {
-          showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                    title: Text(data.errorModel!.statusText),
-                    actions: [
-                      ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text("Ok"))
-                    ],
-                  ));
-        }
-      }
-    }
-  }
-
-  Widget getProductListWidget(ThemeData theme, List<AssortmentModel> data) {
+  Widget getProductListWidget(List<AssortmentModel> data, double width) {
     return Expanded(
       child: Column(
         children: [
@@ -978,10 +837,15 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                   const SizedBox(
                                     width: 20,
                                   ),
-                                  Text(
-                                    e.name,
-                                    style: const TextStyle(
-                                        fontSize: 16, color: Color(0xFF222222)),
+                                  SizedBox(
+                                    width: width / 2 - 20 - 31,
+                                    child: Text(
+                                      e.name,
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Color(0xFF222222)),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -992,10 +856,15 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    e.vendorCode,
-                                    style: const TextStyle(
-                                        fontSize: 16, color: Color(0xFF222222)),
+                                  SizedBox(
+                                    width: width / 2 - 18 - 3 * 18,
+                                    child: Text(
+                                      e.vendorCode,
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Color(0xFF222222)),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                   InkWell(
                                     onTap: () async {
@@ -1023,10 +892,10 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                             }).then((value) {
                                           if (value) {
                                             ScaffoldMessenger.of(context)
-                                                .showSnackBar(const SnackBar(
-                                              duration: Duration(seconds: 1),
+                                                .showSnackBar(SnackBar(
+                                              duration: const Duration(seconds: 1),
                                               content:
-                                                  Text("Added to transfer"),
+                                                  Text(AppLocalizations.of(context)!.addedToTransfer),
                                             ));
                                           }
                                         });
@@ -1064,7 +933,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
     );
   }
 
-  Widget getProductGridWidget(List<AssortmentModel> data) {
+  Widget getProductGridWidget(List<AssortmentModel> data, double width) {
     return Expanded(
         child: Padding(
       padding: const EdgeInsets.only(top: 10, left: 30, right: 30, bottom: 20),
@@ -1330,16 +1199,25 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    element.name,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
+                                  SizedBox(
+                                    width: 120,
+                                    child: Text(
+                                      element.name,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                  Text(
-                                    element.vendorCode,
-                                    style: const TextStyle(
-                                        fontSize: 13, color: Color(0xFF909090)),
+                                  SizedBox(
+                                    width: 120,
+                                    child: Text(
+                                      element.vendorCode,
+                                      style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Color(0xFF909090)),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                   element.quantity == null
                                       ? Text(
@@ -1383,10 +1261,10 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                             }).then((value) {
                                           if (value) {
                                             ScaffoldMessenger.of(context)
-                                                .showSnackBar(const SnackBar(
-                                              duration: Duration(seconds: 1),
+                                                .showSnackBar(SnackBar(
+                                              duration: const Duration(seconds: 1),
                                               content:
-                                                  Text("Added to transfer"),
+                                                  Text(AppLocalizations.of(context)!.addedToTransfer),
                                             ));
                                           }
                                         });
@@ -1413,11 +1291,15 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                             scale: 8,
                                           ),
                                           const SizedBox(width: 6),
-                                          const Text(
-                                            "TRANSFER",
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.white),
+                                          SizedBox(
+                                            width: 65,
+                                            child: Text(
+                                              AppLocalizations.of(context)!.transferCaps,
+                                              style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.white),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           )
                                         ],
                                       ),
@@ -1438,17 +1320,17 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
     ));
   }
 
-  Widget filtersBottomSheet(BuildContext context) {
+  Widget filtersBottomSheet(BuildContext context, double width) {
     return SafeArea(
       child: Padding(
         padding:
             EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
         child: StatefulBuilder(builder: (context, setState) {
-          return SingleChildScrollView(
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-              ),
+          return Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+            ),
+            child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -1477,14 +1359,6 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                   "category": null
                                 };
                               });
-                              // resetSelection(filtersUseCase!.categoryModels!);
-                              // for (var element
-                              //     in filtersUseCase!.collectionModels!) {
-                              //   element.isSelected = false;
-                              // }
-                              // for (var element in filtersUseCase!.brandModels!) {
-                              //   element.isSelected = false;
-                              // }
                               ref.refresh(getFiltersProvider).value;
                             }, AppLocalizations.of(context)!.clearAllCaps),
                             const SizedBox(
@@ -1704,7 +1578,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                         filteredList,
                                         brandCont,
                                         AppLocalizations.of(context)!.brand,
-                                        filtersUseCase!.brandModels!);
+                                        filtersUseCase!.brandModels!,
+                                        width);
                                   }).then((value) => setState(() {
                                     selectedBrands = [];
                                     for (var element
@@ -1807,7 +1682,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                         collectionCont,
                                         AppLocalizations.of(context)!
                                             .collection,
-                                        filtersUseCase!.collectionModels!);
+                                        filtersUseCase!.collectionModels!,
+                                        width);
                                   }).then((value) => setState(() {
                                     selectedCollections = [];
                                     for (var element
@@ -1910,7 +1786,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                         filteredList,
                                         categoryCont,
                                         AppLocalizations.of(context)!.category,
-                                        filtersUseCase!.categoryModels!);
+                                        filtersUseCase!.categoryModels!,
+                                        width);
                                   }).then((value) => setState(() {
                                     selectedCategories = [];
                                     for (var element
@@ -1992,7 +1869,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
   }
 
   Widget selectFiltersModal(BuildContext context, List filteredList,
-      TextEditingController cont, String title, List models) {
+      TextEditingController cont, String title, List models, double width) {
     return AlertDialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -2117,10 +1994,14 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            element.name,
-                                            style:
-                                                const TextStyle(fontSize: 16),
+                                          SizedBox(
+                                            width: width - 16 - 36 - 110,
+                                            child: Text(
+                                              element.name,
+                                              style:
+                                                  const TextStyle(fontSize: 16),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
                                           filteredList[index].isSelected
                                               ? const Icon(
@@ -2167,7 +2048,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
   }
 
   Widget selectCategoriesModal(BuildContext context, List filteredList,
-      TextEditingController cont, String title, List models) {
+      TextEditingController cont, String title, List models, double width) {
     return AlertDialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -2266,7 +2147,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                   SizedBox(
                       width: double.maxFinite,
                       height: 400,
-                      child: listOfCategories(filteredList, -3, true, null)),
+                      child: listOfCategories(
+                          filteredList, -3, true, null, width)),
                   const SizedBox(height: 20),
                   SizedBox(
                     height: 30,
@@ -2294,8 +2176,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
         }));
   }
 
-  Widget listOfCategories(
-      List filteredList, double padding, bool isFirst, Color? prevColor) {
+  Widget listOfCategories(List filteredList, double padding, bool isFirst,
+      Color? prevColor, double width) {
     padding = padding + 11;
     return StatefulBuilder(builder: (context, setState) {
       return ListView(
@@ -2342,9 +2224,13 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                     ),
                                   )
                                 : Container(),
-                            Text(
-                              element.name,
-                              style: const TextStyle(fontSize: 16),
+                            SizedBox(
+                              width: width - padding - 44 - 18 - 110,
+                              child: Text(
+                                element.name,
+                                style: const TextStyle(fontSize: 16),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                             const Spacer(),
                             filteredList[index].isSelected
@@ -2367,7 +2253,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                         ? const Color(0xFFF6F6F6)
                                         : Colors.white
                                     : prevColor
-                                : prevColor)
+                                : prevColor,
+                            width)
                         : Container()
                     : Container(),
                 isFirst
@@ -2487,9 +2374,9 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        "TRANSFER",
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.transferCaps,
+                        style: const TextStyle(
                             fontSize: 24, fontWeight: FontWeight.w500),
                       ),
                       Row(
@@ -2561,7 +2448,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                     );
                                   });
                             }
-                          }, "COMPLETE TRANSFER"),
+                          }, AppLocalizations.of(context)!.completeTransferCaps),
                         ],
                       )
                     ],
@@ -2700,8 +2587,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
     return AlertDialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
-        title: const Text(
-          "TRANSFER ITEM EDIT",
+        title: Text(
+          AppLocalizations.of(context)!.transferItemEdit,
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
         ),
         content: StatefulBuilder(builder: (context, setState) {
@@ -2854,8 +2741,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                     int.parse(quantityCont.text),
                                     {curPrice: pricesData[curPrice]!},
                                     pricesData[curPrice]! *
-                                        int.parse(quantityCont.text)),
-                                widget.storehouseId);
+                                        int.parse(quantityCont.text)));
                             Navigator.pop(context, true);
                           }, AppLocalizations.of(context)!.saveCaps),
                         ],
@@ -2888,8 +2774,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
           children: [
             SizedBox(
               width: MediaQuery.of(context).size.shortestSide > 650 ? 400 : 200,
-              child: const Text(
-                "TRANSFER ITEM EDIT",
+              child: Text(
+                AppLocalizations.of(context)!.transferItemEdit,
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -2939,7 +2825,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                   InkWell(
                                     onTap: () {
                                       ref.read(transferProvider).deleteFromCart(
-                                          data, widget.storehouseId);
+                                          data);
                                       Navigator.pop(context);
                                     },
                                     child: Container(
@@ -3144,8 +3030,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                             ref.read(transferProvider).updateCartModel(
                                 data,
                                 false,
-                                int.parse(quantityCont.text),
-                                widget.storehouseId);
+                                int.parse(quantityCont.text));
                             Navigator.pop(context, true);
                           }, AppLocalizations.of(context)!.saveCaps),
                         ],

@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/data/models/currentstock_model.dart';
 import 'package:mobile_app_slb/presentation/pages/transferassembly_page.dart';
@@ -12,6 +13,7 @@ import '../widgets/app_drawer_qr.dart';
 import '../widgets/backButton.dart';
 import '../widgets/exit_dialog.dart';
 import 'auth_page.dart';
+import 'dart:io' show Platform;
 
 class SelectAddressPage extends ConsumerStatefulWidget {
   const SelectAddressPage(
@@ -30,6 +32,8 @@ class _SelectAddressPageState extends ConsumerState<SelectAddressPage> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(
           textScaler: MediaQuery.of(context).size.shortestSide > 650
@@ -77,44 +81,42 @@ class _SelectAddressPageState extends ConsumerState<SelectAddressPage> {
                                 }
                               });
                             }, AppLocalizations.of(context)!.cancelCaps, false),
-                            Builder(
-                              builder: (context) {
-                                return InkWell(
-                                  onTap: () {
-                                    Scaffold.of(context).openDrawer();
-                                  },
-                                  child: Container(
-                                    width: 30,
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                        color: const Color(0xFF3C3C3C),
-                                        borderRadius: BorderRadius.circular(5)),
-                                    child: const Icon(
-                                      Icons.menu,
-                                      color: Colors.white,
-                                    ),
+                            Builder(builder: (context) {
+                              return InkWell(
+                                onTap: () {
+                                  Scaffold.of(context).openDrawer();
+                                },
+                                child: Container(
+                                  width: 30,
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                      color: const Color(0xFF3C3C3C),
+                                      borderRadius: BorderRadius.circular(5)),
+                                  child: const Icon(
+                                    Icons.menu,
+                                    color: Colors.white,
                                   ),
-                                );
-                              }
-                            ),
+                                ),
+                              );
+                            }),
                           ],
                         ),
                       ),
-                      const Expanded(
+                      Expanded(
                         flex: 2,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "ADDRESS",
-                              style: TextStyle(
+                              AppLocalizations.of(context)!.adressCaps,
+                              style: const TextStyle(
                                   fontSize: 24,
                                   color: Color(0xFF909090),
                                   height: 0.5),
                             ),
                             Text(
-                              "Select address",
-                              style: TextStyle(
+                              AppLocalizations.of(context)!.selectAdress,
+                              style: const TextStyle(
                                   fontSize: 36,
                                   color: Color(0xFF363636),
                                   fontWeight: FontWeight.bold),
@@ -177,9 +179,7 @@ class _SelectAddressPageState extends ConsumerState<SelectAddressPage> {
                                   .refresh(
                                       getAddressesProvider(searchCont.text))
                                   .value;
-                              setState(() {
-
-                              });
+                              setState(() {});
                             },
                             style: ElevatedButton.styleFrom(
                                 padding: EdgeInsets.zero,
@@ -213,19 +213,30 @@ class _SelectAddressPageState extends ConsumerState<SelectAddressPage> {
 
                         return Container();
                       }
-                      return addressListWidget(value.shopModels!);
+                      return addressListWidget(value.shopModels!, width);
                     },
                     error: (error, stacktrace) {
-                      return AlertDialog(
-                        title: Text(error.toString()),
-                        actions: [
-                          ElevatedButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text("Ok"))
-                        ],
-                      );
+                      if (Platform.isAndroid) {
+                        return AlertDialog(
+                          title: Text(error.toString()),
+                          actions: [
+                            ElevatedButton(
+                                onPressed: () {
+                                  //Navigator.pop(context);
+                                  SystemChannels.platform
+                                      .invokeMethod('SystemNavigator.pop');
+                                },
+                                child: const Text("Ok"))
+                          ],
+                        );
+                      } else {
+                        return AlertDialog(
+                          title: Text(
+                            AppLocalizations.of(context)!.smtWentWrongReload,
+                            textAlign: TextAlign.center,
+                          ),
+                        );
+                      }
                     },
                     loading: () => const Center(
                           child: CircularProgressIndicator(),
@@ -236,17 +247,31 @@ class _SelectAddressPageState extends ConsumerState<SelectAddressPage> {
     );
   }
 
-  Widget addressListWidget(List<ShopModel> shopModels) {
+  Widget addressListWidget(List<ShopModel> shopModels, double width) {
     return ListView(
       shrinkWrap: true,
       children: shopModels
           .where((element) => element.id != widget.stockModel.id)
           .mapIndexed((index, e) => ListTile(
-                title: Text(e.name),
-                subtitle: Text(e.address),
-                contentPadding: const EdgeInsets.only(left: 40, right: 40),
+                title: Text(
+                  e.name,
+                  style: const TextStyle(fontSize: 16),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(
+                  e.address,
+                  style:
+                      const TextStyle(fontSize: 16, color: Color(0xFF969696)),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                leading: const Icon(
+                  Icons.place,
+                  color: Colors.black,
+                  size: 20,
+                ),
+                contentPadding: const EdgeInsets.only(left: 20, right: 40),
                 tileColor:
-                    index % 2 == 0 ? const Color(0xFFF6F6F6) : Colors.white,
+                    index % 2 != 0 ? const Color(0xFFF6F6F6) : Colors.white,
                 onTap: () async {
                   final data = await ref
                       .read(transferProvider)
@@ -259,8 +284,8 @@ class _SelectAddressPageState extends ConsumerState<SelectAddressPage> {
                             return AlertDialog(
                               backgroundColor: Colors.white,
                               surfaceTintColor: Colors.transparent,
-                              title: const Text(
-                                  "Are you sure you want continue with selected store"),
+                              title: Text(
+                                  AppLocalizations.of(context)!.areYouSureStore),
                               actions: [
                                 TextButton(
                                     onPressed: () {
@@ -298,8 +323,9 @@ class _SelectAddressPageState extends ConsumerState<SelectAddressPage> {
                     }
                   } else {
                     if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(duration: Duration(seconds: 1),
-                        content: Text("An error occured"),
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        duration: const Duration(seconds: 1),
+                        content: Text(AppLocalizations.of(context)!.anErrorOccured),
                       ));
                     }
                   }

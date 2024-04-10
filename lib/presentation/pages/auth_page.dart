@@ -6,6 +6,7 @@ import 'package:mobile_app_slb/presentation/states/home_state.dart';
 import 'package:mobile_app_slb/presentation/widgets/black_button.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
+import '../states/auth_state.dart';
 import '../states/transfer_state.dart';
 import 'gettransfer_page.dart';
 import 'home_page.dart';
@@ -81,14 +82,27 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                               if (value.errorModel == null &&
                                   value.authModel != null) {
                                 if (value.authModel!.type == "stock") {
-                                  ref.refresh(getHomeProvider).value;
-                                  Future.microtask(() =>
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (builder) =>
-                                                  const HomePage()),
-                                          (route) => false));
+                                  final data =
+                                      await AuthRepository().getStock();
+                                  if (data.stockModel != null) {
+                                    if (data.stockModel!.salesManaging ||
+                                        data.stockModel!.arrivalsManaging ||
+                                        data.stockModel!.transfersManaging) {
+                                      ref.refresh(getHomeProvider).value;
+                                      Future.microtask(() =>
+                                          Navigator.pushAndRemoveUntil(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (builder) =>
+                                                      const HomePage()),
+                                              (route) => false));
+                                    }
+                                  } else {
+                                    setState(() {
+                                      isError = true;
+                                    });
+                                    ref.read(deleteAuthProvider).deleteAuth();
+                                  }
                                 } else if (value.authModel!.type ==
                                     "transaction") {
                                   final data =
@@ -96,7 +110,8 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
                                   if (data.stockModel != null) {
                                     if (data.stockModel!.typeId == 3 &&
-                                        data.stockModel!.statusId == 2) {
+                                        data.stockModel!.statusId == 2 &&
+                                        data.stockModel!.transfersManaging) {
                                       final newData = await ref
                                           .read(transferProvider)
                                           .getCurrentStock();
@@ -115,7 +130,8 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                                 (route) => false));
                                       }
                                     } else if (data.stockModel!.typeId == 3 &&
-                                        data.stockModel!.statusId == 4) {
+                                        data.stockModel!.statusId == 4 &&
+                                        data.stockModel!.transfersManaging) {
                                       final newData = await ref
                                           .read(transferProvider)
                                           .getCurrentStock();
@@ -138,7 +154,8 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                                         )),
                                                 (route) => false));
                                       }
-                                    } else if (data.stockModel!.typeId == 2) {
+                                    } else if (data.stockModel!.typeId == 2 &&
+                                        data.stockModel!.salesManaging) {
                                       Future.microtask(() =>
                                           Navigator.pushAndRemoveUntil(
                                               context,
@@ -158,6 +175,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                       setState(() {
                                         isError = true;
                                       });
+                                      ref.read(deleteAuthProvider).deleteAuth();
                                     }
                                   }
                                 }
@@ -165,6 +183,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                 setState(() {
                                   isError = true;
                                 });
+                                ref.read(deleteAuthProvider).deleteAuth();
                               }
                               setState(() {
                                 isLoading = false;

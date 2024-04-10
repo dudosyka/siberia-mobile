@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:mobile_app_slb/data/models/arrivalproduct_model.dart';
 import 'package:mobile_app_slb/data/models/assembly_model.dart';
 import 'package:mobile_app_slb/data/models/assortment_model.dart';
 import 'package:mobile_app_slb/data/models/auth_model.dart';
@@ -327,7 +328,8 @@ class RemoteData {
       for (var element in (res.data["transactionData"]["products"] as List)) {
         Map<String, dynamic> curPrice = {};
 
-        if (element["product"]["offertaPrice"] == null) {
+        if (element["product"]["offertaPrice"] == null ||
+            element["product"]["offertaPrice"] == 0.0) {
           if (element["product"]["distributorPrice"] <=
               element["product"]["professionalPrice"]) {
             curPrice = {"Distribution": element["product"]["distributorPrice"]};
@@ -571,9 +573,9 @@ class RemoteData {
 
   Future<dynamic> getAddresses(String token, String name) async {
     final res = await dio.post("${baseUrl}stock/all",
-        data: {"filters": {
-          "name": name
-        }},
+        data: {
+          "filters": {"name": name}
+        },
         options: Options(validateStatus: (_) => true, headers: {
           "Content-Type": "application/json",
           "authorization": "Bearer $token",
@@ -590,15 +592,15 @@ class RemoteData {
 
   Future<dynamic> selectAddress(
       String token, int transactionId, int stockId) async {
-    final res = await dio.get(
-        "$baseUrl/transaction/transfer/$transactionId/4/$stockId",
-        options: Options(validateStatus: (_) => true, headers: {
-          "Content-Type": "application/json",
-          "authorization": "Bearer $token",
-        }));
+    final res =
+        await dio.get("$baseUrl/transaction/transfer/$transactionId/4/$stockId",
+            options: Options(validateStatus: (_) => true, headers: {
+              "Content-Type": "application/json",
+              "authorization": "Bearer $token",
+            }));
 
     if (res.statusCode == 200) {
-      if(res.data as bool) {
+      if (res.data as bool) {
         return true;
       } else {
         return false;
@@ -610,7 +612,8 @@ class RemoteData {
     }
   }
 
-  Future<dynamic> completeTransferAssembly(String token, int transactionId, int stockId) async {
+  Future<dynamic> completeTransferAssembly(
+      String token, int transactionId, int stockId) async {
     final res = await dio.patch(
         "$baseUrl/transaction/transfer/$transactionId/4/$stockId",
         options: Options(validateStatus: (_) => true, headers: {
@@ -627,14 +630,15 @@ class RemoteData {
     }
   }
 
-  Future<dynamic> getTransfer(String token, int transactionId, List<int> objects, String type) async {
-    if(type == "all") {
-      final res = await dio.patch(
-          "$baseUrl/transaction/transfer/$transactionId/6",
-          options: Options(validateStatus: (_) => true, headers: {
-            "Content-Type": "application/json",
-            "authorization": "Bearer $token",
-          }));
+  Future<dynamic> getTransfer(
+      String token, int transactionId, List<int> objects, String type) async {
+    if (type == "all") {
+      final res =
+          await dio.patch("$baseUrl/transaction/transfer/$transactionId/6",
+              options: Options(validateStatus: (_) => true, headers: {
+                "Content-Type": "application/json",
+                "authorization": "Bearer $token",
+              }));
 
       if (res.statusCode == 200) {
         return true;
@@ -648,13 +652,13 @@ class RemoteData {
       } else {
         return ErrorModel("auth error", 401, "Unauthorized");
       }
-    } else if(type == "missing") {
-      final res = await dio.patch(
-          "$baseUrl/transaction/transfer/$transactionId/7",
-          options: Options(validateStatus: (_) => true, headers: {
-            "Content-Type": "application/json",
-            "authorization": "Bearer $token",
-          }));
+    } else if (type == "missing") {
+      final res =
+          await dio.patch("$baseUrl/transaction/transfer/$transactionId/7",
+              options: Options(validateStatus: (_) => true, headers: {
+                "Content-Type": "application/json",
+                "authorization": "Bearer $token",
+              }));
 
       if (res.statusCode == 200) {
         return true;
@@ -687,6 +691,57 @@ class RemoteData {
       } else {
         return ErrorModel("auth error", 401, "Unauthorized");
       }
+    }
+  }
+
+  Future<dynamic> getProductBarcode(String token, String barcode) async {
+    final res = await dio.get("$baseUrl/product/bar/$barcode",
+        options: Options(validateStatus: (_) => true, headers: {
+          "Content-Type": "application/json",
+          "authorization": "Bearer $token",
+        }));
+
+    if (res.statusCode == 200) {
+      return (res.data as List)
+          .map((e) => ArrivalProductModel.fromJson(e))
+          .toList();
+    } else if (res.statusCode == 415) {
+      return ErrorModel("unsupported media", 415, "Unsupported Media Type");
+    } else {
+      return ErrorModel("auth error", 401, "Unauthorized");
+    }
+  }
+
+  Future<dynamic> setTransactionIncome(
+      String token, int storeId, List<CartModel> models) async {
+    final res = await dio.post("$baseUrl/transaction/income",
+        data: {
+          "to": storeId,
+          "type": 1,
+          "products": models
+              .map((e) => {
+                    "productId": e.model.id,
+                    "amount": e.quantity,
+                    "price": e.curPrice
+                  })
+              .toList()
+        },
+        options: Options(validateStatus: (_) => true, headers: {
+          "Content-Type": "application/json",
+          "authorization": "Bearer $token",
+        }));
+
+    if (res.statusCode == 200) {
+      return true;
+    } else if (res.statusCode == 415) {
+      return ErrorModel("unsupported media", 415, "Bad request body");
+    } else if (res.statusCode == 400) {
+      return ErrorModel(
+          "bad transaction id", 400, "Transaction id must be INT");
+    } else if (res.statusCode == 403) {
+      return ErrorModel("forbidden", 403, "Stock forbidden");
+    } else {
+      return ErrorModel("auth error", 401, "Unauthorized");
     }
   }
 

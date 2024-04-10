@@ -6,6 +6,7 @@
   "newArrival": "+ Nueva llegada",
   "ok": "Ok",
   "assortment": "Rango",
+  "smtWentWrongReload": "Algo salió mal:(\nPor favor recarga la aplicación",
 
   "filters": "Filtros",
   "search": "Buscar",
@@ -84,5 +85,66 @@
   "region": "Región",
   "address": "DIRECCIÓN",
   "person": "Recipiente",
-  "endSaleCaps": "COMPLETO"
+  "endSaleCaps": "COMPLETO",
+
+  "homeScreen": "Hogar",
+  "transfer": "Transferir",
+  "logout": "Salida",
+
+  "no": "No",
+  "yes": "Sí",
+
+  "newArrivalCompletedCaps": "¡NUEVA LLEGADA EXITOSA!",
+
+  "areYouSureReturn": "¿Está seguro? No podrás regresar",
+  "selectAtList": "Seleccione al menos un producto",
+  "bulkAssemblyCaps": "ASAMBLEA MASIVA",
+  "operations": "Operaciones",
+  "dateCaps": "FECHA",
+  "saleCaps": "VENTA",
+
+  "orders": "Pedidos",
+  "orderCaps": "ORDEN ",
+
+  "assemblingCompletedCaps": "¡SE HA FORMADO EL PEDIDO!",
+
+  "areYouSureProceed": "¿Estas seguro que deseas continuar? No podrás cancelar",
+  "transferCaps": "TRANSFERIR",
+  "areYouSureTransfer": "¿Estás seguro de que quieres terminar la transferencia?",
+  "itemChosen": "Elementos elegidos en parte, ¿desea continuar o finalizar esta transferencia en parte, o faltaban algunos elementos?",
+  "missingItemsCaps": "OBJETOS PERDIDOS",
+  "endPartlyCaps": "TERMINAR EN PARCIA",
+  "continueCaps": "CONTINUAR",
+
+  "youDontTab": "No tienes acceso a esta pestaña",
+
+  "anErrorOccured": "Ocurrió un error. Inténtalo de nuevo",
+  "scan": "Escanear",
+  "newArrivalCaps": "NUEVA LLEGADA",
+  "arrivalList": "Lista de llegada",
+  "noItemsYetCaps": "NO HAY ARTÍCULOS AÚN",
+  "startWith": "Comience con el escaneo a continuación",
+  "distribution": "Distribución",
+  "professional": "Profesional",
+  "oferta": "Oferta",
+  "other": "Otra",
+
+  "newTransferCaps": "NUEVA TRANSFERENCIA",
+  "addedToTransfer": "Añadido a la transferencia",
+  "completeTransferCaps": "TRANSFERENCIA COMPLETA",
+  "transferItemEdit": "TRANSFERIR ARTÍCULO EDITAR",
+
+  "inStockCaps": "EN STOCK",
+
+  "selectProduct": "Seleccionar producto",
+  "scanProduct": "Escanear código de producto",
+  "reScan": "Algo salió mal. Intente volver a escanear nuevamente",
+
+  "adressCaps": "DIRECCIÓN",
+  "selectAdress": "Seleccionar dirección",
+  "areYouSureStore": "¿Estás seguro de que quieres continuar con la tienda seleccionada?",
+
+  "transferAssembly": "Conjunto de transferencia",
+
+  "transferAssemblingCompCaps": "¡MONTAJE DE TRANSFERENCIA COMPLETADO!"
 }

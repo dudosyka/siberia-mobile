@@ -38,6 +38,7 @@ class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage> {
   @override
   Widget build(BuildContext context) {
     bool isAllSelected = allSelected(widget.cartModels);
+    double width = MediaQuery.of(context).size.width;
 
     return MediaQuery(
         data: MediaQuery.of(context).copyWith(
@@ -93,7 +94,8 @@ class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage> {
                                   }
                                 : () {
                                     ScaffoldMessenger.of(context)
-                                        .showSnackBar(SnackBar(duration: const Duration(seconds: 1),
+                                        .showSnackBar(SnackBar(
+                                      duration: const Duration(seconds: 1),
                                       content: Text(
                                           AppLocalizations.of(context)!
                                               .notAllProducts),
@@ -170,39 +172,37 @@ class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage> {
                                 });
                               }, AppLocalizations.of(context)!.cancelCaps,
                                   false),
-                              Builder(
-                                builder: (context) {
-                                  return InkWell(
-                                    onTap: () {
-                                      Scaffold.of(context).openDrawer();
-                                    },
-                                    child: Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                          color: const Color(0xFF3C3C3C),
-                                          borderRadius: BorderRadius.circular(5)),
-                                      child: const Icon(
-                                        Icons.menu,
-                                        color: Colors.white,
-                                      ),
+                              Builder(builder: (context) {
+                                return InkWell(
+                                  onTap: () {
+                                    Scaffold.of(context).openDrawer();
+                                  },
+                                  child: Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                        color: const Color(0xFF3C3C3C),
+                                        borderRadius: BorderRadius.circular(5)),
+                                    child: const Icon(
+                                      Icons.menu,
+                                      color: Colors.white,
                                     ),
-                                  );
-                                }
-                              ),
+                                  ),
+                                );
+                              }),
                             ],
                           ),
                           const Spacer(),
-                          const Text(
-                            "TRANSFER",
-                            style: TextStyle(
+                          Text(
+                            AppLocalizations.of(context)!.transferCaps,
+                            style: const TextStyle(
                                 fontSize: 24,
                                 color: Color(0xFF909090),
                                 height: 0.5),
                           ),
-                          const Text(
-                            "Transfer assembly",
-                            style: TextStyle(
+                          Text(
+                            AppLocalizations.of(context)!.transferAssembly,
+                            style: const TextStyle(
                                 fontSize: 36,
                                 color: Color(0xFF363636),
                                 fontWeight: FontWeight.bold),
@@ -217,8 +217,7 @@ class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage> {
                   ),
                   Expanded(
                     flex: 6,
-                    child: getProductListWidget(
-                        Theme.of(context), widget.cartModels),
+                    child: getProductListWidget(widget.cartModels, width),
                   ),
                   const Center(child: VerticalDivider()),
                 ],
@@ -226,7 +225,7 @@ class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage> {
             )));
   }
 
-  Widget getProductListWidget(ThemeData theme, List<CartModel> data) {
+  Widget getProductListWidget(List<CartModel> data, double width) {
     return Column(
       children: [
         Container(
@@ -313,10 +312,14 @@ class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage> {
                                 const SizedBox(
                                   width: 20,
                                 ),
-                                Text(
-                                  e.model.name,
-                                  style: const TextStyle(
-                                      fontSize: 16, color: Color(0xFF222222)),
+                                SizedBox(
+                                  width: width / 2 - 18 - 20 - 20,
+                                  child: Text(
+                                    e.model.name,
+                                    style: const TextStyle(
+                                        fontSize: 16, color: Color(0xFF222222)),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ],
                             ),
@@ -327,10 +330,14 @@ class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  e.quantity.toString(),
-                                  style: const TextStyle(
-                                      fontSize: 16, color: Color(0xFF222222)),
+                                SizedBox(
+                                  width: width / 2 - 66,
+                                  child: Text(
+                                    e.quantity.toString(),
+                                    style: const TextStyle(
+                                        fontSize: 16, color: Color(0xFF222222)),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                                 IconButton(
                                     onPressed: () async {

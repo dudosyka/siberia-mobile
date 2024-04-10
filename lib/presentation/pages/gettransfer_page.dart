@@ -39,6 +39,7 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
   @override
   Widget build(BuildContext context) {
     bool isOneSelected = atLeastOneSelected(widget.cartModels);
+    double width = MediaQuery.of(context).size.width;
 
     return MediaQuery(
         data: MediaQuery.of(context).copyWith(
@@ -74,7 +75,7 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                                           context: context,
                                           builder: (context) {
                                             return exitDialog(context,
-                                                "Are you sure you want to proceed? You won't be able to cancel");
+                                                AppLocalizations.of(context)!.areYouSureProceed);
                                           }).then((returned) async {
                                         if (returned) {
                                           final data = await ref
@@ -118,9 +119,10 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                                   }
                                 : () {
                                     ScaffoldMessenger.of(context)
-                                        .showSnackBar(const SnackBar(duration: Duration(seconds: 1),
+                                        .showSnackBar(SnackBar(
+                                      duration: const Duration(seconds: 1),
                                       content:
-                                          Text("Select at least one product"),
+                                          Text(AppLocalizations.of(context)!.selectAtList),
                                     ));
                                   },
                             child: Stack(
@@ -194,32 +196,30 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                                 });
                               }, AppLocalizations.of(context)!.cancelCaps,
                                   false),
-                              Builder(
-                                builder: (context) {
-                                  return InkWell(
-                                    onTap: () {
-                                      Scaffold.of(context).openDrawer();
-                                    },
-                                    child: Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                          color: const Color(0xFF3C3C3C),
-                                          borderRadius: BorderRadius.circular(5)),
-                                      child: const Icon(
-                                        Icons.menu,
-                                        color: Colors.white,
-                                      ),
+                              Builder(builder: (context) {
+                                return InkWell(
+                                  onTap: () {
+                                    Scaffold.of(context).openDrawer();
+                                  },
+                                  child: Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                        color: const Color(0xFF3C3C3C),
+                                        borderRadius: BorderRadius.circular(5)),
+                                    child: const Icon(
+                                      Icons.menu,
+                                      color: Colors.white,
                                     ),
-                                  );
-                                }
-                              ),
+                                  ),
+                                );
+                              }),
                             ],
                           ),
                           const Spacer(),
-                          const Text(
-                            "TRANSFER",
-                            style: TextStyle(
+                          Text(
+                            AppLocalizations.of(context)!.transferCaps,
+                            style: const TextStyle(
                                 fontSize: 24,
                                 color: Color(0xFF909090),
                                 height: 0.5),
@@ -241,8 +241,7 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                   ),
                   Expanded(
                     flex: 6,
-                    child: getProductListWidget(
-                        Theme.of(context), widget.cartModels),
+                    child: getProductListWidget(widget.cartModels, width),
                   ),
                   const Center(child: VerticalDivider()),
                 ],
@@ -250,7 +249,7 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
             )));
   }
 
-  Widget getProductListWidget(ThemeData theme, List<CartModel> data) {
+  Widget getProductListWidget(List<CartModel> data, double width) {
     return Column(
       children: [
         Container(
@@ -337,10 +336,14 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                                 const SizedBox(
                                   width: 20,
                                 ),
-                                Text(
-                                  e.model.name,
-                                  style: const TextStyle(
-                                      fontSize: 16, color: Color(0xFF222222)),
+                                SizedBox(
+                                  width: width / 2 - 18 - 20 - 20,
+                                  child: Text(
+                                    e.model.name,
+                                    style: const TextStyle(
+                                        fontSize: 16, color: Color(0xFF222222)),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ],
                             ),
@@ -351,10 +354,14 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  e.quantity.toString(),
-                                  style: const TextStyle(
-                                      fontSize: 16, color: Color(0xFF222222)),
+                                SizedBox(
+                                  width: width / 2 - 66,
+                                  child: Text(
+                                    e.quantity.toString(),
+                                    style: const TextStyle(
+                                        fontSize: 16, color: Color(0xFF222222)),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                                 IconButton(
                                     onPressed: () async {
@@ -424,10 +431,10 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  "Are you sure you want to end transfer?",
+                Text(
+                  AppLocalizations.of(context)!.areYouSureTransfer,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF222222)),
@@ -437,11 +444,11 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                   child: Column(
                     children: [
                       const SizedBox(height: 10),
-                      const Text(
-                        "Items chosen partly, do you want to proceed or end this transfer partly, or some items were missing",
+                      Text(
+                        AppLocalizations.of(context)!.itemChosen,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 16, color: Color(0xFF3A3A3A)),
+                        style:
+                            const TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
                       ),
                       const SizedBox(height: 30),
                       Row(
@@ -449,7 +456,7 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                         children: [
                           outlinedGrayButton(() {
                             Navigator.pop(context, false);
-                          }, "CONTINUE"),
+                          }, AppLocalizations.of(context)!.continueCaps),
                           const SizedBox(
                             width: 18,
                           ),
@@ -458,17 +465,17 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                                 context: context,
                                 builder: (context) {
                                   return exitDialog(context,
-                                      "Are you sure you want to proceed? You won't be able to cancel");
+                                      AppLocalizations.of(context)!.areYouSureProceed);
                                 }).then((returned) async {
                               if (returned) {
                                 final data = await ref
                                     .read(transferProvider)
                                     .getTransfer(
-                                    widget.transactionId,
-                                    widget.cartModels
-                                        .map((e) => e.model.id)
-                                        .toList(),
-                                    "missing");
+                                        widget.transactionId,
+                                        widget.cartModels
+                                            .map((e) => e.model.id)
+                                            .toList(),
+                                        "missing");
 
                                 if (data.errorModel == null) {
                                   if (context.mounted) {
@@ -476,9 +483,9 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                            const TransferCompletePage(
-                                                isQr: true)),
-                                            (route) => false);
+                                                const TransferCompletePage(
+                                                    isQr: true)),
+                                        (route) => false);
                                   }
                                 } else {
                                   if (context.mounted) {
@@ -486,13 +493,13 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                            const AuthPage()),
-                                            (route) => false);
+                                                const AuthPage()),
+                                        (route) => false);
                                   }
                                 }
                               }
                             });
-                          }, "MISSING ITEMS"),
+                          }, AppLocalizations.of(context)!.missingItemsCaps),
                           const SizedBox(
                             width: 18,
                           ),
@@ -502,7 +509,7 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                                   context: context,
                                   builder: (context) {
                                     return exitDialog(context,
-                                        "Are you sure you want to proceed? You won't be able to cancel");
+                                        AppLocalizations.of(context)!.areYouSureProceed);
                                   }).then((returned) async {
                                 if (returned) {
                                   final selectedIds = <int>[];
@@ -513,20 +520,18 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                                   }
                                   final data = await ref
                                       .read(transferProvider)
-                                      .getTransfer(
-                                      widget.transactionId,
-                                      selectedIds,
-                                      "partly");
-                                  
+                                      .getTransfer(widget.transactionId,
+                                          selectedIds, "partly");
+
                                   if (data.errorModel == null) {
                                     if (context.mounted) {
                                       Navigator.pushAndRemoveUntil(
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                              const TransferCompletePage(
-                                                  isQr: true)),
-                                              (route) => false);
+                                                  const TransferCompletePage(
+                                                      isQr: true)),
+                                          (route) => false);
                                     }
                                   } else {
                                     if (context.mounted) {
@@ -534,8 +539,8 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                              const AuthPage()),
-                                              (route) => false);
+                                                  const AuthPage()),
+                                          (route) => false);
                                     }
                                   }
                                 }
@@ -545,13 +550,13 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                                 decoration: BoxDecoration(
                                     color: const Color(0xFF000000),
                                     borderRadius: BorderRadius.circular(4)),
-                                child: const Padding(
-                                  padding:
-                                  EdgeInsets.only(left: 10, right: 10, top: 4, bottom: 4),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 10, right: 10, top: 4, bottom: 4),
                                   child: Center(
                                     child: Text(
-                                      "END PARTLY",
-                                      style: TextStyle(
+                                      AppLocalizations.of(context)!.endPartlyCaps,
+                                      style: const TextStyle(
                                           fontSize: 12,
                                           color: Colors.white,
                                           fontWeight: FontWeight.w500),

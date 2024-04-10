@@ -13,6 +13,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mobile_app_slb/presentation/states/main_state.dart';
 import 'package:mobile_app_slb/presentation/states/network_state.dart';
 import 'package:provider/provider.dart' as provider;
+import 'dart:io' show Platform;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -90,25 +91,32 @@ class _MyAppState extends ConsumerState<MyApp> {
                         value.$2.errorModel != null ||
                         value.$3.errorModel != null) {
                       return const AuthPage();
+                    } else if (!value.$2.stockModel!.transfersManaging &&
+                        !value.$2.stockModel!.arrivalsManaging &&
+                        !value.$2.stockModel!.salesManaging) {
+                      return const AuthPage();
                     } else {
                       if (value.$1.authModel!.type == "stock") {
                         return const HomePage();
                       } else if (value.$1.authModel!.type == "transaction") {
                         if (value.$2.stockModel!.statusId == 2 &&
-                            value.$2.stockModel!.typeId == 3) {
+                            value.$2.stockModel!.typeId == 3 &&
+                            value.$2.stockModel!.transfersManaging) {
                           return SelectAddressPage(
                             stockModel: value.$2.stockModel!,
                             currentStock: value.$3.currentStock!,
                           );
                         } else if (value.$2.stockModel!.typeId == 3 &&
-                            value.$2.stockModel!.statusId == 4) {
+                            value.$2.stockModel!.statusId == 4 &&
+                            value.$2.stockModel!.transfersManaging) {
                           return GetTransferPage(
                             stockModel: value.$2.stockModel!,
                             cartModels: value.$3.currentStock!.cartModels,
                             transactionId: value.$3.currentStock!.id,
                             stockId: value.$2.stockModel!.id,
                           );
-                        } else if (value.$2.stockModel!.typeId == 2) {
+                        } else if (value.$2.stockModel!.typeId == 2 &&
+                            value.$2.stockModel!.salesManaging) {
                           return NewSalePage(
                             currentStorehouse: value.$2.stockModel!.name,
                             storehouseId: value.$2.stockModel!.id,
@@ -122,16 +130,27 @@ class _MyAppState extends ConsumerState<MyApp> {
                     }
                     return const AuthPage();
                   }, error: (error, stacktrace) {
-                    return AlertDialog(
-                      title: Text(error.toString()),
-                      actions: [
-                        ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text("Ok"))
-                      ],
-                    );
+                    if (Platform.isAndroid) {
+                      return AlertDialog(
+                        title: Text(error.toString()),
+                        actions: [
+                          ElevatedButton(
+                              onPressed: () {
+                                //Navigator.pop(context);
+                                SystemChannels.platform
+                                    .invokeMethod('SystemNavigator.pop');
+                              },
+                              child: const Text("Ok"))
+                        ],
+                      );
+                    } else {
+                      return const AlertDialog(
+                        title: Text(
+                          "Something went wrong:(\nPlease reload app",
+                          textAlign: TextAlign.center,
+                        ),
+                      );
+                    }
                   }, loading: () {
                     return Column(
                       children: [

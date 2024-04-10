@@ -16,7 +16,7 @@ class TransferNotifier extends ChangeNotifier {
   List<CartModel> cartData = [];
   int? transactionId;
 
-  Future<void> addToCart(CartModel newModel, int storeId) async {
+  Future<void> addToCart(CartModel newModel) async {
     bool flag = false;
     for (var element in cartData) {
       if (element.model.id == newModel.model.id) {
@@ -36,13 +36,13 @@ class TransferNotifier extends ChangeNotifier {
     return data;
   }
 
-  Future<void> deleteFromCart(CartModel oldModel, int storeId) async {
+  Future<void> deleteFromCart(CartModel oldModel) async {
     cartData.removeWhere((element) => element.model.id == oldModel.model.id);
     notifyListeners();
   }
 
   Future<void> updateCartModel(
-      CartModel model, bool add, int? isText, int storeId) async {
+      CartModel model, bool add, int? isText) async {
     if (isText != null) {
       cartData
           .firstWhere((element) => element.model.id == model.model.id)
@@ -57,7 +57,7 @@ class TransferNotifier extends ChangeNotifier {
             .firstWhere((element) => element.model.id == model.model.id)
             .quantity -= 1;
         if (model.quantity == 1) {
-          deleteFromCart(model, storeId);
+          deleteFromCart(model);
         }
       }
     }

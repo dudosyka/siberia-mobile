@@ -29,6 +29,8 @@ class _BulkApprovePageState extends ConsumerState<BulkApprovePage> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(
           textScaler: MediaQuery.of(context).size.shortestSide > 650
@@ -149,39 +151,37 @@ class _BulkApprovePageState extends ConsumerState<BulkApprovePage> {
                                 }
                               });
                             }, AppLocalizations.of(context)!.cancelCaps, false),
-                            Builder(
-                              builder: (context) {
-                                return InkWell(
-                                  onTap: () {
-                                    Scaffold.of(context).openDrawer();
-                                  },
-                                  child: Container(
-                                    width: 30,
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                        color: const Color(0xFF3C3C3C),
-                                        borderRadius: BorderRadius.circular(5)),
-                                    child: const Icon(
-                                      Icons.menu,
-                                      color: Colors.white,
-                                    ),
+                            Builder(builder: (context) {
+                              return InkWell(
+                                onTap: () {
+                                  Scaffold.of(context).openDrawer();
+                                },
+                                child: Container(
+                                  width: 30,
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                      color: const Color(0xFF3C3C3C),
+                                      borderRadius: BorderRadius.circular(5)),
+                                  child: const Icon(
+                                    Icons.menu,
+                                    color: Colors.white,
                                   ),
-                                );
-                              }
-                            ),
+                                ),
+                              );
+                            }),
                           ],
                         ),
                         const Spacer(),
-                        const Text(
-                          "BULK ASSEMBLY",
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)!.bulkAssemblyCaps,
+                          style: const TextStyle(
                               fontSize: 24,
                               color: Color(0xFF909090),
                               height: 0.5),
                         ),
-                        const Text(
-                          "Orders",
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)!.orders,
+                          style: const TextStyle(
                               fontSize: 36,
                               color: Color(0xFF363636),
                               fontWeight: FontWeight.bold),
@@ -196,8 +196,7 @@ class _BulkApprovePageState extends ConsumerState<BulkApprovePage> {
                 ),
                 Expanded(
                   flex: 6,
-                  child: getProductListWidget(
-                      Theme.of(context), widget.bulkModels),
+                  child: getProductListWidget(widget.bulkModels, width),
                 ),
                 const Center(child: VerticalDivider()),
               ],
@@ -206,7 +205,7 @@ class _BulkApprovePageState extends ConsumerState<BulkApprovePage> {
     );
   }
 
-  Widget getProductListWidget(ThemeData theme, List<BulkSortedModel> data) {
+  Widget getProductListWidget(List<BulkSortedModel> data, double width) {
     return Column(
       children: [
         Container(
@@ -259,8 +258,9 @@ class _BulkApprovePageState extends ConsumerState<BulkApprovePage> {
                             const BoxDecoration(color: Color(0xFFEBEBEB)),
                         child: Center(
                           child: Text(
-                            "ORDER ${e.assemblyModel.id}",
+                            "${AppLocalizations.of(context)!.orderCaps}${e.assemblyModel.id}",
                             style: const TextStyle(fontSize: 16),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ),
@@ -281,33 +281,33 @@ class _BulkApprovePageState extends ConsumerState<BulkApprovePage> {
                                   children: [
                                     Expanded(
                                       flex: 1,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
+                                      child: SizedBox(
+                                        width: width / 2,
+                                        child: Center(
+                                          child: Text(
                                             e.model.name,
                                             style: const TextStyle(
                                                 fontSize: 16,
                                                 color: Color(0xFF222222)),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                        ],
+                                        ),
                                       ),
                                     ),
                                     const VerticalDivider(),
                                     Expanded(
                                       flex: 1,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
+                                      child: SizedBox(
+                                        width: width / 2,
+                                        child: Center(
+                                          child: Text(
                                             e.quantity.toString(),
                                             style: const TextStyle(
                                                 fontSize: 16,
                                                 color: Color(0xFF222222)),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                        ],
+                                        ),
                                       ),
                                     )
                                   ],
