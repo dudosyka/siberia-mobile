@@ -74,8 +74,10 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                                       showDialog(
                                           context: context,
                                           builder: (context) {
-                                            return exitDialog(context,
-                                                AppLocalizations.of(context)!.areYouSureProceed);
+                                            return exitDialog(
+                                                context,
+                                                AppLocalizations.of(context)!
+                                                    .areYouSureProceed);
                                           }).then((returned) async {
                                         if (returned) {
                                           final data = await ref
@@ -121,8 +123,9 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                                     ScaffoldMessenger.of(context)
                                         .showSnackBar(SnackBar(
                                       duration: const Duration(seconds: 1),
-                                      content:
-                                          Text(AppLocalizations.of(context)!.selectAtList),
+                                      content: Text(
+                                          AppLocalizations.of(context)!
+                                              .selectAtList),
                                     ));
                                   },
                             child: Stack(
@@ -447,8 +450,8 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                       Text(
                         AppLocalizations.of(context)!.itemChosen,
                         textAlign: TextAlign.center,
-                        style:
-                            const TextStyle(fontSize: 16, color: Color(0xFF3A3A3A)),
+                        style: const TextStyle(
+                            fontSize: 16, color: Color(0xFF3A3A3A)),
                       ),
                       const SizedBox(height: 30),
                       Row(
@@ -464,8 +467,10 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                             showDialog(
                                 context: context,
                                 builder: (context) {
-                                  return exitDialog(context,
-                                      AppLocalizations.of(context)!.areYouSureProceed);
+                                  return exitDialog(
+                                      context,
+                                      AppLocalizations.of(context)!
+                                          .areYouSureProceed);
                                 }).then((returned) async {
                               if (returned) {
                                 final data = await ref
@@ -508,8 +513,10 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                               showDialog(
                                   context: context,
                                   builder: (context) {
-                                    return exitDialog(context,
-                                        AppLocalizations.of(context)!.areYouSureProceed);
+                                    return exitDialog(
+                                        context,
+                                        AppLocalizations.of(context)!
+                                            .areYouSureProceed);
                                   }).then((returned) async {
                                 if (returned) {
                                   final selectedIds = <int>[];
@@ -555,7 +562,8 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                                       left: 10, right: 10, top: 4, bottom: 4),
                                   child: Center(
                                     child: Text(
-                                      AppLocalizations.of(context)!.endPartlyCaps,
+                                      AppLocalizations.of(context)!
+                                          .endPartlyCaps,
                                       style: const TextStyle(
                                           fontSize: 12,
                                           color: Colors.white,

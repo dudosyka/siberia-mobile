@@ -215,8 +215,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                                                               context)
                                                           .showSnackBar(
                                                               SnackBar(
+                                                        duration:
+                                                            const Duration(
+                                                                seconds: 1),
                                                         content: Text(
-                                                            AppLocalizations.of(context)!.youDontTab),
+                                                            AppLocalizations.of(
+                                                                    context)!
+                                                                .youDontTab),
                                                       ));
                                                     }),
                                         );
@@ -255,8 +260,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                                                               context)
                                                           .showSnackBar(
                                                               SnackBar(
+                                                        duration:
+                                                            const Duration(
+                                                                seconds: 1),
                                                         content: Text(
-                                                            AppLocalizations.of(context)!.youDontTab),
+                                                            AppLocalizations.of(
+                                                                    context)!
+                                                                .youDontTab),
                                                       ));
                                                     }),
                                         );
@@ -289,8 +299,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                                                               context)
                                                           .showSnackBar(
                                                               SnackBar(
+                                                        duration:
+                                                            const Duration(
+                                                                seconds: 1),
                                                         content: Text(
-                                                            AppLocalizations.of(context)!.youDontTab),
+                                                            AppLocalizations.of(
+                                                                    context)!
+                                                                .youDontTab),
                                                       ));
                                                     }),
                                         );

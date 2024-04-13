@@ -3,15 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/data/models/stock_model.dart';
 import 'package:mobile_app_slb/presentation/widgets/round_button.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 import '../../data/repository/auth_repository.dart';
 import '../pages/auth_page.dart';
 import '../states/main_state.dart';
 
 class AppDrawerQr extends ConsumerStatefulWidget {
-  const AppDrawerQr(
-      {super.key,
-      required this.stockModel});
+  const AppDrawerQr({super.key, required this.stockModel});
 
   final StockModel stockModel;
 

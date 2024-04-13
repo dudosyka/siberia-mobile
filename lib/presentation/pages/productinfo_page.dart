@@ -79,7 +79,8 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(top: 40, right: 40, left: 40),
+                        padding:
+                            const EdgeInsets.only(top: 40, right: 40, left: 40),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -148,54 +149,58 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                 ),
                 Expanded(
                   flex: 6,
-                  child: ref.watch(getProductInfoProvider(widget.productId)).when(
-                    data: (value) {
-                      if (value.errorModel != null) {
-                        ref.read(deleteAuthProvider).deleteAuth();
-                        Future.microtask(() =>
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(builder: (context) => const AuthPage()),
-                                  (route) => false,
-                            ),
-                        );
+                  child: ref
+                      .watch(getProductInfoProvider(widget.productId))
+                      .when(
+                        data: (value) {
+                          if (value.errorModel != null) {
+                            ref.read(deleteAuthProvider).deleteAuth();
+                            Future.microtask(
+                              () => Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const AuthPage()),
+                                (route) => false,
+                              ),
+                            );
 
-                        return Container();
-                      }
+                            return Container();
+                          }
 
-                      return productInfoWidget(value.productModel!, width);
-                    },
-                    error: (error, stacktrace) {
-                      if (Platform.isAndroid) {
-                        return AlertDialog(
-                          title: Text(error.toString()),
-                          actions: [
-                            ElevatedButton(
-                              onPressed: () {
-                                SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-                              },
-                              child: const Text("Ok"),
-                            ),
-                          ],
-                        );
-                      } else {
-                        return AlertDialog(
-                          title: Text(
-                            AppLocalizations.of(context)!.smtWentWrongReload,
-                            textAlign: TextAlign.center,
-                          ),
-                        );
-                      }
-                    },
-                    loading: () => const Center(
-                      child: CircularProgressIndicator(color: Colors.black),
-                    ),
-                  ),
+                          return productInfoWidget(value.productModel!, width);
+                        },
+                        error: (error, stacktrace) {
+                          if (Platform.isAndroid) {
+                            return AlertDialog(
+                              title: Text(error.toString()),
+                              actions: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    SystemChannels.platform
+                                        .invokeMethod('SystemNavigator.pop');
+                                  },
+                                  child: const Text("Ok"),
+                                ),
+                              ],
+                            );
+                          } else {
+                            return AlertDialog(
+                              title: Text(
+                                AppLocalizations.of(context)!
+                                    .smtWentWrongReload,
+                                textAlign: TextAlign.center,
+                              ),
+                            );
+                          }
+                        },
+                        loading: () => const Center(
+                          child: CircularProgressIndicator(color: Colors.black),
+                        ),
+                      ),
                 ),
               ],
             ),
           ),
-
         ));
   }
 

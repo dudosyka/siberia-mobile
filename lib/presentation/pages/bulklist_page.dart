@@ -323,11 +323,14 @@ class _BulkListPageState extends ConsumerState<BulkListPage> {
                               children: [
                                 SizedBox(
                                   width: width / 2 - 66,
-                                  child: Text(
-                                    e.quantity.toString(),
-                                    style: const TextStyle(
-                                        fontSize: 16, color: Color(0xFF222222)),
-                                    overflow: TextOverflow.ellipsis,
+                                  child: Center(
+                                    child: Text(
+                                      e.quantity.toString(),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Color(0xFF222222)),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                 ),
                                 IconButton(

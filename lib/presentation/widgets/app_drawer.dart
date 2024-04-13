@@ -6,7 +6,6 @@ import 'package:mobile_app_slb/presentation/pages/newtransfer_page.dart';
 import 'package:mobile_app_slb/presentation/widgets/exit_dialog.dart';
 import 'package:mobile_app_slb/presentation/widgets/round_button.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 import '../../data/repository/auth_repository.dart';
 import '../pages/auth_page.dart';
 import '../states/main_state.dart';

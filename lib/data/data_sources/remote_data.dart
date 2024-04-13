@@ -340,12 +340,12 @@ class RemoteData {
           }
         } else {
           if (element["product"]["distributorPrice"] <=
-                  element["product"]["professionalPrice"] &&
+              element["product"]["professionalPrice"] &&
               element["product"]["distributorPrice"] <=
                   element["product"]["offertaPrice"]) {
             curPrice = {"Distribution": element["product"]["distributorPrice"]};
           } else if (element["product"]["professionalPrice"] <=
-                  element["product"]["distributorPrice"] &&
+              element["product"]["distributorPrice"] &&
               element["product"]["professionalPrice"] <=
                   element["product"]["offertaPrice"]) {
             curPrice = {
@@ -357,11 +357,11 @@ class RemoteData {
         }
 
         final res2 =
-            await dio.get("${baseUrl}product/${element["product"]["id"]}",
-                options: Options(validateStatus: (_) => true, headers: {
-                  "Content-Type": "application/json",
-                  "authorization": "Bearer $token",
-                }));
+        await dio.get("${baseUrl}product/${element["product"]["id"]}",
+            options: Options(validateStatus: (_) => true, headers: {
+              "Content-Type": "application/json",
+              "authorization": "Bearer $token",
+            }));
 
         if (res2.statusCode == 200) {
           curData.add(CartModel(

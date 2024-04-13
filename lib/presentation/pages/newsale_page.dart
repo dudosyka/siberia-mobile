@@ -73,7 +73,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
   @override
   void initState() {
     super.initState();
-    ref.read(cartDataProvider).getCurrentStock();
+    if (widget.isTransaction) {
+      ref.read(cartDataProvider).getCurrentStock();
+    }
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -620,7 +622,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                             } else {
                                               return AlertDialog(
                                                 title: Text(
-                                                  AppLocalizations.of(context)!.smtWentWrongReload,
+                                                  AppLocalizations.of(context)!
+                                                      .smtWentWrongReload,
                                                   textAlign: TextAlign.center,
                                                 ),
                                               );
@@ -867,12 +870,14 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                 children: [
                                   SizedBox(
                                     width: width / 2 - 18 - 3 * 18,
-                                    child: Text(
-                                      e.vendorCode,
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          color: Color(0xFF222222)),
-                                      overflow: TextOverflow.ellipsis,
+                                    child: Center(
+                                      child: Text(
+                                        e.vendorCode,
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            color: Color(0xFF222222)),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
                                   ),
                                   e.quantity != null

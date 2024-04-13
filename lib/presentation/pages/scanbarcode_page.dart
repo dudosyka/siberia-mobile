@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,327 +29,364 @@ class ScanBarcodePage extends ConsumerStatefulWidget {
 
 class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
   var scaffoldKey = GlobalKey<ScaffoldState>();
-  MobileScannerController cameraController = MobileScannerController(
-      detectionSpeed: DetectionSpeed.noDuplicates, detectionTimeoutMs: 250);
+  MobileScannerController cameraController =
+      MobileScannerController(detectionSpeed: DetectionSpeed.normal);
   double _currentSliderValue = 0;
   bool isError = false;
   bool isLoading = false;
+  bool isScanned = false;
+  List<String> listOfScanned = [];
+  List<String> badBarcodes = [];
 
   @override
   void initState() {
     cameraController.stop();
+    listOfScanned = [];
     super.initState();
   }
 
   @override
   void dispose() {
     cameraController.dispose();
+    listOfScanned = [];
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MediaQuery(
-        data: MediaQuery.of(context).copyWith(
-            textScaler: MediaQuery.of(context).size.shortestSide > 650
-                ? const TextScaler.linear(1.1)
-                : const TextScaler.linear(1.0)),
-        child: Scaffold(
-            key: scaffoldKey,
-            resizeToAvoidBottomInset: false,
-            drawer: AppDrawer(
-              isAbleToNavigate: false,
-              isAssembly: false,
-              isHomePage: false,
-              stockModel: widget.stockModel,
-            ),
-            bottomNavigationBar: SafeArea(
-              child: SizedBox(
-                  height: 80,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: Center(
-                          child: SizedBox(
-                            height: 40,
-                            width: 40,
-                            child: IconButton(
-                                onPressed: () {
-                                  cameraController.toggleTorch();
-                                },
-                                icon: ValueListenableBuilder(
-                                  valueListenable: cameraController.torchState,
-                                  builder: (context, state, child) {
-                                    switch (state) {
-                                      case TorchState.off:
-                                        return Image.asset(
-                                          "assets/images/torch_disabled_icon.png",
-                                          scale: 4,
-                                        );
-                                      case TorchState.on:
-                                        return Image.asset(
-                                          "assets/images/torch_enabled_icon.png",
-                                          scale: 4,
-                                        );
-                                    }
-                                  },
-                                )),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Center(
-                          child: SizedBox(
-                            width: 50,
-                            height: 50,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                IconButton(
-                                    onPressed: () {
-                                      showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return exitDialog(context,
-                                                AppLocalizations.of(context)!.areYouSureReturn);
-                                          }).then((returned) {
-                                        if (returned) {
-                                          Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      NewArrivalPage(
-                                                          stockModel: widget
-                                                              .stockModel)),
-                                              (route) => false);
-                                        }
-                                      });
-                                    },
-                                    icon: const Icon(
-                                      Icons.menu,
-                                      size: 32,
-                                      color: Color(0xFF505050),
-                                    )),
-                                ref.watch(newArrivalProvider).cartData.isEmpty
-                                    ? Container()
-                                    : Padding(
-                                        padding: const EdgeInsets.all(4),
-                                        child: Align(
-                                          alignment: Alignment.topRight,
-                                          child: Container(
-                                            width: 20,
-                                            height: 20,
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(50),
-                                                color: const Color(0xFFD9D9D9)),
-                                            child: Center(
-                                              child: Text(
-                                                  ref
-                                                      .watch(newArrivalProvider)
-                                                      .cartData
-                                                      .length
-                                                      .toString(),
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontSize: 14)),
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                              ],
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  )),
-            ),
-            body: SafeArea(
-              child: Column(
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 40, right: 40, left: 40, bottom: 10),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                backButton(() {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return exitDialog(
-                                            context,
-                                            AppLocalizations.of(context)!
-                                                .areYouSure);
-                                      }).then((returned) {
-                                    if (returned) {
-                                      ref.read(newArrivalProvider).deleteCart();
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const HomePage()),
-                                          (route) => false);
-                                    }
-                                  });
-                                }, AppLocalizations.of(context)!.cancelCaps,
-                                    false)
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Builder(builder: (context) {
-                              return Row(
-                                children: [
-                                  const Spacer(),
-                                  InkWell(
-                                    onTap: () {
-                                      Scaffold.of(context).openDrawer();
-                                    },
-                                    child: Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                          color: const Color(0xFF3C3C3C),
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: const Icon(
-                                        Icons.menu,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 7,
-                    child: Column(
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) {
+          return;
+        }
+        final navigator = Navigator.of(context);
+
+        showDialog(
+            context: context,
+            builder: (context) {
+              return exitDialog(
+                  context, AppLocalizations.of(context)!.areYouSure);
+            }).then((returned) {
+          if (returned) {
+            ref.read(newArrivalProvider).deleteCart();
+            navigator.pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomePage()),
+                (route) => false);
+          }
+        });
+      },
+      child: MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+              textScaler: MediaQuery.of(context).size.shortestSide > 650
+                  ? const TextScaler.linear(1.1)
+                  : const TextScaler.linear(1.0)),
+          child: Scaffold(
+              key: scaffoldKey,
+              resizeToAvoidBottomInset: false,
+              drawer: AppDrawer(
+                isAbleToNavigate: false,
+                isAssembly: false,
+                isHomePage: false,
+                stockModel: widget.stockModel,
+              ),
+              bottomNavigationBar: SafeArea(
+                child: SizedBox(
+                    height: 80,
+                    child: Row(
                       children: [
                         Expanded(
-                          flex: 6,
-                          child: Stack(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: MobileScanner(
-                                    fit: BoxFit.cover,
-                                    controller: cameraController,
-                                    placeholderBuilder: (context, widget) =>
-                                        const Center(
-                                          child: CircularProgressIndicator(
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                    onDetect: (capture) async {
-                                      final List<Barcode> barcodes =
-                                          capture.barcodes;
-
-                                      setState(() {
-                                        isLoading = true;
-                                      });
-
-                                      ref
-                                          .read(newArrivalProvider)
-                                          .getProductBarcode(
-                                              barcodes.last.rawValue!)
-                                          .then((value) {
-                                        cameraController.stop();
-                                        if (value.errorModel != null) {
-                                          if (context.mounted) {
-                                            showDialog(
-                                                context: context,
-                                                builder: (context) {
-                                                  return AlertDialog(
-                                                    title: Text(
-                                                        AppLocalizations.of(context)!.anErrorOccured),
-                                                    actions: [
-                                                      ElevatedButton(
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                          child:
-                                                              const Text("Ok"))
-                                                    ],
-                                                  );
-                                                }).then((value) async {
-                                              await Future.delayed(
-                                                  const Duration(
-                                                      milliseconds: 500));
-                                              cameraController.start();
-                                            });
+                          flex: 1,
+                          child: Center(
+                            child: SizedBox(
+                              height: 40,
+                              width: 40,
+                              child: IconButton(
+                                  onPressed: () {
+                                    cameraController.toggleTorch();
+                                  },
+                                  icon: ValueListenableBuilder(
+                                    valueListenable:
+                                        cameraController.torchState,
+                                    builder: (context, state, child) {
+                                      switch (state) {
+                                        case TorchState.off:
+                                          return Image.asset(
+                                            "assets/images/torch_disabled_icon.png",
+                                            scale: 4,
+                                          );
+                                        case TorchState.on:
+                                          return Image.asset(
+                                            "assets/images/torch_enabled_icon.png",
+                                            scale: 4,
+                                          );
+                                      }
+                                    },
+                                  )),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Center(
+                            child: SizedBox(
+                              width: 50,
+                              height: 50,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  IconButton(
+                                      onPressed: () {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return exitDialog(
+                                                  context,
+                                                  AppLocalizations.of(context)!
+                                                      .areYouSureReturn);
+                                            }).then((returned) {
+                                          if (returned) {
+                                            Navigator.pushAndRemoveUntil(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        NewArrivalPage(
+                                                            stockModel: widget
+                                                                .stockModel)),
+                                                (route) => false);
                                           }
-                                        } else {
-                                          if (value
-                                              .arrivalProductModels!.isEmpty) {
-                                            if (context.mounted) {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return AlertDialog(
-                                                      title: Text(
-                                                          AppLocalizations.of(context)!.anErrorOccured),
-                                                      actions: [
-                                                        ElevatedButton(
-                                                            onPressed: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            child: const Text(
-                                                                "Ok"))
-                                                      ],
-                                                    );
-                                                  }).then((value) async {
-                                                await Future.delayed(
-                                                    const Duration(
-                                                        milliseconds: 500));
-                                                cameraController.start();
-                                              });
-                                            }
-                                          } else {
-                                            if (context.mounted) {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return AlertDialog(
-                                                      backgroundColor:
-                                                          Colors.white,
-                                                      surfaceTintColor:
-                                                          Colors.transparent,
-                                                      title: Text(
-                                                        AppLocalizations.of(context)!.selectProduct,
-                                                        style: const TextStyle(
-                                                            fontSize: 24,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w500),
-                                                      ),
-                                                      content: SizedBox(
-                                                        width: double.maxFinite,
-                                                        height: 300,
-                                                        child: ListView(
-                                                          shrinkWrap: true,
-                                                          children: value
-                                                              .arrivalProductModels!
-                                                              .mapIndexed(
-                                                                  (index, e) =>
+                                        });
+                                      },
+                                      icon: const Icon(
+                                        Icons.menu,
+                                        size: 32,
+                                        color: Color(0xFF505050),
+                                      )),
+                                  ref.watch(newArrivalProvider).cartData.isEmpty
+                                      ? Container()
+                                      : Padding(
+                                          padding: const EdgeInsets.all(4),
+                                          child: Align(
+                                            alignment: Alignment.topRight,
+                                            child: Container(
+                                              width: 20,
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(50),
+                                                  color:
+                                                      const Color(0xFFD9D9D9)),
+                                              child: Center(
+                                                child: Text(
+                                                    ref
+                                                        .watch(
+                                                            newArrivalProvider)
+                                                        .cartData
+                                                        .length
+                                                        .toString(),
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 14)),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                ],
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    )),
+              ),
+              body: SafeArea(
+                child: Column(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 40, right: 40, left: 40, bottom: 10),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  backButton(() {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return exitDialog(
+                                              context,
+                                              AppLocalizations.of(context)!
+                                                  .areYouSure);
+                                        }).then((returned) {
+                                      if (returned) {
+                                        ref
+                                            .read(newArrivalProvider)
+                                            .deleteCart();
+                                        Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const HomePage()),
+                                            (route) => false);
+                                      }
+                                    });
+                                  }, AppLocalizations.of(context)!.cancelCaps,
+                                      false)
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Builder(builder: (context) {
+                                return Row(
+                                  children: [
+                                    const Spacer(),
+                                    InkWell(
+                                      onTap: () {
+                                        Scaffold.of(context).openDrawer();
+                                      },
+                                      child: Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                            color: const Color(0xFF3C3C3C),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        child: const Icon(
+                                          Icons.menu,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 7,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            flex: 6,
+                            child: Stack(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: MobileScanner(
+                                      fit: BoxFit.cover,
+                                      controller: cameraController,
+                                      placeholderBuilder: (context, widget) =>
+                                          const Center(
+                                            child: CircularProgressIndicator(
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                      onDetect: (capture) async {
+                                        final List<Barcode> barcodes =
+                                            capture.barcodes;
+
+                                        if (!listOfScanned.contains(barcodes
+                                                .first.rawValue
+                                                .toString()) &&
+                                            !isScanned &&
+                                            !badBarcodes.contains(barcodes
+                                                .first.rawValue
+                                                .toString())) {
+                                          setState(() {
+                                            isLoading = true;
+                                            listOfScanned.add(barcodes
+                                                .first.rawValue
+                                                .toString());
+                                            isScanned = true;
+                                          });
+
+                                          ref
+                                              .read(newArrivalProvider)
+                                              .getProductBarcode(
+                                                  barcodes.first.rawValue!)
+                                              .then((value) async {
+                                            if (value.errorModel != null) {
+                                              if (context.mounted) {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(SnackBar(
+                                                  duration: const Duration(
+                                                      seconds: 1),
+                                                  content: Text(
+                                                      AppLocalizations.of(
+                                                              context)!
+                                                          .anErrorOccured),
+                                                ));
+                                                listOfScanned.remove(
+                                                    barcodes.first.rawValue!);
+                                                badBarcodes.add(
+                                                    barcodes.first.rawValue!);
+                                                setState(() {
+                                                  isScanned = false;
+                                                });
+                                              }
+                                            } else {
+                                              if (value.arrivalProductModels!
+                                                  .isEmpty) {
+                                                if (context.mounted) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(SnackBar(
+                                                    duration: const Duration(
+                                                        seconds: 1),
+                                                    content: Text(
+                                                        AppLocalizations.of(
+                                                                context)!
+                                                            .anErrorOccured),
+                                                  ));
+                                                  listOfScanned.remove(
+                                                      barcodes.first.rawValue!);
+                                                  badBarcodes.add(
+                                                      barcodes.first.rawValue!);
+                                                  setState(() {
+                                                    isScanned = false;
+                                                  });
+                                                }
+                                              } else {
+                                                if (context.mounted) {
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (context) {
+                                                        return AlertDialog(
+                                                          backgroundColor:
+                                                              Colors.white,
+                                                          surfaceTintColor:
+                                                              Colors
+                                                                  .transparent,
+                                                          title: Text(
+                                                            AppLocalizations.of(
+                                                                    context)!
+                                                                .selectProduct,
+                                                            style: const TextStyle(
+                                                                fontSize: 24,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500),
+                                                          ),
+                                                          content: SizedBox(
+                                                            width: double
+                                                                .maxFinite,
+                                                            height: 300,
+                                                            child: ListView(
+                                                              shrinkWrap: true,
+                                                              children: value
+                                                                  .arrivalProductModels!
+                                                                  .mapIndexed((index,
+                                                                          e) =>
                                                                       ListTile(
                                                                         title: Text(
                                                                             e.name),
@@ -371,194 +407,206 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                                                           }
                                                                         },
                                                                       ))
-                                                              .toList(),
-                                                        ),
-                                                      ),
-                                                    );
-                                                  }).then((value) async {
-                                                if (value != null) {
-                                                  if (value
-                                                      is ProductInfoUseCase) {
-                                                    if (value.errorModel ==
-                                                        null) {
-                                                      showDialog(
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return addToCartModal(
-                                                                value
-                                                                    .productModel!);
-                                                          }).then((value) async {
-                                                        await Future.delayed(
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    500));
-                                                        cameraController
-                                                            .start();
-                                                      });
+                                                                  .toList(),
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }).then((value) async {
+                                                    if (value != null) {
+                                                      if (value
+                                                          is ProductInfoUseCase) {
+                                                        if (value.errorModel ==
+                                                            null) {
+                                                          showDialog(
+                                                              context: context,
+                                                              builder:
+                                                                  (context) {
+                                                                return addToCartModal(
+                                                                    value
+                                                                        .productModel!);
+                                                              }).then((value) {
+                                                            listOfScanned
+                                                                .remove(barcodes
+                                                                    .first
+                                                                    .rawValue!);
+                                                            setState(() {
+                                                              isScanned = false;
+                                                            });
+                                                          });
+                                                        } else {
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                                  SnackBar(
+                                                            duration:
+                                                                const Duration(
+                                                                    seconds: 1),
+                                                            content: Text(
+                                                                AppLocalizations.of(
+                                                                        context)!
+                                                                    .anErrorOccured),
+                                                          ));
+                                                          listOfScanned.remove(
+                                                              barcodes.first
+                                                                  .rawValue!);
+                                                          badBarcodes.add(
+                                                              barcodes.first
+                                                                  .rawValue!);
+                                                          setState(() {
+                                                            isScanned = false;
+                                                          });
+                                                        }
+                                                      } else {
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                                SnackBar(
+                                                          duration:
+                                                              const Duration(
+                                                                  seconds: 1),
+                                                          content: Text(
+                                                              AppLocalizations.of(
+                                                                      context)!
+                                                                  .anErrorOccured),
+                                                        ));
+                                                        listOfScanned.remove(
+                                                            barcodes.first
+                                                                .rawValue!);
+                                                        badBarcodes.add(barcodes
+                                                            .first.rawValue!);
+                                                        setState(() {
+                                                          isScanned = false;
+                                                        });
+                                                      }
                                                     } else {
-                                                      showDialog(
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return AlertDialog(
-                                                              title: Text(
-                                                                  AppLocalizations.of(context)!.anErrorOccured),
-                                                              actions: [
-                                                                ElevatedButton(
-                                                                    onPressed:
-                                                                        () {
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                    },
-                                                                    child:
-                                                                        const Text(
-                                                                            "Ok"))
-                                                              ],
-                                                            );
-                                                          }).then((value) async {
-                                                        await Future.delayed(
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                              SnackBar(
+                                                        duration:
                                                             const Duration(
-                                                                milliseconds:
-                                                                    500));
-                                                        cameraController
-                                                            .start();
+                                                                seconds: 1),
+                                                        content: Text(
+                                                            AppLocalizations.of(
+                                                                    context)!
+                                                                .anErrorOccured),
+                                                      ));
+                                                      listOfScanned.remove(
+                                                          barcodes
+                                                              .first.rawValue!);
+                                                      setState(() {
+                                                        isScanned = false;
                                                       });
                                                     }
-                                                  } else {
-                                                    showDialog(
-                                                        context: context,
-                                                        builder: (context) {
-                                                          return AlertDialog(
-                                                            title: Text(
-                                                                AppLocalizations.of(context)!.anErrorOccured),
-                                                            actions: [
-                                                              ElevatedButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    Navigator.pop(
-                                                                        context);
-                                                                  },
-                                                                  child:
-                                                                      const Text(
-                                                                          "Ok"))
-                                                            ],
-                                                          );
-                                                        }).then((value) async {
-                                                      await Future.delayed(
-                                                          const Duration(
-                                                              milliseconds:
-                                                                  500));
-                                                      cameraController.start();
-                                                    });
-                                                  }
-                                                } else {
-                                                  await Future.delayed(
-                                                      const Duration(
-                                                          milliseconds: 500));
-                                                  cameraController.start();
+                                                  });
                                                 }
-                                              });
+                                              }
                                             }
-                                          }
-                                        }
-                                      });
+                                          });
 
-                                      setState(() {
-                                        isLoading = false;
-                                      });
-                                    }),
-                              ),
-                              QRScannerOverlay(
-                                overlayColor: Colors.white,
-                                borderColor: Colors.black,
-                                scanAreaHeight: 320,
-                                scanAreaWidth: 320,
-                              )
-                            ],
+                                          setState(() {
+                                            isLoading = false;
+                                          });
+                                        }
+                                      }),
+                                ),
+                                QRScannerOverlay(
+                                  overlayColor: Colors.white,
+                                  borderColor: Colors.black,
+                                  scanAreaHeight: 320,
+                                  scanAreaWidth: 320,
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 50, right: 50),
-                                child: ConstrainedBox(
-                                  constraints:
-                                      const BoxConstraints(maxWidth: 320),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Text(
-                                        "-",
-                                        style: TextStyle(
-                                            fontSize: 40, color: Colors.grey),
-                                      ),
-                                      Expanded(
-                                        child: Slider(
-                                          value: _currentSliderValue,
-                                          min: 0,
-                                          max: 1,
-                                          activeColor: Colors.black,
-                                          inactiveColor: Colors.grey,
-                                          label: _currentSliderValue
-                                              .round()
-                                              .toString(),
-                                          onChanged: (double value) {
-                                            if (value < 0.1) {
-                                              cameraController.resetZoomScale();
-                                            } else {
-                                              cameraController
-                                                  .setZoomScale(value);
-                                            }
-                                            setState(() {
-                                              _currentSliderValue = value;
-                                            });
-                                          },
-                                        ),
-                                      ),
-                                      const Text("+",
+                          Expanded(
+                            flex: 2,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 50, right: 50),
+                                  child: ConstrainedBox(
+                                    constraints:
+                                        const BoxConstraints(maxWidth: 320),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const Text(
+                                          "-",
                                           style: TextStyle(
-                                              fontSize: 40, color: Colors.grey))
-                                    ],
+                                              fontSize: 40, color: Colors.grey),
+                                        ),
+                                        Expanded(
+                                          child: Slider(
+                                            value: _currentSliderValue,
+                                            min: 0,
+                                            max: 1,
+                                            activeColor: Colors.black,
+                                            inactiveColor: Colors.grey,
+                                            label: _currentSliderValue
+                                                .round()
+                                                .toString(),
+                                            onChanged: (double value) {
+                                              if (value < 0.1) {
+                                                cameraController
+                                                    .resetZoomScale();
+                                              } else {
+                                                cameraController
+                                                    .setZoomScale(value);
+                                              }
+                                              setState(() {
+                                                _currentSliderValue = value;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                        const Text("+",
+                                            style: TextStyle(
+                                                fontSize: 40,
+                                                color: Colors.grey))
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 20),
-                              isLoading
-                                  ? const Center(
-                                      child: CircularProgressIndicator(
-                                        color: Colors.black,
+                                const SizedBox(height: 20),
+                                isLoading
+                                    ? const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.black,
+                                        ),
+                                      )
+                                    : Text(
+                                        AppLocalizations.of(context)!
+                                            .scanProduct,
+                                        style: const TextStyle(fontSize: 17),
                                       ),
-                                    )
-                                  : Text(
-                                AppLocalizations.of(context)!.scanProduct,
-                                      style: TextStyle(fontSize: 17),
-                                    ),
-                              isError && !isLoading
-                                  ? Padding(
-                                      padding:
-                                          const EdgeInsets.only(left: 50, right: 50),
-                                      child: Text(
-                                        AppLocalizations.of(context)!.reScan,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 17,
-                                            color: Color(0xFFFF0000)),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    )
-                                  : Container(),
-                            ],
-                          ),
-                        )
-                      ],
+                                isError && !isLoading
+                                    ? Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 50, right: 50),
+                                        child: Text(
+                                          AppLocalizations.of(context)!.reScan,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 17,
+                                              color: Color(0xFFFF0000)),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      )
+                                    : Container(),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            )));
+                  ],
+                ),
+              ))),
+    );
   }
 
   Widget addToCartModal(ProductInfoModel productInfo) {
@@ -724,11 +772,13 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                         items: [
                           DropdownMenuItem(
                             value: "Distribution",
-                            child: Text(AppLocalizations.of(context)!.distribution),
+                            child: Text(
+                                AppLocalizations.of(context)!.distribution),
                           ),
                           DropdownMenuItem(
                             value: "Professional",
-                            child: Text(AppLocalizations.of(context)!.professional),
+                            child: Text(
+                                AppLocalizations.of(context)!.professional),
                           ),
                           DropdownMenuItem(
                             value: "Oferta",

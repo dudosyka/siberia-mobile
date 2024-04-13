@@ -370,7 +370,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                     Padding(
                                       padding: const EdgeInsets.only(top: 10),
                                       child: Text(
-                                        AppLocalizations.of(context)!.transferCaps,
+                                        AppLocalizations.of(context)!
+                                            .transferCaps,
                                         style: const TextStyle(
                                             fontSize: 24,
                                             color: Color(0xFF909090),
@@ -378,7 +379,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                       ),
                                     ),
                                     Text(
-                                      AppLocalizations.of(context)!.newTransferCaps,
+                                      AppLocalizations.of(context)!
+                                          .newTransferCaps,
                                       style: const TextStyle(
                                           fontSize: 36,
                                           color: Color(0xFF363636),
@@ -612,7 +614,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                             } else {
                                               return AlertDialog(
                                                 title: Text(
-                                                  AppLocalizations.of(context)!.smtWentWrongReload,
+                                                  AppLocalizations.of(context)!
+                                                      .smtWentWrongReload,
                                                   textAlign: TextAlign.center,
                                                 ),
                                               );
@@ -858,12 +861,14 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                 children: [
                                   SizedBox(
                                     width: width / 2 - 18 - 3 * 18,
-                                    child: Text(
-                                      e.vendorCode,
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          color: Color(0xFF222222)),
-                                      overflow: TextOverflow.ellipsis,
+                                    child: Center(
+                                      child: Text(
+                                        e.vendorCode,
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            color: Color(0xFF222222)),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
                                   ),
                                   InkWell(
@@ -893,9 +898,11 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                           if (value) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(SnackBar(
-                                              duration: const Duration(seconds: 1),
-                                              content:
-                                                  Text(AppLocalizations.of(context)!.addedToTransfer),
+                                              duration:
+                                                  const Duration(seconds: 1),
+                                              content: Text(
+                                                  AppLocalizations.of(context)!
+                                                      .addedToTransfer),
                                             ));
                                           }
                                         });
@@ -1262,9 +1269,11 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                           if (value) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(SnackBar(
-                                              duration: const Duration(seconds: 1),
-                                              content:
-                                                  Text(AppLocalizations.of(context)!.addedToTransfer),
+                                              duration:
+                                                  const Duration(seconds: 1),
+                                              content: Text(
+                                                  AppLocalizations.of(context)!
+                                                      .addedToTransfer),
                                             ));
                                           }
                                         });
@@ -1294,7 +1303,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                           SizedBox(
                                             width: 65,
                                             child: Text(
-                                              AppLocalizations.of(context)!.transferCaps,
+                                              AppLocalizations.of(context)!
+                                                  .transferCaps,
                                               style: const TextStyle(
                                                   fontSize: 12,
                                                   color: Colors.white),
@@ -2448,7 +2458,9 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                     );
                                   });
                             }
-                          }, AppLocalizations.of(context)!.completeTransferCaps),
+                          },
+                              AppLocalizations.of(context)!
+                                  .completeTransferCaps),
                         ],
                       )
                     ],
@@ -2589,7 +2601,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
         surfaceTintColor: Colors.transparent,
         title: Text(
           AppLocalizations.of(context)!.transferItemEdit,
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
         ),
         content: StatefulBuilder(builder: (context, setState) {
           return SingleChildScrollView(
@@ -2735,13 +2747,12 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                             width: 18,
                           ),
                           grayButton(() {
-                            ref.read(transferProvider).addToCart(
-                                CartModel(
-                                    data,
-                                    int.parse(quantityCont.text),
-                                    {curPrice: pricesData[curPrice]!},
-                                    pricesData[curPrice]! *
-                                        int.parse(quantityCont.text)));
+                            ref.read(transferProvider).addToCart(CartModel(
+                                data,
+                                int.parse(quantityCont.text),
+                                {curPrice: pricesData[curPrice]!},
+                                pricesData[curPrice]! *
+                                    int.parse(quantityCont.text)));
                             Navigator.pop(context, true);
                           }, AppLocalizations.of(context)!.saveCaps),
                         ],
@@ -2776,7 +2787,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
               width: MediaQuery.of(context).size.shortestSide > 650 ? 400 : 200,
               child: Text(
                 AppLocalizations.of(context)!.transferItemEdit,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -2824,8 +2836,9 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      ref.read(transferProvider).deleteFromCart(
-                                          data);
+                                      ref
+                                          .read(transferProvider)
+                                          .deleteFromCart(data);
                                       Navigator.pop(context);
                                     },
                                     child: Container(
@@ -3028,9 +3041,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                             data.curPrice = pricesData[curPrice]! *
                                 int.parse(quantityCont.text);
                             ref.read(transferProvider).updateCartModel(
-                                data,
-                                false,
-                                int.parse(quantityCont.text));
+                                data, false, int.parse(quantityCont.text));
                             Navigator.pop(context, true);
                           }, AppLocalizations.of(context)!.saveCaps),
                         ],

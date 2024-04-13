@@ -426,7 +426,8 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                       } else {
                                         return AlertDialog(
                                           title: Text(
-                                            AppLocalizations.of(context)!.smtWentWrongReload,
+                                            AppLocalizations.of(context)!
+                                                .smtWentWrongReload,
                                             textAlign: TextAlign.center,
                                           ),
                                         );

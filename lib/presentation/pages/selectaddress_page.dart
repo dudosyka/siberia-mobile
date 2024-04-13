@@ -284,8 +284,8 @@ class _SelectAddressPageState extends ConsumerState<SelectAddressPage> {
                             return AlertDialog(
                               backgroundColor: Colors.white,
                               surfaceTintColor: Colors.transparent,
-                              title: Text(
-                                  AppLocalizations.of(context)!.areYouSureStore),
+                              title: Text(AppLocalizations.of(context)!
+                                  .areYouSureStore),
                               actions: [
                                 TextButton(
                                     onPressed: () {
@@ -325,7 +325,8 @@ class _SelectAddressPageState extends ConsumerState<SelectAddressPage> {
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         duration: const Duration(seconds: 1),
-                        content: Text(AppLocalizations.of(context)!.anErrorOccured),
+                        content:
+                            Text(AppLocalizations.of(context)!.anErrorOccured),
                       ));
                     }
                   }

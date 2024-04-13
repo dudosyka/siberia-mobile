@@ -1,10 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile_app_slb/presentation/pages/productinfo_page.dart';
 import 'package:mobile_app_slb/presentation/pages/salecomplete_page.dart';
 import 'package:mobile_app_slb/presentation/states/newsale_state.dart';
 import '../../data/models/cart_model.dart';
 import '../../data/models/stock_model.dart';
+import '../states/assortment_state.dart';
 import '../states/auth_state.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/backButton.dart';
@@ -415,16 +417,64 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                           const VerticalDivider(),
                           Expanded(
                             flex: 1,
-                            child: SizedBox(
-                              width: width / 2 - 20,
-                              child: Center(
-                                child: Text(
-                                  e.quantity.toString(),
-                                  style: const TextStyle(
-                                      fontSize: 16, color: Color(0xFF222222)),
-                                  overflow: TextOverflow.ellipsis,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: width / 2 - 66,
+                                  child: Center(
+                                    child: Text(
+                                      e.quantity.toString(),
+                                      style: const TextStyle(
+                                          fontSize: 16, color: Color(0xFF222222)),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                IconButton(
+                                    onPressed: () async {
+                                      final availability = await ref
+                                          .read(getAvailabilityProvider)
+                                          .getAvailability(e.model.id);
+                                      if (availability.errorModel == null) {
+                                        if (mounted) {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ProductInfoPage(
+                                                        productId: e.model.id,
+                                                        name: e.model.name,
+                                                        photos:
+                                                        e.model.fileNames,
+                                                        sku: e.model.vendorCode,
+                                                        ean: e.model.eanCode,
+                                                        count:
+                                                        e.model.quantity ??
+                                                            0.0,
+                                                        availabilityModel:
+                                                        availability
+                                                            .availabilityModel!,
+                                                        stockModel:
+                                                        widget.stockModel,
+                                                        isQr: false,
+                                                      )));
+                                        } else {
+                                          ref
+                                              .read(deleteAuthProvider)
+                                              .deleteAuth();
+                                          Future.microtask(() =>
+                                              Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                      const AuthPage()),
+                                                      (route) => false));
+                                        }
+                                      }
+                                    },
+                                    icon: const Icon(Icons.info))
+                              ],
                             ),
                           )
                         ],

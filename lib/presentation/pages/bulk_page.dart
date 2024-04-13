@@ -55,7 +55,7 @@ class _BulkPageState extends ConsumerState<BulkPage> {
             ref.read(bulkProvider).deleteAssemblies();
             navigator.pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => const HomePage()),
-                    (route) => false);
+                (route) => false);
           }
         });
       },
@@ -78,7 +78,8 @@ class _BulkPageState extends ConsumerState<BulkPage> {
                     height: 80,
                     decoration: const BoxDecoration(
                         border: Border(
-                            top: BorderSide(color: Color(0xFFD9D9D9), width: 1))),
+                            top: BorderSide(
+                                color: Color(0xFFD9D9D9), width: 1))),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -99,8 +100,10 @@ class _BulkPageState extends ConsumerState<BulkPage> {
                                       showDialog(
                                           context: context,
                                           builder: (context) {
-                                            return exitDialog(context,
-                                                AppLocalizations.of(context)!.areYouSureReturn);
+                                            return exitDialog(
+                                                context,
+                                                AppLocalizations.of(context)!
+                                                    .areYouSureReturn);
                                           }).then((returned) async {
                                         if (returned) {
                                           final ids = ref
@@ -132,8 +135,9 @@ class _BulkPageState extends ConsumerState<BulkPage> {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(SnackBar(
                                         duration: const Duration(seconds: 1),
-                                        content:
-                                            Text(AppLocalizations.of(context)!.selectAtList),
+                                        content: Text(
+                                            AppLocalizations.of(context)!
+                                                .selectAtList),
                                       ));
                                     },
                               child: Stack(
@@ -144,7 +148,8 @@ class _BulkPageState extends ConsumerState<BulkPage> {
                                       width: 68,
                                       height: 68,
                                       decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(50),
+                                          borderRadius:
+                                              BorderRadius.circular(50),
                                           color: const Color(0xFFDFDFDF)),
                                     ),
                                   ),
@@ -220,7 +225,9 @@ class _BulkPageState extends ConsumerState<BulkPage> {
                                                 (route) => false);
                                           }
                                         });
-                                      }, AppLocalizations.of(context)!.cancelCaps,
+                                      },
+                                          AppLocalizations.of(context)!
+                                              .cancelCaps,
                                           false),
                                       Builder(builder: (context) {
                                         return InkWell(
@@ -245,7 +252,8 @@ class _BulkPageState extends ConsumerState<BulkPage> {
                                   ),
                                   const Spacer(),
                                   Text(
-                                    AppLocalizations.of(context)!.bulkAssemblyCaps,
+                                    AppLocalizations.of(context)!
+                                        .bulkAssemblyCaps,
                                     style: const TextStyle(
                                         fontSize: 24,
                                         color: Color(0xFF909090),

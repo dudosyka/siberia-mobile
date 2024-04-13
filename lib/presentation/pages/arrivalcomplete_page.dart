@@ -20,8 +20,8 @@ class _ArrivalCompletePageState extends ConsumerState<ArrivalCompletePage> {
     super.initState();
 
     _timer = Timer(const Duration(seconds: 5), () {
-      Future.microtask(() => Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const HomePage())));
+      Future.microtask(() => Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const HomePage())));
     });
   }
 
@@ -116,7 +116,8 @@ class _ArrivalCompletePageState extends ConsumerState<ArrivalCompletePage> {
                               color: const Color(0xFF3C3C3C),
                               borderRadius: BorderRadius.circular(8)),
                           child: Center(
-                            child: Text(AppLocalizations.of(context)!.homeCaps,
+                            child: Text(
+                              AppLocalizations.of(context)!.homeCaps,
                               style: const TextStyle(
                                   fontSize: 24,
                                   color: Colors.white,
