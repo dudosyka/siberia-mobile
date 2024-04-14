@@ -17,6 +17,8 @@ Widget grayButton(void Function() onTap, String text) {
                   fontSize: 12,
                   color: Colors.white,
                   fontWeight: FontWeight.w500),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           ),
         )),

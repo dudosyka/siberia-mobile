@@ -190,8 +190,11 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                   showModalBottomSheet(
                                       context: context,
                                       isScrollControlled: true,
+                                      constraints: BoxConstraints(
+                                        maxWidth: MediaQuery.of(context).size.shortestSide <= 650 ? width : 650,
+                                      ),
                                       builder: (context) {
-                                        return cartBottomSheet();
+                                        return cartBottomSheet(width);
                                       });
                                 },
                                 child: Stack(
@@ -1181,9 +1184,11 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                       alignment: Alignment.bottomCenter,
                                       child: DotsIndicator(
                                         dotsCount: data[index].fileNames != null
+                                            ? data[index].fileNames!.length <= 4
                                             ? data[index].fileNames!.length
+                                            : 4
                                             : 1,
-                                        position: data[index].currentIndex,
+                                        position: data[index].currentIndex % 4,
                                         decorator: DotsDecorator(
                                           shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -2363,7 +2368,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
   int compareString(bool ascending, String value1, String value2) =>
       ascending ? value1.compareTo(value2) : value2.compareTo(value1);
 
-  Widget cartBottomSheet() {
+  Widget cartBottomSheet(double width) {
     List<CartModel> data = ref.watch(transferProvider).cartData;
 
     return SafeArea(
@@ -2380,7 +2385,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 20, left: 28, right: 28),
+                  padding: const EdgeInsets.only(top: 20, left: 8, right: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -2395,72 +2400,75 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                             Navigator.pop(context);
                           }, AppLocalizations.of(context)!.backCaps),
                           const SizedBox(
-                            width: 18,
+                            width: 8,
                           ),
-                          grayButton(() {
-                            if (ref
-                                .watch(transferProvider)
-                                .cartData
-                                .isNotEmpty) {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return exitDialog(
-                                        context,
-                                        AppLocalizations.of(context)!
-                                            .areYouSureCart);
-                                  }).then((returned) async {
-                                if (returned) {
-                                  final data = await ref
-                                      .read(transferProvider)
-                                      .createTransfer(widget.storehouseId);
-                                  if (data.errorModel != null) {
-                                    ref.read(deleteAuthProvider).deleteAuth();
+                          SizedBox(
+                            width: MediaQuery.of(context).size.shortestSide > 650 ? 650 / 2 - 24 : width / 2 - 24,
+                            child: grayButton(() {
+                              if (ref
+                                  .watch(transferProvider)
+                                  .cartData
+                                  .isNotEmpty) {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return exitDialog(
+                                          context,
+                                          AppLocalizations.of(context)!
+                                              .areYouSureCart);
+                                    }).then((returned) async {
+                                  if (returned) {
+                                    final data = await ref
+                                        .read(transferProvider)
+                                        .createTransfer(widget.storehouseId);
+                                    if (data.errorModel != null) {
+                                      ref.read(deleteAuthProvider).deleteAuth();
+                                      Future.microtask(() =>
+                                          Navigator.pushAndRemoveUntil(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const AuthPage()),
+                                              (route) => false));
+                                    }
+                                    ref.read(transferProvider).deleteCart();
                                     Future.microtask(() =>
                                         Navigator.pushAndRemoveUntil(
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    const AuthPage()),
+                                                    const TransferCompletePage(
+                                                        isQr: false)),
                                             (route) => false));
                                   }
-                                  ref.read(transferProvider).deleteCart();
-                                  Future.microtask(() =>
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const TransferCompletePage(
-                                                      isQr: false)),
-                                          (route) => false));
-                                }
-                              });
-                            } else {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      backgroundColor: Colors.white,
-                                      surfaceTintColor: Colors.transparent,
-                                      title: Text(AppLocalizations.of(context)!
-                                          .youHaventCart),
-                                      actions: [
-                                        TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context, true);
-                                            },
-                                            child: const Text(
-                                              "Ok",
-                                              style: TextStyle(
-                                                  color: Colors.black),
-                                            ))
-                                      ],
-                                    );
-                                  });
-                            }
-                          },
-                              AppLocalizations.of(context)!
-                                  .completeTransferCaps),
+                                });
+                              } else {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        backgroundColor: Colors.white,
+                                        surfaceTintColor: Colors.transparent,
+                                        title: Text(AppLocalizations.of(context)!
+                                            .youHaventCart),
+                                        actions: [
+                                          TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context, true);
+                                              },
+                                              child: const Text(
+                                                "Ok",
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                              ))
+                                        ],
+                                      );
+                                    });
+                              }
+                            },
+                                AppLocalizations.of(context)!
+                                    .completeTransferCaps),
+                          ),
                         ],
                       )
                     ],

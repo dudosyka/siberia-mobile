@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app_slb/main.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../states/network_state.dart';
 
 class NoNetworkPage extends StatefulWidget {
@@ -28,12 +28,12 @@ class _NoNetworkPageState extends State<NoNetworkPage> {
                     (route) => false);
               });
             }
-            return const Padding(
-              padding: EdgeInsets.all(16),
+            return Padding(
+              padding: const EdgeInsets.all(16),
               child: Center(
                 child: Text(
-                  "No internet connection. Please turn on internet and you will be redirected back",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  AppLocalizations.of(context)!.noInet,
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
               ),

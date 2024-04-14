@@ -146,5 +146,7 @@
 
   "transferAssembly": "Conjunto de transferencia",
 
-  "transferAssemblingCompCaps": "¡MONTAJE DE TRANSFERENCIA COMPLETADO!"
+  "transferAssemblingCompCaps": "¡MONTAJE DE TRANSFERENCIA COMPLETADO!",
+
+  "noInet": "Sin conexión a Internet. Enciende Internet y serás redirigido de regreso."
 }

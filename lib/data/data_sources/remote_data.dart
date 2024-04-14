@@ -187,7 +187,7 @@ class RemoteData {
   Future<dynamic> updateOutcome(String token, List<CartModel> products,
       int storeId, int transactionId) async {
     final res =
-        await dio.patch("${baseUrl}transaction/outcome/hidden/$transactionId",
+        await dio.patch("${baseUrl}transaction/outcome/$transactionId",
             data: getProductList(products),
             options: Options(validateStatus: (_) => true, headers: {
               "Content-Type": "application/json",

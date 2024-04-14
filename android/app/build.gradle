@@ -64,7 +64,9 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    implementation 'com.google.mlkit:barcode-scanning:17.2.0'
+}
 
 configurations.all {
     resolutionStrategy {

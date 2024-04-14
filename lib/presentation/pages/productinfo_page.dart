@@ -114,12 +114,13 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              AppLocalizations.of(context)!.singleProductCaps,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                color: Color(0xFF909090),
-                                height: 0.5,
+                            SizedBox(
+                              width: width - 80,
+                              child: Text(
+                                AppLocalizations.of(context)!.singleProductCaps,
+                                style: const TextStyle(
+                                    fontSize: 24, color: Color(0xFF909090)),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             SizedBox(
@@ -313,10 +314,12 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                         child: DotsIndicator(
                           dotsCount: widget.photos != null
                               ? widget.photos!.isNotEmpty
-                                  ? widget.photos!.length
+                                  ? widget.photos!.length <= 4
+                                      ? widget.photos!.length
+                                      : 4
                                   : 1
                               : 1,
-                          position: currentIndex,
+                          position: currentIndex % 4,
                           decorator: DotsDecorator(
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15.0)),
@@ -501,12 +504,16 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      AppLocalizations.of(context)!.defaultPriceCaps,
-                      style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF909090)),
+                    SizedBox(
+                      width: width / 3 - 12,
+                      child: Text(
+                        AppLocalizations.of(context)!.defaultPriceCaps,
+                        style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF909090)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     SizedBox(
                       width: width / 3 - 12,
@@ -524,12 +531,16 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      AppLocalizations.of(context)!.distributionPriceCaps,
-                      style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF909090)),
+                    SizedBox(
+                      width: width / 3 - 12,
+                      child: Text(
+                        AppLocalizations.of(context)!.distributionPriceCaps,
+                        style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF909090)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     SizedBox(
                       width: width / 3 - 12,
@@ -547,12 +558,16 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      AppLocalizations.of(context)!.professionalPriceCaps,
-                      style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF909090)),
+                    SizedBox(
+                      width: width / 3 - 12,
+                      child: Text(
+                        AppLocalizations.of(context)!.professionalPriceCaps,
+                        style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF909090)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     SizedBox(
                       width: width / 3 - 12,

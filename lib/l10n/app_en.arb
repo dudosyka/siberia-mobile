@@ -146,7 +146,9 @@
 
   "transferAssembly": "Transfer assembly",
 
-  "transferAssemblingCompCaps": "TRANSFER ASSEMBLING COMPLETED!"
+  "transferAssemblingCompCaps": "TRANSFER ASSEMBLING COMPLETED!",
+
+  "noInet": "No internet connection. Please turn on internet and you will be redirected back"
 
 
 

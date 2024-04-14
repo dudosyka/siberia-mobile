@@ -20,11 +20,12 @@ class AuthPage extends ConsumerStatefulWidget {
 }
 
 class _AuthPageState extends ConsumerState<AuthPage> {
-  MobileScannerController cameraController = MobileScannerController(
-      detectionSpeed: DetectionSpeed.noDuplicates, detectionTimeoutMs: 250);
+  MobileScannerController cameraController =
+      MobileScannerController(detectionSpeed: DetectionSpeed.normal);
   double _currentSliderValue = 0;
   bool isError = false;
   bool isLoading = false;
+  bool isScanned = false;
 
   @override
   void initState() {
@@ -76,119 +77,167 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                             setState(() {
                               isLoading = true;
                             });
-                            AuthRepository()
-                                .loginUser(barcodes[0].rawValue!)
-                                .then((value) async {
-                              if (value.errorModel == null &&
-                                  value.authModel != null) {
-                                if (value.authModel!.type == "stock") {
-                                  final data =
-                                      await AuthRepository().getStock();
-                                  if (data.stockModel != null) {
-                                    if (data.stockModel!.salesManaging ||
-                                        data.stockModel!.arrivalsManaging ||
-                                        data.stockModel!.transfersManaging) {
-                                      ref.refresh(getHomeProvider).value;
-                                      Future.microtask(() =>
-                                          Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (builder) =>
-                                                      const HomePage()),
-                                              (route) => false));
+                            if (!isScanned) {
+                              setState(() {
+                                isScanned = true;
+                              });
+                              AuthRepository()
+                                  .loginUser(barcodes[0].rawValue!)
+                                  .then((value) async {
+                                if (value.errorModel == null &&
+                                    value.authModel != null) {
+                                  if (value.authModel!.type == "stock") {
+                                    final data =
+                                        await AuthRepository().getStock();
+                                    if (data.stockModel != null) {
+                                      if (data.stockModel!.salesManaging ||
+                                          data.stockModel!.arrivalsManaging ||
+                                          data.stockModel!.transfersManaging) {
+                                        ref.refresh(getHomeProvider).value;
+                                        Future.microtask(() =>
+                                            Navigator.pushAndRemoveUntil(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (builder) =>
+                                                        const HomePage()),
+                                                (route) => false));
+                                      } else {
+                                        setState(() {
+                                          isError = true;
+                                          isScanned = false;
+                                        });
+                                        ref
+                                            .read(deleteAuthProvider)
+                                            .deleteAuth();
+                                      }
+                                    } else {
+                                      setState(() {
+                                        isError = true;
+                                        isScanned = false;
+                                      });
+                                      ref.read(deleteAuthProvider).deleteAuth();
+                                    }
+                                  } else if (value.authModel!.type ==
+                                      "transaction") {
+                                    final data =
+                                        await AuthRepository().getStock();
+
+                                    if (data.stockModel != null) {
+                                      if (data.stockModel!.typeId == 3 &&
+                                          data.stockModel!.statusId == 2 &&
+                                          data.stockModel!.transfersManaging) {
+                                        final newData = await ref
+                                            .read(transferProvider)
+                                            .getCurrentStock();
+                                        if (newData.errorModel == null) {
+                                          Future.microtask(() =>
+                                              Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (builder) =>
+                                                          SelectAddressPage(
+                                                            stockModel: data
+                                                                .stockModel!,
+                                                            currentStock: newData
+                                                                .currentStock!,
+                                                          )),
+                                                  (route) => false));
+                                        } else {
+                                          setState(() {
+                                            isError = true;
+                                            isScanned = false;
+                                          });
+                                          ref
+                                              .read(deleteAuthProvider)
+                                              .deleteAuth();
+                                        }
+                                      } else if (data.stockModel!.typeId == 3 &&
+                                          data.stockModel!.statusId == 4 &&
+                                          data.stockModel!.transfersManaging) {
+                                        final newData = await ref
+                                            .read(transferProvider)
+                                            .getCurrentStock();
+                                        if (newData.errorModel == null) {
+                                          Future.microtask(() =>
+                                              Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (builder) =>
+                                                          GetTransferPage(
+                                                            stockModel: data
+                                                                .stockModel!,
+                                                            cartModels: newData
+                                                                .currentStock!
+                                                                .cartModels,
+                                                            transactionId: newData
+                                                                .currentStock!
+                                                                .id,
+                                                            stockId: data
+                                                                .stockModel!.id,
+                                                          )),
+                                                  (route) => false));
+                                        } else {
+                                          setState(() {
+                                            isError = true;
+                                            isScanned = false;
+                                          });
+                                          ref
+                                              .read(deleteAuthProvider)
+                                              .deleteAuth();
+                                        }
+                                      } else if (data.stockModel!.typeId == 2 &&
+                                          data.stockModel!.salesManaging) {
+                                        Future.microtask(() =>
+                                            Navigator.pushAndRemoveUntil(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (builder) =>
+                                                        NewSalePage(
+                                                          currentStorehouse:
+                                                              data.stockModel!
+                                                                  .name,
+                                                          storehouseId: data
+                                                              .stockModel!.id,
+                                                          isTransaction: true,
+                                                          stockModel:
+                                                              data.stockModel!,
+                                                        )),
+                                                (route) => false));
+                                      } else {
+                                        setState(() {
+                                          isError = true;
+                                          isScanned = false;
+                                        });
+                                        ref
+                                            .read(deleteAuthProvider)
+                                            .deleteAuth();
+                                      }
+                                    } else {
+                                      setState(() {
+                                        isError = true;
+                                        isScanned = false;
+                                      });
+                                      ref.read(deleteAuthProvider).deleteAuth();
                                     }
                                   } else {
                                     setState(() {
                                       isError = true;
+                                      isScanned = false;
                                     });
                                     ref.read(deleteAuthProvider).deleteAuth();
                                   }
-                                } else if (value.authModel!.type ==
-                                    "transaction") {
-                                  final data =
-                                      await AuthRepository().getStock();
-
-                                  if (data.stockModel != null) {
-                                    if (data.stockModel!.typeId == 3 &&
-                                        data.stockModel!.statusId == 2 &&
-                                        data.stockModel!.transfersManaging) {
-                                      final newData = await ref
-                                          .read(transferProvider)
-                                          .getCurrentStock();
-                                      if (newData.errorModel == null) {
-                                        Future.microtask(() =>
-                                            Navigator.pushAndRemoveUntil(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (builder) =>
-                                                        SelectAddressPage(
-                                                          stockModel:
-                                                              data.stockModel!,
-                                                          currentStock: newData
-                                                              .currentStock!,
-                                                        )),
-                                                (route) => false));
-                                      }
-                                    } else if (data.stockModel!.typeId == 3 &&
-                                        data.stockModel!.statusId == 4 &&
-                                        data.stockModel!.transfersManaging) {
-                                      final newData = await ref
-                                          .read(transferProvider)
-                                          .getCurrentStock();
-                                      if (newData.errorModel == null) {
-                                        Future.microtask(() =>
-                                            Navigator.pushAndRemoveUntil(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (builder) =>
-                                                        GetTransferPage(
-                                                          stockModel:
-                                                              data.stockModel!,
-                                                          cartModels: newData
-                                                              .currentStock!
-                                                              .cartModels,
-                                                          transactionId: newData
-                                                              .currentStock!.id,
-                                                          stockId: data
-                                                              .stockModel!.id,
-                                                        )),
-                                                (route) => false));
-                                      }
-                                    } else if (data.stockModel!.typeId == 2 &&
-                                        data.stockModel!.salesManaging) {
-                                      Future.microtask(() =>
-                                          Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (builder) =>
-                                                      NewSalePage(
-                                                        currentStorehouse: data
-                                                            .stockModel!.name,
-                                                        storehouseId:
-                                                            data.stockModel!.id,
-                                                        isTransaction: true,
-                                                        stockModel:
-                                                            data.stockModel!,
-                                                      )),
-                                              (route) => false));
-                                    } else {
-                                      setState(() {
-                                        isError = true;
-                                      });
-                                      ref.read(deleteAuthProvider).deleteAuth();
-                                    }
-                                  }
+                                } else {
+                                  setState(() {
+                                    isError = true;
+                                    isScanned = false;
+                                  });
+                                  ref.read(deleteAuthProvider).deleteAuth();
                                 }
-                              } else {
                                 setState(() {
-                                  isError = true;
+                                  isLoading = false;
                                 });
-                                ref.read(deleteAuthProvider).deleteAuth();
-                              }
-                              setState(() {
-                                isLoading = false;
                               });
-                            });
+                            }
                           }),
                     ),
                     QRScannerOverlay(

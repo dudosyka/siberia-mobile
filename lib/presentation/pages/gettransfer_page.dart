@@ -454,59 +454,66 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                             fontSize: 16, color: Color(0xFF3A3A3A)),
                       ),
                       const SizedBox(height: 30),
-                      Row(
+                      Column(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          outlinedGrayButton(() {
-                            Navigator.pop(context, false);
-                          }, AppLocalizations.of(context)!.continueCaps),
-                          const SizedBox(
-                            width: 18,
+                          SizedBox(
+                            width: 210,
+                            child: outlinedGrayButton(() {
+                              Navigator.pop(context, false);
+                            }, AppLocalizations.of(context)!.continueCaps),
                           ),
-                          grayButton(() {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return exitDialog(
-                                      context,
-                                      AppLocalizations.of(context)!
-                                          .areYouSureProceed);
-                                }).then((returned) async {
-                              if (returned) {
-                                final data = await ref
-                                    .read(transferProvider)
-                                    .getTransfer(
-                                        widget.transactionId,
-                                        widget.cartModels
-                                            .map((e) => e.model.id)
-                                            .toList(),
-                                        "missing");
+                          const SizedBox(
+                            height: 18,
+                          ),
+                          SizedBox(
+                            width: 210,
+                            child: grayButton(() {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return exitDialog(
+                                        context,
+                                        AppLocalizations.of(context)!
+                                            .areYouSureProceed);
+                                  }).then((returned) async {
+                                if (returned) {
+                                  final data = await ref
+                                      .read(transferProvider)
+                                      .getTransfer(
+                                          widget.transactionId,
+                                          widget.cartModels
+                                              .map((e) => e.model.id)
+                                              .toList(),
+                                          "missing");
 
-                                if (data.errorModel == null) {
-                                  if (context.mounted) {
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const TransferCompletePage(
-                                                    isQr: true)),
-                                        (route) => false);
-                                  }
-                                } else {
-                                  if (context.mounted) {
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const AuthPage()),
-                                        (route) => false);
+                                  if (data.errorModel == null) {
+                                    if (context.mounted) {
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const TransferCompletePage(
+                                                      isQr: true)),
+                                          (route) => false);
+                                    }
+                                  } else {
+                                    if (context.mounted) {
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const AuthPage()),
+                                          (route) => false);
+                                    }
                                   }
                                 }
-                              }
-                            });
-                          }, AppLocalizations.of(context)!.missingItemsCaps),
+                              });
+                            }, AppLocalizations.of(context)!.missingItemsCaps),
+                          ),
                           const SizedBox(
-                            width: 18,
+                            height: 18,
                           ),
                           InkWell(
                             onTap: () async {
@@ -554,6 +561,7 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                               });
                             },
                             child: Container(
+                              width: 210,
                                 decoration: BoxDecoration(
                                     color: const Color(0xFF000000),
                                     borderRadius: BorderRadius.circular(4)),

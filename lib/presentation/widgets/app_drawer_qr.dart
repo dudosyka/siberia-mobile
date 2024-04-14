@@ -53,8 +53,8 @@ class _AppDrawerState extends ConsumerState<AppDrawerQr> {
                                       "assets/images/en_lan_icon.png",
                                       scale: 4,
                                     ),
-                                    42, () {
-                                  ref
+                                    42, () async {
+                                  await ref
                                       .read(localeChangeProvider)
                                       .changeLocale("en");
                                 }, currentCode == "en"),
@@ -63,8 +63,8 @@ class _AppDrawerState extends ConsumerState<AppDrawerQr> {
                                       "assets/images/es_lan_icon.png",
                                       scale: 4,
                                     ),
-                                    42, () {
-                                  ref
+                                    42, () async {
+                                  await ref
                                       .read(localeChangeProvider)
                                       .changeLocale("es");
                                 }, currentCode == "es"),
@@ -73,8 +73,8 @@ class _AppDrawerState extends ConsumerState<AppDrawerQr> {
                                       "assets/images/ru_lan_icon.png",
                                       scale: 4,
                                     ),
-                                    42, () {
-                                  ref
+                                    42, () async {
+                                  await ref
                                       .read(localeChangeProvider)
                                       .changeLocale("ru");
                                 }, currentCode == "ru")

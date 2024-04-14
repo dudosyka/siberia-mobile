@@ -69,7 +69,7 @@ class NewSaleRepository extends NewSaleRepositoryImpl {
       }
       if ((data as ErrorModel).type != "auth error") {
         await remoteData.bugReport(authData.token,
-            "Endpoint: transaction/outcome/hidden/$transactionId, Code: ${data
+            "Endpoint: transaction/outcome/$transactionId, Code: ${data
                 .statusCode}, description: ${data.statusText}");
       }
       return OutcomeUseCase(errorModel: data);

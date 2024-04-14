@@ -1195,9 +1195,11 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                       alignment: Alignment.bottomCenter,
                                       child: DotsIndicator(
                                         dotsCount: data[index].fileNames != null
+                                            ? data[index].fileNames!.length <= 4
                                             ? data[index].fileNames!.length
+                                            : 4
                                             : 1,
-                                        position: data[index].currentIndex,
+                                        position: data[index].currentIndex % 4,
                                         decorator: DotsDecorator(
                                           shape: RoundedRectangleBorder(
                                               borderRadius:

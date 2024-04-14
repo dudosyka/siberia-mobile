@@ -109,7 +109,7 @@ class _BulkCompletePageState extends State<BulkCompletePage> {
                                 builder: (context) => const HomePage()));
                       },
                       child: Container(
-                          width: 152,
+                          width: 192,
                           height: 48,
                           decoration: BoxDecoration(
                               color: const Color(0xFF3C3C3C),
