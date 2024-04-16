@@ -88,7 +88,7 @@
   "endSaleCaps": "COMPLETO",
 
   "homeScreen": "Hogar",
-  "transfer": "Transferir",
+  "transfer": "Pedido",
   "logout": "Salida",
 
   "no": "No",
@@ -109,10 +109,10 @@
   "assemblingCompletedCaps": "¡SE HA FORMADO EL PEDIDO!",
 
   "areYouSureProceed": "¿Estas seguro que deseas continuar? No podrás cancelar",
-  "transferCaps": "TRANSFERIR",
-  "areYouSureTransfer": "¿Estás seguro de que quieres terminar la transferencia?",
-  "itemChosen": "Elementos elegidos en parte, ¿desea continuar o finalizar esta transferencia en parte, o faltaban algunos elementos?",
-  "missingItemsCaps": "OBJETOS PERDIDOS",
+  "transferCaps": "PEDIDO",
+  "areYouSureTransfer": "¿Estás seguro de que quieres terminar la pedido?",
+  "itemChosen": "Elementos elegidos en parte, ¿desea continuar o finalizar esta pedido en parte, o faltaban algunos elementos?",
+  "missingItemsCaps": "BIENES PERDIDOS",
   "endPartlyCaps": "TERMINAR EN PARCIA",
   "continueCaps": "CONTINUAR",
 
@@ -129,10 +129,10 @@
   "oferta": "Oferta",
   "other": "Otra",
 
-  "newTransferCaps": "NUEVA TRANSFERENCIA",
-  "addedToTransfer": "Añadido a la transferencia",
-  "completeTransferCaps": "TRANSFERENCIA COMPLETA",
-  "transferItemEdit": "TRANSFERIR ARTÍCULO EDITAR",
+  "newTransferCaps": "NUEVA PEDIDO",
+  "addedToTransfer": "Añadido a la pedido",
+  "completeTransferCaps": "PEDIDO COMPLETA",
+  "transferItemEdit": "PEDIDO ARTÍCULO EDITAR",
 
   "inStockCaps": "EN STOCK",
 
@@ -144,9 +144,9 @@
   "selectAdress": "Seleccionar dirección",
   "areYouSureStore": "¿Estás seguro de que quieres continuar con la tienda seleccionada?",
 
-  "transferAssembly": "Conjunto de transferencia",
+  "transferAssembly": "Conjunto de pedido",
 
-  "transferAssemblingCompCaps": "¡MONTAJE DE TRANSFERENCIA COMPLETADO!",
+  "transferAssemblingCompCaps": "¡MONTAJE DE PEDIDO COMPLETADO!",
 
   "noInet": "Sin conexión a Internet. Enciende Internet y serás redirigido de regreso."
 }
