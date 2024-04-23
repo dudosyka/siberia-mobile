@@ -4,12 +4,10 @@ class CollectionModel {
   bool isSelected = false;
 
   factory CollectionModel.fromJson(Map<String, dynamic> json) {
-    return CollectionModel(json["id"], json["name"]);
+    return CollectionModel(json["id"], json["name"] ?? "None");
   }
 
   CollectionModel(this.id, this.name);
 
-  Map<String, dynamic> toJson() => {
-
-  };
+  Map<String, dynamic> toJson() => {};
 }

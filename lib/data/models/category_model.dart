@@ -8,7 +8,7 @@ class CategoryModel {
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
         json["id"],
-        json["name"],
+        json["name"] ?? "None",
         json["children"] == null
             ? []
             : List<CategoryModel>.from(

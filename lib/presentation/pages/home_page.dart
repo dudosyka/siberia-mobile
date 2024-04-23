@@ -49,7 +49,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             if (value.errorModel == null && value.stockModel != null) {
               return Scaffold(
                 key: scaffoldKey,
-                drawer: AppDrawer(
+                endDrawer: AppDrawer(
                   isAbleToNavigate: true,
                   isAssembly: false,
                   isHomePage: true,
@@ -91,7 +91,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                       padding: const EdgeInsets.only(right: 30),
                                       child: InkWell(
                                         onTap: () {
-                                          Scaffold.of(context).openDrawer();
+                                          Scaffold.of(context).openEndDrawer();
                                         },
                                         child: Container(
                                           width: 30,

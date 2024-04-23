@@ -103,9 +103,16 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                                 (route) => false));
                                       } else {
                                         setState(() {
-                                          isError = true;
                                           isScanned = false;
                                         });
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(const SnackBar(
+                                            duration: Duration(seconds: 1),
+                                            content: Text(
+                                                "You don't have enough permissions"),
+                                          ));
+                                        }
                                         ref
                                             .read(deleteAuthProvider)
                                             .deleteAuth();
@@ -205,9 +212,16 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                                 (route) => false));
                                       } else {
                                         setState(() {
-                                          isError = true;
                                           isScanned = false;
                                         });
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(const SnackBar(
+                                            duration: Duration(seconds: 1),
+                                            content: Text(
+                                                "You don't have enough permissions"),
+                                          ));
+                                        }
                                         ref
                                             .read(deleteAuthProvider)
                                             .deleteAuth();

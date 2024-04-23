@@ -61,7 +61,7 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
         child: Scaffold(
           key: scaffoldKey,
           resizeToAvoidBottomInset: false,
-          drawer: widget.isQr
+          endDrawer: widget.isQr
               ? AppDrawerQr(stockModel: widget.stockModel)
               : AppDrawer(
                   isAbleToNavigate: true,
@@ -89,7 +89,7 @@ class _ProductInfoPageState extends ConsumerState<ProductInfoPage> {
                             Builder(builder: (context) {
                               return InkWell(
                                 onTap: () {
-                                  Scaffold.of(context).openDrawer();
+                                  Scaffold.of(context).openEndDrawer();
                                 },
                                 child: Container(
                                   width: 30,

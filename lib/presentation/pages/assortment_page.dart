@@ -68,7 +68,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
         child: Scaffold(
           key: scaffoldKey,
           resizeToAvoidBottomInset: false,
-          drawer: AppDrawer(
+          endDrawer: AppDrawer(
             isAbleToNavigate: true,
             isAssembly: false,
             isHomePage: false,
@@ -171,7 +171,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                         return InkWell(
                                           onTap: () {
                                             scaffoldKey.currentState
-                                                ?.openDrawer();
+                                                ?.openEndDrawer();
                                           },
                                           child: Container(
                                             width: 30,
@@ -484,6 +484,8 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
   }
 
   Widget getProductListWidget(List<AssortmentModel> data, double width) {
+    bool isProductOpened = false;
+
     return Expanded(
       child: Column(
         children: [
@@ -587,20 +589,25 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                           .getAvailability(e.id);
                       if (availability.errorModel == null) {
                         if (mounted) {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ProductInfoPage(
-                                      productId: data[index].id,
-                                      name: data[index].name,
-                                      photos: data[index].fileNames,
-                                      sku: data[index].vendorCode,
-                                      ean: data[index].eanCode,
-                                      count: data[index].quantity ?? 0.0,
-                                      availabilityModel:
-                                          availability.availabilityModel!,
-                                      stockModel: widget.stockModel,
-                                      isQr: false)));
+                          if(!isProductOpened) {
+                            setState(() {
+                              isProductOpened = true;
+                            });
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ProductInfoPage(
+                                        productId: data[index].id,
+                                        name: data[index].name,
+                                        photos: data[index].fileNames,
+                                        sku: data[index].vendorCode,
+                                        ean: data[index].eanCode,
+                                        count: data[index].quantity ?? 0.0,
+                                        availabilityModel:
+                                        availability.availabilityModel!,
+                                        stockModel: widget.stockModel,
+                                        isQr: false)));
+                          }
                         } else {
                           ref.read(deleteAuthProvider).deleteAuth();
                           Future.microtask(() => Navigator.pushAndRemoveUntil(
@@ -692,6 +699,8 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
   }
 
   Widget getProductGridWidget(List<AssortmentModel> data, double width) {
+    bool isProductOpened = false;
+
     return Expanded(
         child: Padding(
       padding: const EdgeInsets.only(top: 10, left: 30, right: 30, bottom: 20),
@@ -791,20 +800,25 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                           .getAvailability(element.id);
                       if (availability.errorModel == null) {
                         if (context.mounted) {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ProductInfoPage(
-                                      productId: data[index].id,
-                                      name: data[index].name,
-                                      photos: data[index].fileNames,
-                                      sku: data[index].vendorCode,
-                                      ean: data[index].eanCode,
-                                      count: data[index].quantity ?? 0.0,
-                                      availabilityModel:
-                                          availability.availabilityModel!,
-                                      stockModel: widget.stockModel,
-                                      isQr: false)));
+                          if(!isProductOpened) {
+                            setState(() {
+                              isProductOpened = true;
+                            });
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ProductInfoPage(
+                                        productId: data[index].id,
+                                        name: data[index].name,
+                                        photos: data[index].fileNames,
+                                        sku: data[index].vendorCode,
+                                        ean: data[index].eanCode,
+                                        count: data[index].quantity ?? 0.0,
+                                        availabilityModel:
+                                        availability.availabilityModel!,
+                                        stockModel: widget.stockModel,
+                                        isQr: false)));
+                          }
                         } else {
                           ref.read(deleteAuthProvider).deleteAuth();
                           Future.microtask(() => Navigator.pushAndRemoveUntil(

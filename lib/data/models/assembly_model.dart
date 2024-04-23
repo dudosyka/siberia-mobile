@@ -14,13 +14,13 @@ class AssemblyModel {
     return AssemblyModel(
         json["id"],
         json["from"],
-        json["fromName"],
+        json["fromName"] ?? "None",
         json["address"],
         json["status"]["id"],
-        json["status"]["name"],
+        json["status"] == null ? "None" : json["status"]["name"] ?? "None",
         json["type"]["id"],
-        json["type"]["name"],
-        json["timestamp"]);
+        json["type"] == null ? "None" : json["type"]["name"] ?? "None",
+        json["timestamp"] ?? "None");
   }
 
   AssemblyModel(this.id, this.from, this.fromName, this.address, this.statusId,

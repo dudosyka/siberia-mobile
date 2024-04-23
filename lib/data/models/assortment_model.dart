@@ -25,11 +25,11 @@ class AssortmentModel {
 
     return AssortmentModel(
         json["id"],
-        json["name"],
-        json["vendorCode"],
+        json["name"] ?? "None",
+        json["vendorCode"] ?? "None",
         json["price"],
         files.isEmpty ? null : files,
-        json["eanCode"],
+        json["eanCode"] ?? "None",
         json["quantity"]);
   }
 

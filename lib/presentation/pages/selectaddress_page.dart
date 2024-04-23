@@ -42,7 +42,7 @@ class _SelectAddressPageState extends ConsumerState<SelectAddressPage> {
       child: Scaffold(
           key: scaffoldKey,
           resizeToAvoidBottomInset: false,
-          drawer: AppDrawerQr(
+          endDrawer: AppDrawerQr(
             stockModel: widget.stockModel,
           ),
           body: SafeArea(
@@ -84,7 +84,7 @@ class _SelectAddressPageState extends ConsumerState<SelectAddressPage> {
                             Builder(builder: (context) {
                               return InkWell(
                                 onTap: () {
-                                  Scaffold.of(context).openDrawer();
+                                  Scaffold.of(context).openEndDrawer();
                                 },
                                 child: Container(
                                   width: 30,

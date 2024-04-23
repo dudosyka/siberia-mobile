@@ -82,7 +82,7 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
           child: Scaffold(
             key: scaffoldKey,
             resizeToAvoidBottomInset: false,
-            drawer: AppDrawer(
+            endDrawer: AppDrawer(
               isAbleToNavigate: false,
               isAssembly: true,
               isHomePage: false,
@@ -263,7 +263,7 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                             Builder(builder: (context) {
                               return InkWell(
                                 onTap: () {
-                                  Scaffold.of(context).openDrawer();
+                                  Scaffold.of(context).openEndDrawer();
                                 },
                                 child: Container(
                                   width: 30,
@@ -316,6 +316,8 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
   }
 
   Widget getProductListWidget(List<CartModel> data, double width) {
+    bool isProductOpened = false;
+
     return Column(
       children: [
         Container(
@@ -438,27 +440,32 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                                           .getAvailability(e.model.id);
                                       if (availability.errorModel == null) {
                                         if (mounted) {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ProductInfoPage(
-                                                        productId: e.model.id,
-                                                        name: e.model.name,
-                                                        photos:
-                                                        e.model.fileNames,
-                                                        sku: e.model.vendorCode,
-                                                        ean: e.model.eanCode,
-                                                        count:
-                                                        e.model.quantity ??
-                                                            0.0,
-                                                        availabilityModel:
-                                                        availability
-                                                            .availabilityModel!,
-                                                        stockModel:
-                                                        widget.stockModel,
-                                                        isQr: false,
-                                                      )));
+                                          if(!isProductOpened) {
+                            setState(() {
+                              isProductOpened = true;
+                            });
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ProductInfoPage(
+                                                          productId: e.model.id,
+                                                          name: e.model.name,
+                                                          photos:
+                                                          e.model.fileNames,
+                                                          sku: e.model.vendorCode,
+                                                          ean: e.model.eanCode,
+                                                          count:
+                                                          e.model.quantity ??
+                                                              0.0,
+                                                          availabilityModel:
+                                                          availability
+                                                              .availabilityModel!,
+                                                          stockModel:
+                                                          widget.stockModel,
+                                                          isQr: false,
+                                                        )));
+                                          }
                                         } else {
                                           ref
                                               .read(deleteAuthProvider)

@@ -3,13 +3,11 @@ class BrandModel {
   final String name;
   bool isSelected = false;
 
-   factory BrandModel.fromJson(Map<String, dynamic> json) {
-       return BrandModel(json["id"], json["name"]);
-   }
+  factory BrandModel.fromJson(Map<String, dynamic> json) {
+    return BrandModel(json["id"], json["name"] ?? "None");
+  }
 
   BrandModel(this.id, this.name);
 
-   Map<String, dynamic> toJson() => {
-
-   };
+  Map<String, dynamic> toJson() => {};
 }

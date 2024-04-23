@@ -18,16 +18,18 @@ class ProductInfoModel {
   factory ProductInfoModel.fromJson(Map<String, dynamic> json) {
     return ProductInfoModel(
         json["id"],
-        json["name"],
+        json["name"] ?? "None",
         json["photo"],
-        json["vendorCode"],
-        json["eanCode"],
+        json["vendorCode"] ?? "None",
+        json["eanCode"] ?? "None",
         json["quantity"],
-        json["description"],
-        json["brand"]["name"],
-        json["collection"]["name"],
-        json["category"]["name"],
-        json["color"],
+        json["description"] ?? "None",
+        json["brand"] == null ? "None" : json["brand"]["name"] ?? "None",
+        json["collection"] == null
+            ? "None"
+            : json["collection"]["name"] ?? "None",
+        json["category"] == null ? "None" : json["category"]["name"] ?? "None",
+        json["color"] ?? "None",
         json["commonPrice"],
         json["distributorPrice"],
         json["professionalPrice"],

@@ -67,7 +67,7 @@ class _BulkPageState extends ConsumerState<BulkPage> {
           child: Scaffold(
               key: scaffoldKey,
               resizeToAvoidBottomInset: false,
-              drawer: AppDrawer(
+              endDrawer: AppDrawer(
                 isAbleToNavigate: false,
                 isAssembly: false,
                 isHomePage: false,
@@ -232,7 +232,7 @@ class _BulkPageState extends ConsumerState<BulkPage> {
                                       Builder(builder: (context) {
                                         return InkWell(
                                           onTap: () {
-                                            Scaffold.of(context).openDrawer();
+                                            Scaffold.of(context).openEndDrawer();
                                           },
                                           child: Container(
                                             width: 30,

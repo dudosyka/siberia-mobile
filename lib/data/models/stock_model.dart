@@ -11,14 +11,17 @@ class StockModel {
   factory StockModel.fromJson(Map<String, dynamic> json) {
     return StockModel(
         json["stockData"]["id"],
-        json["stockData"]["name"],
-        json["stockData"]["address"],
+        json["stockData"] == null
+            ? "None"
+            : json["stockData"]["name"] ?? "None",
+        json["stockData"] == null
+            ? "None"
+            : json["stockData"]["address"] ?? "None",
         json["operationsAccess"]["arrivalsManaging"],
         json["operationsAccess"]["salesManaging"],
         json["operationsAccess"]["transfersManaging"],
         json["transactionData"]?["type"]["id"],
-        json["transactionData"]?["status"]["id"]
-    );
+        json["transactionData"]?["status"]["id"]);
   }
 
   StockModel(this.id, this.name, this.address, this.arrivalsManaging,

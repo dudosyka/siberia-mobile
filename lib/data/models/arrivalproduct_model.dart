@@ -5,8 +5,8 @@ class ArrivalProductModel {
   final double price;
 
   factory ArrivalProductModel.fromJson(Map<String, dynamic> json) {
-    return ArrivalProductModel(
-        json["id"], json["name"], json["vendorCode"], json["price"]);
+    return ArrivalProductModel(json["id"], json["name"] ?? "None",
+        json["vendorCode"] ?? "None", json["price"]);
   }
 
   ArrivalProductModel(this.id, this.name, this.vendorCode, this.price);

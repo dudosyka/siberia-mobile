@@ -4,12 +4,11 @@ class ShopModel {
   final String address;
 
   factory ShopModel.fromJson(Map<String, dynamic> json) {
-    return ShopModel(json["id"], json["name"], json["address"]);
+    return ShopModel(
+        json["id"], json["name"] ?? "None", json["address"] ?? "None");
   }
 
   ShopModel(this.id, this.name, this.address);
 
-  Map<String, dynamic> toJson() => {
-
-  };
+  Map<String, dynamic> toJson() => {};
 }

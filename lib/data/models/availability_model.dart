@@ -4,7 +4,8 @@ class AvailabilityModel {
   final String address;
 
   factory AvailabilityModel.fromJson(Map<String, dynamic> json) {
-    return AvailabilityModel(json["id"], json["name"], json["address"]);
+    return AvailabilityModel(
+        json["id"], json["name"] ?? "None", json["address"] ?? "None");
   }
 
   AvailabilityModel(this.id, this.name, this.address);

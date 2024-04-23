@@ -16,6 +16,7 @@ import '../widgets/backButton.dart';
 import '../widgets/exit_dialog.dart';
 import '../widgets/gray_button.dart';
 import '../widgets/outlined_gray_button.dart';
+import '../widgets/round_button.dart';
 import 'home_page.dart';
 
 class ScanBarcodePage extends ConsumerStatefulWidget {
@@ -84,7 +85,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
           child: Scaffold(
               key: scaffoldKey,
               resizeToAvoidBottomInset: false,
-              drawer: AppDrawer(
+              endDrawer: AppDrawer(
                 isAbleToNavigate: false,
                 isAssembly: false,
                 isHomePage: false,
@@ -130,6 +131,162 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                           flex: 1,
                           child: Center(
                             child: SizedBox(
+                              width: 65,
+                              height: 65,
+                              child: Stack(
+                                children: [
+                                  roundButton(
+                                      const Icon(
+                                        Icons.add,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                      60, () async {
+                                    cameraController.stop();
+                                    var value2 = await showDialog(
+                                        barrierDismissible: false,
+                                        context: context,
+                                        builder: (context) =>
+                                            enterBarcodeModal());
+
+                                    if (value2 != null) {
+                                      if (context.mounted) {
+                                        showDialog(
+                                            barrierDismissible: false,
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                backgroundColor: Colors.white,
+                                                surfaceTintColor:
+                                                    Colors.transparent,
+                                                title: Text(
+                                                  AppLocalizations.of(context)!
+                                                      .selectProduct,
+                                                  style: const TextStyle(
+                                                      fontSize: 24,
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                ),
+                                                content: SizedBox(
+                                                  width: double.maxFinite,
+                                                  height: 300,
+                                                  child: ListView(
+                                                    shrinkWrap: true,
+                                                    children: (value2.$1
+                                                                .arrivalProductModels!
+                                                            as List)
+                                                        .mapIndexed((index,
+                                                                e) =>
+                                                            ListTile(
+                                                              title:
+                                                                  Text(e.name),
+                                                              tileColor: index %
+                                                                          2 !=
+                                                                      0
+                                                                  ? const Color(
+                                                                      0xFFF6F6F6)
+                                                                  : Colors
+                                                                      .white,
+                                                              onTap: () async {
+                                                                final productData = await ref
+                                                                    .read(
+                                                                        newArrivalProvider)
+                                                                    .getProductInfo(
+                                                                        e.id);
+
+                                                                if (context
+                                                                    .mounted) {
+                                                                  Navigator.pop(
+                                                                      context,
+                                                                      productData);
+                                                                }
+                                                              },
+                                                            ))
+                                                        .toList(),
+                                                  ),
+                                                ),
+                                                actions: [
+                                                  outlinedGrayButton(() {
+                                                    cameraController.start();
+                                                    if (context.mounted) {
+                                                      Navigator.pop(
+                                                          context, true);
+                                                    }
+                                                  },
+                                                      AppLocalizations.of(
+                                                              context)!
+                                                          .cancelCaps),
+                                                ],
+                                              );
+                                            }).then((value) async {
+                                          if (value != null) {
+                                            if (value is ProductInfoUseCase) {
+                                              if (value.errorModel == null) {
+                                                showDialog(
+                                                    barrierDismissible: false,
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return addToCartModal(
+                                                          value.productModel!,
+                                                          value2.$2);
+                                                    });
+                                              } else {
+                                                cameraController.start();
+                                                Navigator.pop(context);
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(SnackBar(
+                                                  duration: const Duration(
+                                                      seconds: 1),
+                                                  content: Text(
+                                                      AppLocalizations.of(
+                                                              context)!
+                                                          .anErrorOccured),
+                                                ));
+                                              }
+                                            } else {
+                                              if (value is bool) {
+
+                                              } else {
+                                                cameraController.start();
+                                                Navigator.pop(context);
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(SnackBar(
+                                                  duration: const Duration(
+                                                      seconds: 1),
+                                                  content: Text(
+                                                      AppLocalizations.of(
+                                                          context)!
+                                                          .anErrorOccured),
+                                                ));
+                                              }
+                                            }
+                                          } else {
+                                            cameraController.start();
+                                            Navigator.pop(context);
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                              duration:
+                                                  const Duration(seconds: 1),
+                                              content: Text(
+                                                  AppLocalizations.of(context)!
+                                                      .anErrorOccured),
+                                            ));
+                                          }
+                                        });
+                                      }
+                                    } else {
+                                      cameraController.start();
+                                    }
+                                  }, true),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Center(
+                            child: SizedBox(
                               width: 50,
                               height: 50,
                               child: Stack(
@@ -137,25 +294,14 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                 children: [
                                   IconButton(
                                       onPressed: () {
-                                        showDialog(
-                                            context: context,
-                                            builder: (context) {
-                                              return exitDialog(
-                                                  context,
-                                                  AppLocalizations.of(context)!
-                                                      .areYouSureReturn);
-                                            }).then((returned) {
-                                          if (returned) {
-                                            Navigator.pushAndRemoveUntil(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        NewArrivalPage(
-                                                            stockModel: widget
-                                                                .stockModel)),
-                                                (route) => false);
-                                          }
-                                        });
+                                        Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    NewArrivalPage(
+                                                        stockModel:
+                                                            widget.stockModel)),
+                                            (route) => false);
                                       },
                                       icon: const Icon(
                                         Icons.menu,
@@ -250,7 +396,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                     const Spacer(),
                                     InkWell(
                                       onTap: () {
-                                        Scaffold.of(context).openDrawer();
+                                        Scaffold.of(context).openEndDrawer();
                                       },
                                       child: Container(
                                         width: 30,
@@ -329,8 +475,6 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                                 ));
                                                 listOfScanned.remove(
                                                     barcodes.first.rawValue!);
-                                                badBarcodes.add(
-                                                    barcodes.first.rawValue!);
                                                 setState(() {
                                                   isScanned = false;
                                                 });
@@ -350,15 +494,15 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                                   ));
                                                   listOfScanned.remove(
                                                       barcodes.first.rawValue!);
-                                                  badBarcodes.add(
-                                                      barcodes.first.rawValue!);
                                                   setState(() {
                                                     isScanned = false;
                                                   });
                                                 }
                                               } else {
+                                                cameraController.stop();
                                                 if (context.mounted) {
                                                   showDialog(
+                                                      barrierDismissible: false,
                                                       context: context,
                                                       builder: (context) {
                                                         return AlertDialog(
@@ -377,6 +521,18 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                                                     FontWeight
                                                                         .w500),
                                                           ),
+                                                          actions: [
+                                                            outlinedGrayButton(() {
+                                                              cameraController.start();
+                                                              if (context.mounted) {
+                                                                Navigator.pop(
+                                                                    context, true);
+                                                              }
+                                                            },
+                                                                AppLocalizations.of(
+                                                                    context)!
+                                                                    .cancelCaps),
+                                                          ],
                                                           content: SizedBox(
                                                             width: double
                                                                 .maxFinite,
@@ -418,12 +574,17 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                                         if (value.errorModel ==
                                                             null) {
                                                           showDialog(
+                                                              barrierDismissible:
+                                                                  false,
                                                               context: context,
                                                               builder:
                                                                   (context) {
                                                                 return addToCartModal(
                                                                     value
-                                                                        .productModel!);
+                                                                        .productModel!,
+                                                                    barcodes
+                                                                        .first
+                                                                        .rawValue!);
                                                               }).then((value) {
                                                             listOfScanned
                                                                 .remove(barcodes
@@ -449,9 +610,6 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                                           listOfScanned.remove(
                                                               barcodes.first
                                                                   .rawValue!);
-                                                          badBarcodes.add(
-                                                              barcodes.first
-                                                                  .rawValue!);
                                                           setState(() {
                                                             isScanned = false;
                                                           });
@@ -472,8 +630,6 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                                         listOfScanned.remove(
                                                             barcodes.first
                                                                 .rawValue!);
-                                                        badBarcodes.add(barcodes
-                                                            .first.rawValue!);
                                                         setState(() {
                                                           isScanned = false;
                                                         });
@@ -609,7 +765,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
     );
   }
 
-  Widget addToCartModal(ProductInfoModel productInfo) {
+  Widget addToCartModal(ProductInfoModel productInfo, String barcode) {
     final TextEditingController quantityCont = TextEditingController();
     final TextEditingController priceCont = TextEditingController();
     final pricesData = {
@@ -868,6 +1024,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           outlinedGrayButton(() {
+                            cameraController.start();
                             Navigator.pop(context, false);
                           }, AppLocalizations.of(context)!.cancelCaps),
                           const SizedBox(
@@ -887,6 +1044,30 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                 {curPrice: pricesData[curPrice]!},
                                 pricesData[curPrice]!));
                             Navigator.pop(context);
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                      backgroundColor: Colors.white,
+                                      surfaceTintColor: Colors.transparent,
+                                      title: Text("${productInfo.name} added"),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            "${productInfo.name} with barcode: $barcode added",
+                                            style: const TextStyle(
+                                                color: Color(0xFF888888)),
+                                          )
+                                        ],
+                                      ),
+                                      actions: [
+                                        grayButton(() {
+                                          cameraController.start();
+                                          Navigator.pop(context);
+                                        }, AppLocalizations.of(context)!.ok),
+                                      ],
+                                    ));
                           }, AppLocalizations.of(context)!.saveCaps),
                         ],
                       )
@@ -897,5 +1078,106 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
             ),
           );
         }));
+  }
+
+  Widget enterBarcodeModal() {
+    final TextEditingController barcodeCont = TextEditingController();
+
+    return AlertDialog(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.transparent,
+      content: SingleChildScrollView(
+        padding: MediaQuery.of(context).viewInsets,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "Enter barcode",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            const Divider(),
+            const SizedBox(height: 10),
+            SizedBox(
+              height: 40,
+              width: 290,
+              child: TextFormField(
+                controller: barcodeCont,
+                cursorColor: Colors.black,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    fontSize: 14,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.w300),
+                decoration: const InputDecoration(
+                  hintText: "BARCODE",
+                  contentPadding: EdgeInsets.zero,
+                  fillColor: Color(0xFFFCFCFC),
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                      borderRadius: BorderRadius.all(Radius.circular(6))),
+                  disabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                      borderRadius: BorderRadius.all(Radius.circular(6))),
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFFC8C8C8)),
+                      borderRadius: BorderRadius.all(Radius.circular(6))),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black),
+                      borderRadius: BorderRadius.all(Radius.circular(6))),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Divider(),
+            const SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                outlinedGrayButton(() {
+                  Navigator.pop(context, null);
+                  cameraController.start();
+                }, AppLocalizations.of(context)!.backCaps),
+                const SizedBox(
+                  width: 18,
+                ),
+                grayButton(() {
+                  ref
+                      .read(newArrivalProvider)
+                      .getProductBarcode(barcodeCont.text)
+                      .then((value) async {
+                    if (value.errorModel != null) {
+                      Navigator.pop(context, null);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          duration: const Duration(seconds: 1),
+                          content: Text(
+                              AppLocalizations.of(context)!.anErrorOccured),
+                        ));
+                      }
+                    } else {
+                      if (value.arrivalProductModels!.isEmpty) {
+                        Navigator.pop(context, null);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            duration: const Duration(seconds: 1),
+                            content: Text(
+                                AppLocalizations.of(context)!.anErrorOccured),
+                          ));
+                        }
+                      } else {
+                        Navigator.pop(context, (value, barcodeCont.text));
+                      }
+                    }
+                  });
+                }, "ADD BARCODE"),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
   }
 }

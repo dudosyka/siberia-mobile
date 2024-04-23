@@ -88,7 +88,7 @@
   "endSaleCaps": "END SALE",
 
   "homeScreen": "Home screen",
-  "transfer": "Request",
+  "transfer": "Transfer",
   "logout": "Log out",
 
   "no": "No",
@@ -109,9 +109,9 @@
   "assemblingCompletedCaps": "ASSEMBLING COMPLETED!",
 
   "areYouSureProceed": "Are you sure you want to proceed? You won't be able to cancel",
-  "transferCaps": "REQUEST",
-  "areYouSureTransfer": "Are you sure you want to end request?",
-  "itemChosen": "Items chosen partly, do you want to proceed or end this request partly, or some items were missing",
+  "transferCaps": "TRANSFER",
+  "areYouSureTransfer": "Are you sure you want to end transfer?",
+  "itemChosen": "Items chosen partly, do you want to proceed or end this transfer partly, or some items were missing",
   "missingItemsCaps": "MISSING ITEMS",
   "endPartlyCaps": "END PARTLY",
   "continueCaps": "CONTINUE",
@@ -129,10 +129,10 @@
   "oferta": "Oferta",
   "other": "Other",
 
-  "newTransferCaps": "NEW REQUEST",
-  "addedToTransfer": "Added to request",
-  "completeTransferCaps": "COMPLETE REQUEST",
-  "transferItemEdit": "REQUEST ITEM EDIT",
+  "newTransferCaps": "NEW TRANSFER",
+  "addedToTransfer": "Added to transfer",
+  "completeTransferCaps": "COMPLETE TRANSFER",
+  "transferItemEdit": "TRANSFER ITEM EDIT",
 
   "inStockCaps": "IN STOCK",
 
@@ -144,9 +144,9 @@
   "selectAdress": "Select address",
   "areYouSureStore": "Are you sure you want continue with selected store",
 
-  "transferAssembly": "Request assembly",
+  "transferAssembly": "Transfer assembly",
 
-  "transferAssemblingCompCaps": "REQUEST ASSEMBLING COMPLETED!",
+  "transferAssemblingCompCaps": "TRANSFER ASSEMBLING COMPLETED!",
 
   "noInet": "No internet connection. Please turn on internet and you will be redirected back"
 

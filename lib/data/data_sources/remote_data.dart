@@ -56,7 +56,7 @@ class RemoteData {
   Future<dynamic> getAssortment(
       String token, Map<String, dynamic> filters) async {
     final res = await dio.post("${baseUrl}product/search",
-        data: {"filters": filters},
+        data: {"filters": filters, "needImages": true},
         options: Options(validateStatus: (_) => true, headers: {
           "Content-Type": "application/json",
           "authorization": "Bearer $token",

@@ -39,7 +39,7 @@ class _BulkApprovePageState extends ConsumerState<BulkApprovePage> {
       child: Scaffold(
           key: scaffoldKey,
           resizeToAvoidBottomInset: false,
-          drawer: AppDrawer(
+          endDrawer: AppDrawer(
             isAbleToNavigate: false,
             isAssembly: false,
             isHomePage: false,
@@ -154,7 +154,7 @@ class _BulkApprovePageState extends ConsumerState<BulkApprovePage> {
                             Builder(builder: (context) {
                               return InkWell(
                                 onTap: () {
-                                  Scaffold.of(context).openDrawer();
+                                  Scaffold.of(context).openEndDrawer();
                                 },
                                 child: Container(
                                   width: 30,

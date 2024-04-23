@@ -196,6 +196,21 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                     },
                   ),
                   const Divider(),
+                  ListTile(
+                    title: const Text(
+                      "Scan QR",
+                      style: TextStyle(fontSize: 24),
+                    ),
+                    leading: const Icon(Icons.qr_code),
+                    onTap: () async {
+                      await AuthRepository().deleteAuthData().then((value) =>
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (builder) => const AuthPage())));
+                    },
+                  ),
+                  const Divider(),
                 ],
               ),
             ),

@@ -88,7 +88,7 @@
   "endSaleCaps": "ЗАВЕРШИТЬ",
 
   "homeScreen": "Главная",
-  "transfer": "Запрос",
+  "transfer": "Трансфер",
   "logout": "Выход",
 
   "no": "Нет",
@@ -109,10 +109,10 @@
   "assemblingCompletedCaps": "ЗАКАЗ СФОРМИРОВАН!",
 
   "areYouSureProceed": "Вы уверены, что хотите продолжить? Вы не сможете отменить",
-  "transferCaps": "ЗАПРОС",
-  "areYouSureTransfer": "Вы уверены, что хотите завершить запрос?",
+  "transferCaps": "ТРАНСФЕР",
+  "areYouSureTransfer": "Вы уверены, что хотите завершить трансфер?",
   "itemChosen": "Элементы выбраны частично. Вы хотите продолжить или частично завершить перенос, или некоторые элементы отсутствуют.",
-  "missingItemsCaps": "ОТСУТСТВУЮЩИЕ ТОВАРЫ",
+  "missingItemsCaps": "ОТСУТСТВУЮЩИЕ ПУНКТЫ",
   "endPartlyCaps": "ЧАСТИЧНО",
   "continueCaps": "ПРОДОЛЖИТЬ",
 
@@ -129,10 +129,10 @@
   "oferta": "Oferta",
   "other": "Другая",
 
-  "newTransferCaps": "НОВЫЙ ЗАПРОС",
-  "addedToTransfer": "добавлено в запрос",
-  "completeTransferCaps": "ЗАПРОС ЗАВЕРШЕН",
-  "transferItemEdit": "РЕДАКТИРОВАНИЕ ЗАПРОСА",
+  "newTransferCaps": "НОВЫЙ ТРАНСФЕР",
+  "addedToTransfer": "добавлено в трансфер",
+  "completeTransferCaps": "ТРАНСФЕР ЗАВЕРШЕН",
+  "transferItemEdit": "ТРАНСФЕР РЕДАКТИРОВАНИЕ",
 
   "inStockCaps": "НАЛИЧИЕ",
 
@@ -144,9 +144,9 @@
   "selectAdress": "Выберите адрес",
   "areYouSureStore": "Вы уверены, что хотите продолжить работу с выбранным магазином?",
 
-  "transferAssembly": "Сборка запроса",
+  "transferAssembly": "Сборка трансфера",
 
-  "transferAssemblingCompCaps": "СБОРКА ЗАПРОСА ЗАВЕРШЕНА!",
+  "transferAssemblingCompCaps": "СБОРКА ТРАНСФЕРА ЗАВЕРШЕНА!",
 
   "noInet": "Нет соединения с интернетом. Пожалуйста, включите Интернет, и вы будете перенаправлены обратно."
 
