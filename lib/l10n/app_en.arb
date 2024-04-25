@@ -13,8 +13,8 @@
   "backCaps": "BACK",
   "assortmentCaps": "ASSORTMENT",
   "viewCaps": "VIEW",
-  "inStockCaps": "IN STOCK",
-  "isInStockInThis": " is in stock in this storehouses",
+  "inStockCaps": "IN STOREHOUSE",
+  "isInStockInThis": " is in storehouse in this storehouses",
   "nameCaps": "NAME",
   "skuCaps": "SKU",
   "loading": "Loading...",
@@ -134,7 +134,7 @@
   "completeTransferCaps": "COMPLETE TRANSFER",
   "transferItemEdit": "TRANSFER ITEM EDIT",
 
-  "inStockCaps": "IN STOCK",
+  "inStockCaps": "IN STOREHOUSE",
 
   "selectProduct": "Select product",
   "scanProduct": "Scan product code",

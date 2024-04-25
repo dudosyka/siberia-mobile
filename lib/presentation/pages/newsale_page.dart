@@ -250,7 +250,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                       ),
                     ),
                     Expanded(
-                      flex: 4,
+                      flex: 2,
                       child: InkWell(
                         onTap: () {
                           ref
@@ -267,6 +267,28 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                             const SizedBox(height: 4),
                             Text(
                               AppLocalizations.of(context)!.search,
+                              style: const TextStyle(fontSize: 12),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: InkWell(
+                        onTap: () {
+
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/images/dark_scan_icon.png",
+                              scale: 4,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              AppLocalizations.of(context)!.scan,
                               style: const TextStyle(fontSize: 12),
                             )
                           ],
