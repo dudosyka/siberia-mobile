@@ -1,8 +1,8 @@
 import 'package:collection/collection.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_app_slb/presentation/pages/newarrival_page.dart';
-import 'package:mobile_app_slb/presentation/states/newarrival_state.dart';
+import 'package:mobile_app_slb/presentation/states/newsale_state.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -11,6 +11,8 @@ import '../../data/models/cart_model.dart';
 import '../../data/models/productinfo_model.dart';
 import '../../data/models/stock_model.dart';
 import '../../domain/usecases/productinfo_usecase.dart';
+import '../states/assortment_state.dart';
+import '../states/newarrival_state.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/backButton.dart';
 import '../widgets/exit_dialog.dart';
@@ -19,16 +21,18 @@ import '../widgets/outlined_gray_button.dart';
 import '../widgets/round_button.dart';
 import 'home_page.dart';
 
-class ScanBarcodePage extends ConsumerStatefulWidget {
-  const ScanBarcodePage({super.key, required this.stockModel});
+class ScanSaleBarcodePage extends ConsumerStatefulWidget {
+  const ScanSaleBarcodePage(
+      {super.key, required this.stockModel, required this.isQr});
 
   final StockModel stockModel;
+  final bool isQr;
 
   @override
-  ConsumerState<ScanBarcodePage> createState() => _ScanBarcodePageState();
+  ConsumerState<ScanSaleBarcodePage> createState() => _ScanBarcodePageState();
 }
 
-class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
+class _ScanBarcodePageState extends ConsumerState<ScanSaleBarcodePage> {
   var scaffoldKey = GlobalKey<ScaffoldState>();
   MobileScannerController cameraController =
       MobileScannerController(detectionSpeed: DetectionSpeed.normal);
@@ -70,10 +74,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                   context, AppLocalizations.of(context)!.areYouSure);
             }).then((returned) {
           if (returned) {
-            ref.read(newArrivalProvider).deleteCart();
-            navigator.pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomePage()),
-                (route) => false);
+            navigator.pop(context);
           }
         });
       },
@@ -131,162 +132,6 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                           flex: 1,
                           child: Center(
                             child: SizedBox(
-                              width: 65,
-                              height: 65,
-                              child: Stack(
-                                children: [
-                                  roundButton(
-                                      const Icon(
-                                        Icons.add,
-                                        color: Colors.white,
-                                        size: 30,
-                                      ),
-                                      60, () async {
-                                    cameraController.stop();
-                                    var value2 = await showDialog(
-                                        barrierDismissible: false,
-                                        context: context,
-                                        builder: (context) =>
-                                            enterBarcodeModal());
-
-                                    if (value2 != null) {
-                                      if (context.mounted) {
-                                        showDialog(
-                                            barrierDismissible: false,
-                                            context: context,
-                                            builder: (context) {
-                                              return AlertDialog(
-                                                backgroundColor: Colors.white,
-                                                surfaceTintColor:
-                                                    Colors.transparent,
-                                                title: Text(
-                                                  AppLocalizations.of(context)!
-                                                      .selectProduct,
-                                                  style: const TextStyle(
-                                                      fontSize: 24,
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                ),
-                                                content: SizedBox(
-                                                  width: double.maxFinite,
-                                                  height: 300,
-                                                  child: ListView(
-                                                    shrinkWrap: true,
-                                                    children: (value2.$1
-                                                                .arrivalProductModels!
-                                                            as List)
-                                                        .mapIndexed((index,
-                                                                e) =>
-                                                            ListTile(
-                                                              title:
-                                                                  Text(e.name),
-                                                              tileColor: index %
-                                                                          2 !=
-                                                                      0
-                                                                  ? const Color(
-                                                                      0xFFF6F6F6)
-                                                                  : Colors
-                                                                      .white,
-                                                              onTap: () async {
-                                                                final productData = await ref
-                                                                    .read(
-                                                                        newArrivalProvider)
-                                                                    .getProductInfo(
-                                                                        e.id);
-
-                                                                if (context
-                                                                    .mounted) {
-                                                                  Navigator.pop(
-                                                                      context,
-                                                                      productData);
-                                                                }
-                                                              },
-                                                            ))
-                                                        .toList(),
-                                                  ),
-                                                ),
-                                                actions: [
-                                                  outlinedGrayButton(() {
-                                                    cameraController.start();
-                                                    if (context.mounted) {
-                                                      Navigator.pop(
-                                                          context, true);
-                                                    }
-                                                  },
-                                                      AppLocalizations.of(
-                                                              context)!
-                                                          .cancelCaps),
-                                                ],
-                                              );
-                                            }).then((value) async {
-                                          if (value != null) {
-                                            if (value is ProductInfoUseCase) {
-                                              if (value.errorModel == null) {
-                                                showDialog(
-                                                    barrierDismissible: false,
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return addToCartModal(
-                                                          value.productModel!,
-                                                          value2.$2);
-                                                    });
-                                              } else {
-                                                cameraController.start();
-                                                Navigator.pop(context);
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(SnackBar(
-                                                  duration: const Duration(
-                                                      seconds: 1),
-                                                  content: Text(
-                                                      AppLocalizations.of(
-                                                              context)!
-                                                          .anErrorOccured),
-                                                ));
-                                              }
-                                            } else {
-                                              if (value is bool) {
-
-                                              } else {
-                                                cameraController.start();
-                                                Navigator.pop(context);
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(SnackBar(
-                                                  duration: const Duration(
-                                                      seconds: 1),
-                                                  content: Text(
-                                                      AppLocalizations.of(
-                                                          context)!
-                                                          .anErrorOccured),
-                                                ));
-                                              }
-                                            }
-                                          } else {
-                                            cameraController.start();
-                                            Navigator.pop(context);
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(SnackBar(
-                                              duration:
-                                                  const Duration(seconds: 1),
-                                              content: Text(
-                                                  AppLocalizations.of(context)!
-                                                      .anErrorOccured),
-                                            ));
-                                          }
-                                        });
-                                      }
-                                    } else {
-                                      cameraController.start();
-                                    }
-                                  }, true),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Center(
-                            child: SizedBox(
                               width: 50,
                               height: 50,
                               child: Stack(
@@ -294,21 +139,14 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                 children: [
                                   IconButton(
                                       onPressed: () {
-                                        Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    NewArrivalPage(
-                                                        stockModel:
-                                                            widget.stockModel)),
-                                            (route) => false);
+                                        Navigator.pop(context);
                                       },
                                       icon: const Icon(
                                         Icons.menu,
                                         size: 32,
                                         color: Color(0xFF505050),
                                       )),
-                                  ref.watch(newArrivalProvider).cartData.isEmpty
+                                  ref.watch(cartDataProvider).cartData.isEmpty
                                       ? Container()
                                       : Padding(
                                           padding: const EdgeInsets.all(4),
@@ -326,7 +164,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                                 child: Text(
                                                     ref
                                                         .watch(
-                                                            newArrivalProvider)
+                                                            cartDataProvider)
                                                         .cartData
                                                         .length
                                                         .toString(),
@@ -372,15 +210,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                                   .areYouSure);
                                         }).then((returned) {
                                       if (returned) {
-                                        ref
-                                            .read(newArrivalProvider)
-                                            .deleteCart();
-                                        Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const HomePage()),
-                                            (route) => false);
+                                        Navigator.pop(context);
                                       }
                                     });
                                   }, AppLocalizations.of(context)!.cancelCaps,
@@ -522,15 +352,19 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                                                         .w500),
                                                           ),
                                                           actions: [
-                                                            outlinedGrayButton(() {
-                                                              cameraController.start();
-                                                              if (context.mounted) {
+                                                            outlinedGrayButton(
+                                                                () {
+                                                              cameraController
+                                                                  .start();
+                                                              if (context
+                                                                  .mounted) {
                                                                 Navigator.pop(
-                                                                    context, true);
+                                                                    context,
+                                                                    true);
                                                               }
                                                             },
                                                                 AppLocalizations.of(
-                                                                    context)!
+                                                                        context)!
                                                                     .cancelCaps),
                                                           ],
                                                           content: SizedBox(
@@ -573,27 +407,48 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                                           is ProductInfoUseCase) {
                                                         if (value.errorModel ==
                                                             null) {
-                                                          showDialog(
-                                                              barrierDismissible:
-                                                                  false,
-                                                              context: context,
-                                                              builder:
-                                                                  (context) {
-                                                                return addToCartModal(
-                                                                    value
-                                                                        .productModel!,
-                                                                    barcodes
-                                                                        .first
-                                                                        .rawValue!);
-                                                              }).then((value) {
-                                                            listOfScanned
-                                                                .remove(barcodes
-                                                                    .first
+                                                          if(value.productModel!.quantity != 0.0) {
+                                                            showDialog(
+                                                                barrierDismissible:
+                                                                false,
+                                                                context: context,
+                                                                builder:
+                                                                    (context) {
+                                                                  return addToCartModal(
+                                                                      value
+                                                                          .productModel!,
+                                                                      barcodes
+                                                                          .first
+                                                                          .rawValue!);
+                                                                }).then((value) {
+                                                              listOfScanned
+                                                                  .remove(barcodes
+                                                                  .first
+                                                                  .rawValue!);
+                                                              setState(() {
+                                                                isScanned = false;
+                                                              });
+                                                            });
+                                                          } else {
+                                                            ScaffoldMessenger.of(
+                                                                context)
+                                                                .showSnackBar(
+                                                                SnackBar(
+                                                                  duration:
+                                                                  const Duration(
+                                                                      seconds: 1),
+                                                                  content: Text(
+                                                                      AppLocalizations.of(
+                                                                          context)!
+                                                                          .anErrorOccured),
+                                                                ));
+                                                            listOfScanned.remove(
+                                                                barcodes.first
                                                                     .rawValue!);
                                                             setState(() {
                                                               isScanned = false;
                                                             });
-                                                          });
+                                                          }
                                                         } else {
                                                           ScaffoldMessenger.of(
                                                                   context)
@@ -1031,7 +886,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                             width: 18,
                           ),
                           grayButton(() {
-                            ref.read(newArrivalProvider).addToCart(CartModel(
+                            ref.read(cartDataProvider).addToCart(CartModel(
                                 AssortmentModel(
                                     productInfo.id,
                                     productInfo.name,
@@ -1042,7 +897,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                     productInfo.quantity),
                                 int.parse(quantityCont.text),
                                 {curPrice: pricesData[curPrice]!},
-                                pricesData[curPrice]!));
+                                pricesData[curPrice]!), widget.stockModel.id);
                             Navigator.pop(context);
                             showDialog(
                                 barrierDismissible: false,
@@ -1050,12 +905,12 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                 builder: (context) => AlertDialog(
                                       backgroundColor: Colors.white,
                                       surfaceTintColor: Colors.transparent,
-                                      title: Text("${productInfo.name} ${AppLocalizations.of(context)!.added}"),
+                                      title: Text("${productInfo.name} added"),
                                       content: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Text(
-                                            "${productInfo.name} ${AppLocalizations.of(context)!.withBarcode} $barcode ${AppLocalizations.of(context)!.added}",
+                                            "${productInfo.name} with barcode: $barcode added",
                                             style: const TextStyle(
                                                 color: Color(0xFF888888)),
                                           )
@@ -1092,9 +947,9 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              AppLocalizations.of(context)!.enterBarcode,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+            const Text(
+              "Enter barcode",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
@@ -1111,20 +966,20 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                     fontSize: 14,
                     fontStyle: FontStyle.italic,
                     fontWeight: FontWeight.w300),
-                decoration: InputDecoration(
-                  hintText: AppLocalizations.of(context)!.barcodeCaps,
+                decoration: const InputDecoration(
+                  hintText: "BARCODE",
                   contentPadding: EdgeInsets.zero,
                   fillColor: Color(0xFFFCFCFC),
-                  border: const OutlineInputBorder(
+                  border: OutlineInputBorder(
                       borderSide: BorderSide(color: Color(0xFFC8C8C8)),
                       borderRadius: BorderRadius.all(Radius.circular(6))),
-                  disabledBorder: const OutlineInputBorder(
+                  disabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Color(0xFFC8C8C8)),
                       borderRadius: BorderRadius.all(Radius.circular(6))),
-                  enabledBorder: const OutlineInputBorder(
+                  enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Color(0xFFC8C8C8)),
                       borderRadius: BorderRadius.all(Radius.circular(6))),
-                  focusedBorder: const OutlineInputBorder(
+                  focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.black),
                       borderRadius: BorderRadius.all(Radius.circular(6))),
                 ),
@@ -1172,7 +1027,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                       }
                     }
                   });
-                }, AppLocalizations.of(context)!.addBarcodeCaps),
+                }, "ADD BARCODE"),
               ],
             )
           ],

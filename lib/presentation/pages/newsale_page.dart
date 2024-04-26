@@ -13,6 +13,7 @@ import 'package:mobile_app_slb/presentation/pages/assembling_page.dart';
 import 'package:mobile_app_slb/presentation/pages/auth_page.dart';
 import 'package:mobile_app_slb/presentation/pages/home_page.dart';
 import 'package:mobile_app_slb/presentation/pages/productinfo_page.dart';
+import 'package:mobile_app_slb/presentation/pages/scansalebarcode_page.dart';
 import 'package:mobile_app_slb/presentation/states/auth_state.dart';
 import 'package:mobile_app_slb/presentation/states/newsale_state.dart';
 import 'package:mobile_app_slb/presentation/widgets/app_drawer.dart';
@@ -277,7 +278,14 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                       flex: 2,
                       child: InkWell(
                         onTap: () {
-
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      ScanSaleBarcodePage(
+                                        stockModel: widget.stockModel,
+                                        isQr: widget.isTransaction
+                                      )));
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,

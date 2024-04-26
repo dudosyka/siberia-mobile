@@ -197,9 +197,9 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   ),
                   const Divider(),
                   ListTile(
-                    title: const Text(
-                      "Scan QR",
-                      style: TextStyle(fontSize: 24),
+                    title: Text(
+                      AppLocalizations.of(context)!.scanQr,
+                      style: const TextStyle(fontSize: 24),
                     ),
                     leading: const Icon(Icons.qr_code),
                     onTap: () async {

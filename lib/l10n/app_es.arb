@@ -148,5 +148,13 @@
 
   "transferAssemblingCompCaps": "¡MONTAJE DE TRANSFERENCIA COMPLETADO!",
 
-  "noInet": "Sin conexión a Internet. Enciende Internet y serás redirigido de regreso."
+  "noInet": "Sin conexión a Internet. Enciende Internet y serás redirigido de regreso.",
+
+  "scanQr": "Escanear  QR",
+
+    "added": "agregado",
+    "withBarcode": "con código de barras:",
+    "enterBarcode": "Introduzca el código de barras",
+    "barcodeCaps": "CÓDIGO DE BARRAS",
+    "addBarcodeCaps": "AÑADIR CÓDIGO DE BARRAS"
 }

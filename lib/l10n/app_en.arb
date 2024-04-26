@@ -148,7 +148,14 @@
 
   "transferAssemblingCompCaps": "TRANSFER ASSEMBLING COMPLETED!",
 
-  "noInet": "No internet connection. Please turn on internet and you will be redirected back"
+  "noInet": "No internet connection. Please turn on internet and you will be redirected back",
+  "scanQr": "Scan QR",
+
+  "added": "added",
+  "withBarcode": "with barcode:",
+  "enterBarcode": "Enter barcode",
+  "barcodeCaps": "BARCODE",
+  "addBarcodeCaps": "ADD BARCODE"
 
 
 
