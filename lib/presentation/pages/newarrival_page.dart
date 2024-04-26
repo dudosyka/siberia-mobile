@@ -28,8 +28,52 @@ class NewArrivalPage extends ConsumerStatefulWidget {
   ConsumerState<NewArrivalPage> createState() => _NewArrivalPageState();
 }
 
-class _NewArrivalPageState extends ConsumerState<NewArrivalPage> {
+class _NewArrivalPageState extends ConsumerState<NewArrivalPage>
+    with WidgetsBindingObserver {
   var scaffoldKey = GlobalKey<ScaffoldState>();
+  bool isExitOpened = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      if (!isExitOpened) {
+        setState(() {
+          isExitOpened = true;
+        });
+        showDialog(
+            context: context,
+            builder: (context) {
+              return exitDialog(
+                  context, AppLocalizations.of(context)!.areYouSure);
+            }).then((returned) {
+          if (returned) {
+            ref.read(newArrivalProvider).deleteCart();
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+                (route) => false);
+          }
+        }).then((value) => setState(() {
+              isExitOpened = false;
+            }));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +162,8 @@ class _NewArrivalPageState extends ConsumerState<NewArrivalPage> {
                                                 builder: (context) {
                                                   return exitDialog(
                                                       context,
-                                                      AppLocalizations.of(context)!
+                                                      AppLocalizations.of(
+                                                              context)!
                                                           .areYouSureReturn);
                                                 }).then((returned) {
                                               if (returned) {
@@ -129,8 +174,8 @@ class _NewArrivalPageState extends ConsumerState<NewArrivalPage> {
                                                     context,
                                                     MaterialPageRoute(
                                                         builder: (context) =>
-                                                        const ArrivalCompletePage()),
-                                                        (route) => false);
+                                                            const ArrivalCompletePage()),
+                                                    (route) => false);
                                               }
                                             });
                                           }
@@ -483,10 +528,10 @@ class _NewArrivalPageState extends ConsumerState<NewArrivalPage> {
                                         .getAvailability(e.model.id);
                                     if (availability.errorModel == null) {
                                       if (mounted) {
-                                        if(!isProductOpened) {
-                            setState(() {
-                              isProductOpened = true;
-                            });
+                                        if (!isProductOpened) {
+                                          setState(() {
+                                            isProductOpened = true;
+                                          });
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(
@@ -494,16 +539,18 @@ class _NewArrivalPageState extends ConsumerState<NewArrivalPage> {
                                                       ProductInfoPage(
                                                         productId: e.model.id,
                                                         name: e.model.name,
-                                                        photos: e.model.fileNames,
+                                                        photos:
+                                                            e.model.fileNames,
                                                         sku: e.model.vendorCode,
                                                         ean: e.model.eanCode,
-                                                        count: e.model.quantity ??
-                                                            0.0,
+                                                        count:
+                                                            e.model.quantity ??
+                                                                0.0,
                                                         availabilityModel:
-                                                        availability
-                                                            .availabilityModel!,
+                                                            availability
+                                                                .availabilityModel!,
                                                         stockModel:
-                                                        widget.stockModel,
+                                                            widget.stockModel,
                                                         isQr: false,
                                                       )));
                                         }

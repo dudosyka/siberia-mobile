@@ -18,12 +18,12 @@
   "nameCaps": "ИМЯ",
   "skuCaps": "SKU",
   "loading": "загрузка...",
-  "notAvailable": "Отсутствует",
-  "available": "Доступно",
+  "notAvailable": "нет",
+  "available": "да",
   "filtersCaps": "ФИЛЬТРЫ",
   "clearAllCaps": "СБРОСИТЬ",
   "applyCaps": "ПРИНЯТЬ",
-  "availability": "Доступность",
+  "availability": "Сортировать по наличию?",
   "color": "Цвет",
   "brand": "Бренд",
   "selectABrand": "Выбрерите бренд...",
@@ -88,7 +88,7 @@
   "endSaleCaps": "ЗАВЕРШИТЬ",
 
   "homeScreen": "Главная",
-  "transfer": "Трансфер",
+  "transfer": "Запрос",
   "logout": "Выход",
 
   "no": "Нет",
@@ -109,8 +109,8 @@
   "assemblingCompletedCaps": "ЗАКАЗ СФОРМИРОВАН!",
 
   "areYouSureProceed": "Вы уверены, что хотите продолжить? Вы не сможете отменить",
-  "transferCaps": "ТРАНСФЕР",
-  "areYouSureTransfer": "Вы уверены, что хотите завершить трансфер?",
+  "transferCaps": "ЗАПРОС",
+  "areYouSureTransfer": "Вы уверены, что хотите завершить запрос?",
   "itemChosen": "Элементы выбраны частично. Вы хотите продолжить или частично завершить перенос, или некоторые элементы отсутствуют.",
   "missingItemsCaps": "ОТСУТСТВУЮЩИЕ ПУНКТЫ",
   "endPartlyCaps": "ЧАСТИЧНО",
@@ -129,10 +129,10 @@
   "oferta": "Oferta",
   "other": "Другая",
 
-  "newTransferCaps": "НОВЫЙ ТРАНСФЕР",
-  "addedToTransfer": "добавлено в трансфер",
-  "completeTransferCaps": "ТРАНСФЕР ЗАВЕРШЕН",
-  "transferItemEdit": "ТРАНСФЕР РЕДАКТИРОВАНИЕ",
+  "newTransferCaps": "НОВЫЙ ЗАПРОС",
+  "addedToTransfer": "добавлено в запрос",
+  "completeTransferCaps": "ЗАПРОС ЗАВЕРШЕН",
+  "transferItemEdit": "ЗАПРОС РЕДАКТИРОВАНИЕ",
 
   "inStockCaps": "НАЛИЧИЕ",
 
@@ -144,19 +144,22 @@
   "selectAdress": "Выберите адрес",
   "areYouSureStore": "Вы уверены, что хотите продолжить работу с выбранным магазином?",
 
-  "transferAssembly": "Сборка трансфера",
+  "transferAssembly": "Сборка запроса",
 
-  "transferAssemblingCompCaps": "СБОРКА ТРАНСФЕРА ЗАВЕРШЕНА!",
+  "transferAssemblingCompCaps": "СБОРКА ЗАПРОСА ЗАВЕРШЕНА!",
 
   "noInet": "Нет соединения с интернетом. Пожалуйста, включите Интернет, и вы будете перенаправлены обратно.",
 
    "scanQr": "Сканировать QR",
 
-     "added": "добавлено",
-     "withBarcode": "с кодом:",
-     "enterBarcode": "Введите код",
-     "barcodeCaps": "ШТРИХКОД",
-     "addBarcodeCaps": "ДОБАВИТЬ ШТРИХКОД"
-
-
+   "added": "добавлено",
+   "withBarcode": "с кодом:",
+   "enterBarcode": "Введите код",
+   "barcodeCaps": "ШТРИХКОД",
+   "addBarcodeCaps": "ДОБАВИТЬ ШТРИХКОД",
+   "assemblMess": "Вы уверены? Вы сможете продолжить сборку продажи после",
+   "orderCaps": "ЗАКАЗ",
+   "saleQr": "Продажа",
+   "adrBag": "Недостаточно товаров",
+   "bulkLeave": "Вы уверены, что хотите выйти?"
 }

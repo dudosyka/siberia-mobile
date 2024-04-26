@@ -6,11 +6,9 @@ import 'package:mobile_app_slb/data/models/stock_model.dart';
 import 'package:mobile_app_slb/presentation/pages/bulkcomplete_page.dart';
 import 'package:mobile_app_slb/presentation/states/bulk_state.dart';
 import '../../data/models/bulksorted_model.dart';
-import '../states/auth_state.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/backButton.dart';
 import '../widgets/exit_dialog.dart';
-import 'auth_page.dart';
 import 'home_page.dart';
 
 class BulkApprovePage extends ConsumerStatefulWidget {
@@ -24,8 +22,51 @@ class BulkApprovePage extends ConsumerStatefulWidget {
   ConsumerState<BulkApprovePage> createState() => _BulkApprovePageState();
 }
 
-class _BulkApprovePageState extends ConsumerState<BulkApprovePage> {
+class _BulkApprovePageState extends ConsumerState<BulkApprovePage>
+    with WidgetsBindingObserver {
   var scaffoldKey = GlobalKey<ScaffoldState>();
+  bool isExitOpened = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      if (!isExitOpened) {
+        setState(() {
+          isExitOpened = true;
+        });
+        showDialog(
+            context: context,
+            builder: (context) {
+              return exitDialog(
+                  context, AppLocalizations.of(context)!.bulkLeave);
+            }).then((returned) {
+          if (returned) {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+                (route) => false);
+          }
+        }).then((value) => setState(() {
+              isExitOpened = false;
+            }));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,19 +101,19 @@ class _BulkApprovePageState extends ConsumerState<BulkApprovePage> {
                         child: InkWell(
                           onTap: () async {
                             for (var element in widget.bulkModels) {
-                              final data = await ref
+                              await ref
                                   .read(bulkProvider)
                                   .approveAssembly(element.assemblyModel.id);
-                              if (data.errorModel != null) {
-                                ref.read(deleteAuthProvider).deleteAuth();
-                                Future.microtask(() =>
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const AuthPage()),
-                                        (route) => false));
-                              }
+                              // if (data.errorModel != null) {
+                              //   ref.read(deleteAuthProvider).deleteAuth();
+                              //   Future.microtask(() =>
+                              //       Navigator.pushAndRemoveUntil(
+                              //           context,
+                              //           MaterialPageRoute(
+                              //               builder: (context) =>
+                              //                   const AuthPage()),
+                              //           (route) => false));
+                              // }
                             }
                             if (context.mounted) {
                               ref.refresh(getBulkProvider).value;
@@ -139,7 +180,7 @@ class _BulkApprovePageState extends ConsumerState<BulkApprovePage> {
                                     return exitDialog(
                                         context,
                                         AppLocalizations.of(context)!
-                                            .areYouSure);
+                                            .bulkLeave);
                                   }).then((returned) {
                                 if (returned) {
                                   Navigator.pushAndRemoveUntil(

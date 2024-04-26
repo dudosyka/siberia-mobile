@@ -33,8 +33,52 @@ class GetTransferPage extends ConsumerStatefulWidget {
   ConsumerState<GetTransferPage> createState() => _GetTransferPageState();
 }
 
-class _GetTransferPageState extends ConsumerState<GetTransferPage> {
+class _GetTransferPageState extends ConsumerState<GetTransferPage>
+    with WidgetsBindingObserver {
   var scaffoldKey = GlobalKey<ScaffoldState>();
+  bool isExitOpened = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      if (!isExitOpened) {
+        setState(() {
+          isExitOpened = true;
+        });
+        showDialog(
+            context: context,
+            builder: (context) {
+              return exitDialog(
+                  context, AppLocalizations.of(context)!.areYouSure);
+            }).then((returned) {
+          if (returned) {
+            ref.read(deleteAuthProvider).deleteAuth();
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const AuthPage()),
+                (route) => false);
+          }
+        }).then((value) => setState(() {
+              isExitOpened = false;
+            }));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -375,7 +419,7 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage> {
                                           .getAvailability(e.model.id);
                                       if (availability.errorModel == null) {
                                         if (mounted) {
-                                          if(!isProductOpened) {
+                                          if (!isProductOpened) {
                                             setState(() {
                                               isProductOpened = true;
                                             });

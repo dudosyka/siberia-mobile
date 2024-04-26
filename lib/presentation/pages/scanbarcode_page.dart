@@ -28,7 +28,8 @@ class ScanBarcodePage extends ConsumerStatefulWidget {
   ConsumerState<ScanBarcodePage> createState() => _ScanBarcodePageState();
 }
 
-class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
+class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage>
+    with WidgetsBindingObserver {
   var scaffoldKey = GlobalKey<ScaffoldState>();
   MobileScannerController cameraController =
       MobileScannerController(detectionSpeed: DetectionSpeed.normal);
@@ -38,19 +39,52 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
   bool isScanned = false;
   List<String> listOfScanned = [];
   List<String> badBarcodes = [];
+  bool isExitOpened = false;
 
   @override
   void initState() {
     cameraController.stop();
     listOfScanned = [];
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     cameraController.dispose();
     listOfScanned = [];
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      if (!isExitOpened) {
+        setState(() {
+          isExitOpened = true;
+        });
+        showDialog(
+            context: context,
+            builder: (context) {
+              return exitDialog(
+                  context, AppLocalizations.of(context)!.areYouSure);
+            }).then((returned) {
+          if (returned) {
+            ref.read(newArrivalProvider).deleteCart();
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+                (route) => false);
+          }
+        }).then((value) => setState(() {
+              isExitOpened = false;
+            }));
+      }
+    }
   }
 
   @override
@@ -1058,7 +1092,8 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                 builder: (context) => AlertDialog(
                                       backgroundColor: Colors.white,
                                       surfaceTintColor: Colors.transparent,
-                                      title: Text("${productInfo.name} ${AppLocalizations.of(context)!.added}"),
+                                      title: Text(
+                                          "${productInfo.name} ${AppLocalizations.of(context)!.added}"),
                                       content: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [

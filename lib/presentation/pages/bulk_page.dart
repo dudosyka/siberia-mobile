@@ -27,11 +27,54 @@ class BulkPage extends ConsumerStatefulWidget {
   ConsumerState<BulkPage> createState() => _BulkPageState();
 }
 
-class _BulkPageState extends ConsumerState<BulkPage> {
+class _BulkPageState extends ConsumerState<BulkPage>
+    with WidgetsBindingObserver {
   var scaffoldKey = GlobalKey<ScaffoldState>();
+  bool isExitOpened = false;
 
   bool isAscendingDate = true;
   bool isTappedDate = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      if (!isExitOpened) {
+        setState(() {
+          isExitOpened = true;
+        });
+        showDialog(
+            context: context,
+            builder: (context) {
+              return exitDialog(
+                  context, AppLocalizations.of(context)!.bulkLeave);
+            }).then((returned) {
+          if (returned) {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+                (route) => false);
+          }
+        }).then((value) => setState(() {
+              isExitOpened = false;
+            }));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +92,7 @@ class _BulkPageState extends ConsumerState<BulkPage> {
             context: context,
             builder: (context) {
               return exitDialog(
-                  context, AppLocalizations.of(context)!.areYouSure);
+                  context, AppLocalizations.of(context)!.bulkLeave);
             }).then((returned) {
           if (returned) {
             ref.read(bulkProvider).deleteAssemblies();
@@ -211,7 +254,7 @@ class _BulkPageState extends ConsumerState<BulkPage> {
                                               return exitDialog(
                                                   context,
                                                   AppLocalizations.of(context)!
-                                                      .areYouSure);
+                                                      .bulkLeave);
                                             }).then((returned) {
                                           if (returned) {
                                             ref
@@ -232,7 +275,8 @@ class _BulkPageState extends ConsumerState<BulkPage> {
                                       Builder(builder: (context) {
                                         return InkWell(
                                           onTap: () {
-                                            Scaffold.of(context).openEndDrawer();
+                                            Scaffold.of(context)
+                                                .openEndDrawer();
                                           },
                                           child: Container(
                                             width: 30,
@@ -434,7 +478,7 @@ class _BulkPageState extends ConsumerState<BulkPage> {
                                 SizedBox(
                                   width: width / 2 - 20 - 18 - 20,
                                   child: Text(
-                                    AppLocalizations.of(context)!.saleCaps,
+                                    "${AppLocalizations.of(context)!.orderCaps} ${e.id}",
                                     style: const TextStyle(
                                         fontSize: 16, color: Color(0xFF222222)),
                                     overflow: TextOverflow.ellipsis,

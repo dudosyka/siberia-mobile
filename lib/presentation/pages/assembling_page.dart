@@ -34,17 +34,58 @@ class AssemblingPage extends ConsumerStatefulWidget {
   ConsumerState<AssemblingPage> createState() => _AssemblingPageState();
 }
 
-class _AssemblingPageState extends ConsumerState<AssemblingPage> {
+class _AssemblingPageState extends ConsumerState<AssemblingPage>
+    with WidgetsBindingObserver {
   var scaffoldKey = GlobalKey<ScaffoldState>();
+  bool isExitOpened = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      if (!isExitOpened) {
+        setState(() {
+          isExitOpened = true;
+        });
+        showDialog(
+            context: context,
+            builder: (context) {
+              return exitDialog(
+                  context, AppLocalizations.of(context)!.areYouSure);
+            }).then((returned) {
+          if (returned) {
+            if (widget.isTransaction) {
+              ref.read(deleteAuthProvider).deleteAuth();
+              Future.microtask(() => Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AuthPage()),
+                  (route) => false));
+            } else {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                  (route) => false);
+            }
+          }
+        }).then((value) => setState(() {
+              isExitOpened = false;
+            }));
+      }
+    }
   }
 
   @override
@@ -64,7 +105,7 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
               context: context,
               builder: (context) {
                 return exitDialog(
-                    context, AppLocalizations.of(context)!.areYouSure);
+                    context, AppLocalizations.of(context)!.assemblMess);
               }).then((returned) {
             if (returned) {
               ref.read(cartDataProvider).deleteCart();
@@ -236,7 +277,7 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                                     return exitDialog(
                                         context,
                                         AppLocalizations.of(context)!
-                                            .areYouSure);
+                                            .assemblMess);
                                   }).then((returned) {
                                 if (returned) {
                                   if (widget.isTransaction) {
@@ -428,7 +469,8 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                                     child: Text(
                                       e.quantity.toString(),
                                       style: const TextStyle(
-                                          fontSize: 16, color: Color(0xFF222222)),
+                                          fontSize: 16,
+                                          color: Color(0xFF222222)),
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -440,10 +482,10 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                                           .getAvailability(e.model.id);
                                       if (availability.errorModel == null) {
                                         if (mounted) {
-                                          if(!isProductOpened) {
-                            setState(() {
-                              isProductOpened = true;
-                            });
+                                          if (!isProductOpened) {
+                                            setState(() {
+                                              isProductOpened = true;
+                                            });
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
@@ -452,17 +494,18 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                                                           productId: e.model.id,
                                                           name: e.model.name,
                                                           photos:
-                                                          e.model.fileNames,
-                                                          sku: e.model.vendorCode,
+                                                              e.model.fileNames,
+                                                          sku: e
+                                                              .model.vendorCode,
                                                           ean: e.model.eanCode,
-                                                          count:
-                                                          e.model.quantity ??
+                                                          count: e.model
+                                                                  .quantity ??
                                                               0.0,
                                                           availabilityModel:
-                                                          availability
-                                                              .availabilityModel!,
+                                                              availability
+                                                                  .availabilityModel!,
                                                           stockModel:
-                                                          widget.stockModel,
+                                                              widget.stockModel,
                                                           isQr: false,
                                                         )));
                                           }
@@ -475,8 +518,8 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                                                   context,
                                                   MaterialPageRoute(
                                                       builder: (context) =>
-                                                      const AuthPage()),
-                                                      (route) => false));
+                                                          const AuthPage()),
+                                                  (route) => false));
                                         }
                                       }
                                     },

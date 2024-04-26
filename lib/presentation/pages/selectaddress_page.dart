@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,9 +27,54 @@ class SelectAddressPage extends ConsumerStatefulWidget {
   ConsumerState<SelectAddressPage> createState() => _SelectAddressPageState();
 }
 
-class _SelectAddressPageState extends ConsumerState<SelectAddressPage> {
+class _SelectAddressPageState extends ConsumerState<SelectAddressPage>
+    with WidgetsBindingObserver {
+  bool isAble = true;
+  bool isExitOpened = false;
   var scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController searchCont = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      if (!isExitOpened) {
+        setState(() {
+          isExitOpened = true;
+        });
+        showDialog(
+            context: context,
+            builder: (context) {
+              return exitDialog(
+                  context, AppLocalizations.of(context)!.areYouSure);
+            }).then((returned) {
+          if (returned) {
+            ref.read(deleteAuthProvider).deleteAuth();
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const AuthPage()),
+                (route) => false);
+          }
+        }).then((value) => setState(() {
+              isExitOpened = false;
+            }));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -273,61 +319,71 @@ class _SelectAddressPageState extends ConsumerState<SelectAddressPage> {
                 tileColor:
                     index % 2 != 0 ? const Color(0xFFF6F6F6) : Colors.white,
                 onTap: () async {
-                  final data = await ref
-                      .read(transferProvider)
-                      .selectAddress(widget.currentStock.id, e.id);
-                  if (data.errorModel == null) {
-                    if (mounted) {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              backgroundColor: Colors.white,
-                              surfaceTintColor: Colors.transparent,
-                              title: Text(AppLocalizations.of(context)!
-                                  .areYouSureStore),
-                              actions: [
-                                TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context, false);
-                                    },
-                                    child: const Text(
-                                      "No",
-                                      style: TextStyle(color: Colors.black),
-                                    )),
-                                TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context, true);
-                                    },
-                                    child: const Text(
-                                      "Yes",
-                                      style: TextStyle(color: Colors.green),
-                                    ))
-                              ],
-                            );
-                          }).then((returned) {
-                        if (returned) {
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => TransferAssemblyPage(
-                                        stockModel: widget.stockModel,
-                                        transactionId: widget.currentStock.id,
-                                        stockId: e.id,
-                                        cartModels:
-                                            widget.currentStock.cartModels,
-                                      )),
-                              (route) => false);
-                        }
+                  if (isAble) {
+                    setState(() {
+                      isAble = false;
+                    });
+                    Timer(const Duration(seconds: 5), () {
+                      setState(() {
+                        isAble = true;
                       });
-                    }
-                  } else {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        duration: const Duration(seconds: 1),
-                        content:
-                            Text(AppLocalizations.of(context)!.anErrorOccured),
-                      ));
+                    });
+                    final data = await ref
+                        .read(transferProvider)
+                        .selectAddress(widget.currentStock.id, e.id);
+                    if (data.errorModel == null) {
+                      if (mounted) {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                backgroundColor: Colors.white,
+                                surfaceTintColor: Colors.transparent,
+                                title: Text(AppLocalizations.of(context)!
+                                    .areYouSureStore),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context, false);
+                                      },
+                                      child: const Text(
+                                        "No",
+                                        style: TextStyle(color: Colors.black),
+                                      )),
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context, true);
+                                      },
+                                      child: const Text(
+                                        "Yes",
+                                        style: TextStyle(color: Colors.green),
+                                      ))
+                                ],
+                              );
+                            }).then((returned) {
+                          if (returned) {
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => TransferAssemblyPage(
+                                          stockModel: widget.stockModel,
+                                          transactionId: widget.currentStock.id,
+                                          stockId: e.id,
+                                          cartModels:
+                                              widget.currentStock.cartModels,
+                                        )),
+                                (route) => false);
+                          }
+                        });
+                      }
+                    } else {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          duration: const Duration(seconds: 1),
+                          content: Text(
+                              AppLocalizations.of(context)!.adrBag),
+                        ));
+                      }
                     }
                   }
                 },

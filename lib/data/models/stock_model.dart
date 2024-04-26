@@ -5,7 +5,7 @@ class StockModel {
   final bool arrivalsManaging;
   final bool salesManaging;
   final bool transfersManaging;
-  final bool? transfersProcessing;
+  final bool transfersProcessing;
   final int? typeId;
   final int? statusId;
 
@@ -21,7 +21,7 @@ class StockModel {
         json["operationsAccess"]["arrivalsManaging"],
         json["operationsAccess"]["salesManaging"],
         json["operationsAccess"]["transfersManaging"],
-        json["operationsAccess"]["transfersProcessing"],
+        json["operationsAccess"]["transfersProcessing"] ?? false,
         json["transactionData"]?["type"]["id"],
         json["transactionData"]?["status"]["id"]);
   }

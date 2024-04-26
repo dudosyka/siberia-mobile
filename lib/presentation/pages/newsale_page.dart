@@ -70,6 +70,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
   };
   String baseUrl = constants.baseUrl;
   FiltersUseCase? filtersUseCase;
+  bool isExitOpened = false;
 
   @override
   void initState() {
@@ -93,28 +94,35 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
 
     if (state == AppLifecycleState.inactive ||
         state == AppLifecycleState.detached) {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return exitDialog(
-                context, AppLocalizations.of(context)!.areYouSure);
-          }).then((returned) {
-        if (returned) {
-          ref.read(cartDataProvider).deleteOutcome();
-          if (widget.isTransaction) {
-            ref.read(deleteAuthProvider).deleteAuth();
-            Future.microtask(() => Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const AuthPage()),
-                (route) => false));
-          } else {
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-                (route) => false);
+      if (!isExitOpened) {
+        setState(() {
+          isExitOpened = true;
+        });
+        showDialog(
+            context: context,
+            builder: (context) {
+              return exitDialog(
+                  context, AppLocalizations.of(context)!.areYouSure);
+            }).then((returned) {
+          if (returned) {
+            ref.read(cartDataProvider).deleteOutcome();
+            if (widget.isTransaction) {
+              ref.read(deleteAuthProvider).deleteAuth();
+              Future.microtask(() => Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AuthPage()),
+                  (route) => false));
+            } else {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                  (route) => false);
+            }
           }
-        }
-      });
+        }).then((value) => setState(() {
+              isExitOpened = false;
+            }));
+      }
     }
   }
 
@@ -381,7 +389,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                       padding: const EdgeInsets.only(top: 10),
                                       child: Text(
                                         widget.isTransaction
-                                            ? "Sale"
+                                            ? AppLocalizations.of(context)!.saleQr
                                             : AppLocalizations.of(context)!
                                                 .newSaleCaps,
                                         style: const TextStyle(
@@ -513,27 +521,61 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                                   MainAxisAlignment.end,
                                               children: [
                                                 Padding(
-                                                  padding: const EdgeInsets.only(left: 20),
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 20),
                                                   child: InkWell(
-                                                    onTap: () {
-                                                      Navigator.push(
+                                                    onTap: () async {
+                                                      final isGood = await Navigator.push(
                                                           context,
                                                           MaterialPageRoute(
-                                                              builder: (context) => ScanSaleBarcodePage(
-                                                                  stockModel: widget.stockModel,
-                                                                  isQr: widget.isTransaction)));
+                                                              builder: (context) =>
+                                                                  ScanSaleBarcodePage(
+                                                                      stockModel:
+                                                                          widget
+                                                                              .stockModel,
+                                                                      isQr: widget
+                                                                          .isTransaction)));
+                                                      if (isGood != null) {
+                                                        if (isGood is bool) {
+                                                          if (isGood) {
+                                                            if (context
+                                                                .mounted) {
+                                                              showModalBottomSheet(
+                                                                  context:
+                                                                      context,
+                                                                  isScrollControlled:
+                                                                      true,
+                                                                  builder:
+                                                                      (context) {
+                                                                    return cartBottomSheet(
+                                                                        width);
+                                                                  });
+                                                            }
+                                                          }
+                                                        }
+                                                      }
                                                     },
                                                     child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
                                                       children: [
                                                         Image.asset(
                                                           "assets/images/dark_scan_icon.png",
                                                           scale: 3,
                                                         ),
-                                                        const SizedBox(width: 14,),
+                                                        const SizedBox(
+                                                          width: 14,
+                                                        ),
                                                         Text(
-                                                          AppLocalizations.of(context)!.scan,
-                                                          style: const TextStyle(fontSize: 20, color: Color(0xFFAAAAAA)),
+                                                          AppLocalizations.of(
+                                                                  context)!
+                                                              .scan,
+                                                          style: const TextStyle(
+                                                              fontSize: 20,
+                                                              color: Color(
+                                                                  0xFFAAAAAA)),
                                                         )
                                                       ],
                                                     ),
@@ -1410,6 +1452,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                 };
                               });
                               ref.refresh(getFiltersProvider).value;
+                              Navigator.pop(context);
                             }, AppLocalizations.of(context)!.clearAllCaps),
                             const SizedBox(
                               width: 18,
@@ -2406,6 +2449,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
   Widget cartBottomSheet(double width) {
     List<CartModel> data = ref.watch(cartDataProvider).cartData;
     double sum = ref.watch(cartDataProvider).sum;
+    bool isOpenedEdit = false;
 
     return SafeArea(
       child: Padding(
@@ -2569,7 +2613,10 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                     builder: (context) => const AuthPage()),
                                 (route) => false));
                           }
-                          if (context.mounted) {
+                          if (context.mounted && !isOpenedEdit) {
+                            setState(() {
+                              isOpenedEdit = true;
+                            });
                             showDialog(
                                 context: context,
                                 builder: (context) {
@@ -2580,7 +2627,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                               setState(() {
                                 sum = ref.watch(cartDataProvider).sum;
                               });
-                            });
+                            }).then((value) => setState(() {
+                                  isOpenedEdit = false;
+                                }));
                           }
                         },
                         child: Container(
@@ -2851,9 +2900,10 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                           child: Text(
                               quantityCont.text == ""
                                   ? pricesData[curPrice].toString()
-                                  : (pricesData[curPrice]! *
-                                  int.parse(quantityCont.text))
-                                      .toStringAsFixed(5),
+                                  : double.parse((pricesData[curPrice]! *
+                                              int.parse(quantityCont.text))
+                                          .toStringAsFixed(2))
+                                      .toString(),
                               style: const TextStyle(
                                   fontSize: 14,
                                   fontStyle: FontStyle.italic,
@@ -3218,9 +3268,10 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                           child: Text(
                               quantityCont.text == ""
                                   ? pricesData[curPrice].toString()
-                                  : (pricesData[curPrice]! *
-                                          int.parse(quantityCont.text))
-                                      .toStringAsFixed(5),
+                                  : double.parse((pricesData[curPrice]! *
+                                              int.parse(quantityCont.text))
+                                          .toStringAsFixed(2))
+                                      .toString(),
                               style: const TextStyle(
                                   fontSize: 14,
                                   fontStyle: FontStyle.italic,

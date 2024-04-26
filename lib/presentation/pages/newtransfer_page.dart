@@ -65,6 +65,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
   };
   String baseUrl = constants.baseUrl;
   FiltersUseCase? filtersUseCase;
+  bool isExitOpened = false;
 
   @override
   void initState() {
@@ -84,20 +85,27 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
 
     if (state == AppLifecycleState.inactive ||
         state == AppLifecycleState.detached) {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return exitDialog(
-                context, AppLocalizations.of(context)!.areYouSure);
-          }).then((returned) {
-        if (returned) {
-          ref.read(transferProvider).deleteCart();
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const HomePage()),
-              (route) => false);
-        }
-      });
+      if (!isExitOpened) {
+        setState(() {
+          isExitOpened = true;
+        });
+        showDialog(
+            context: context,
+            builder: (context) {
+              return exitDialog(
+                  context, AppLocalizations.of(context)!.areYouSure);
+            }).then((returned) {
+          if (returned) {
+            ref.read(transferProvider).deleteCart();
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+                (route) => false);
+          }
+        }).then((value) => setState(() {
+              isExitOpened = false;
+            }));
+      }
     }
   }
 
@@ -193,7 +201,12 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                       context: context,
                                       isScrollControlled: true,
                                       constraints: BoxConstraints(
-                                        maxWidth: MediaQuery.of(context).size.shortestSide <= 650 ? width : 650,
+                                        maxWidth: MediaQuery.of(context)
+                                                    .size
+                                                    .shortestSide <=
+                                                650
+                                            ? width
+                                            : 650,
                                       ),
                                       builder: (context) {
                                         return cartBottomSheet(width);
@@ -769,7 +782,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                           .getAvailability(e.id);
                       if (availability.errorModel == null) {
                         if (mounted) {
-                          if(!isProductOpened) {
+                          if (!isProductOpened) {
                             setState(() {
                               isProductOpened = true;
                             });
@@ -784,7 +797,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                         ean: data[index].eanCode,
                                         count: data[index].quantity ?? 0.0,
                                         availabilityModel:
-                                        availability.availabilityModel!,
+                                            availability.availabilityModel!,
                                         stockModel: widget.stockModel,
                                         isQr: false)));
                           }
@@ -1023,7 +1036,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                           .getAvailability(element.id);
                       if (availability.errorModel == null) {
                         if (context.mounted) {
-                          if(!isProductOpened) {
+                          if (!isProductOpened) {
                             setState(() {
                               isProductOpened = true;
                             });
@@ -1038,7 +1051,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                         ean: data[index].eanCode,
                                         count: data[index].quantity ?? 0.0,
                                         availabilityModel:
-                                        availability.availabilityModel!,
+                                            availability.availabilityModel!,
                                         stockModel: widget.stockModel,
                                         isQr: false)));
                           }
@@ -1171,8 +1184,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                       child: DotsIndicator(
                                         dotsCount: data[index].fileNames != null
                                             ? data[index].fileNames!.length <= 4
-                                            ? data[index].fileNames!.length
-                                            : 4
+                                                ? data[index].fileNames!.length
+                                                : 4
                                             : 1,
                                         position: data[index].currentIndex % 4,
                                         decorator: DotsDecorator(
@@ -1361,6 +1374,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                 };
                               });
                               ref.refresh(getFiltersProvider).value;
+                              Navigator.pop(context);
                             }, AppLocalizations.of(context)!.clearAllCaps),
                             const SizedBox(
                               width: 18,
@@ -2356,6 +2370,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
 
   Widget cartBottomSheet(double width) {
     List<CartModel> data = ref.watch(transferProvider).cartData;
+    bool isOpenedEdit = false;
 
     return SafeArea(
       child: Padding(
@@ -2389,7 +2404,10 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                             width: 8,
                           ),
                           SizedBox(
-                            width: MediaQuery.of(context).size.shortestSide > 650 ? 650 / 2 - 24 : width / 2 - 24,
+                            width:
+                                MediaQuery.of(context).size.shortestSide > 650
+                                    ? 650 / 2 - 24
+                                    : width / 2 - 24,
                             child: grayButton(() {
                               if (ref
                                   .watch(transferProvider)
@@ -2435,8 +2453,9 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                       return AlertDialog(
                                         backgroundColor: Colors.white,
                                         surfaceTintColor: Colors.transparent,
-                                        title: Text(AppLocalizations.of(context)!
-                                            .youHaventCart),
+                                        title: Text(
+                                            AppLocalizations.of(context)!
+                                                .youHaventCart),
                                         actions: [
                                           TextButton(
                                               onPressed: () {
@@ -2520,14 +2539,19 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                     builder: (context) => const AuthPage()),
                                 (route) => false));
                           }
-                          if (context.mounted) {
+                          if (context.mounted && !isOpenedEdit) {
+                            setState(() {
+                              isOpenedEdit = true;
+                            });
                             showDialog(
                                 context: context,
                                 builder: (context) {
                                   return editCartModal(
                                       data[index], product.productModel!);
                                 }).then((value) {
-                              setState(() {});
+                              setState(() {
+                                isOpenedEdit = false;
+                              });
                             });
                           }
                         },

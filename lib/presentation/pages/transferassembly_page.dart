@@ -32,8 +32,52 @@ class TransferAssemblyPage extends ConsumerStatefulWidget {
       _TransferAssemblyPageState();
 }
 
-class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage> {
+class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage>
+    with WidgetsBindingObserver {
   var scaffoldKey = GlobalKey<ScaffoldState>();
+  bool isExitOpened = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      if (!isExitOpened) {
+        setState(() {
+          isExitOpened = true;
+        });
+        showDialog(
+            context: context,
+            builder: (context) {
+              return exitDialog(
+                  context, AppLocalizations.of(context)!.areYouSure);
+            }).then((returned) {
+          if (returned) {
+            ref.read(deleteAuthProvider).deleteAuth();
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const AuthPage()),
+                (route) => false);
+          }
+        }).then((value) => setState(() {
+              isExitOpened = false;
+            }));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -348,10 +392,10 @@ class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage> {
                                           .getAvailability(e.model.id);
                                       if (availability.errorModel == null) {
                                         if (mounted) {
-                                          if(!isProductOpened) {
-                            setState(() {
-                              isProductOpened = true;
-                            });
+                                          if (!isProductOpened) {
+                                            setState(() {
+                                              isProductOpened = true;
+                                            });
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
@@ -360,17 +404,18 @@ class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage> {
                                                           productId: e.model.id,
                                                           name: e.model.name,
                                                           photos:
-                                                          e.model.fileNames,
-                                                          sku: e.model.vendorCode,
+                                                              e.model.fileNames,
+                                                          sku: e
+                                                              .model.vendorCode,
                                                           ean: e.model.eanCode,
-                                                          count:
-                                                          e.model.quantity ??
+                                                          count: e.model
+                                                                  .quantity ??
                                                               0.0,
                                                           availabilityModel:
-                                                          availability
-                                                              .availabilityModel!,
+                                                              availability
+                                                                  .availabilityModel!,
                                                           stockModel:
-                                                          widget.stockModel,
+                                                              widget.stockModel,
                                                           isQr: true,
                                                         )));
                                           }

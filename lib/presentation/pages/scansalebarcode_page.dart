@@ -115,7 +115,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanSaleBarcodePage> {
                               children: [
                                 IconButton(
                                     onPressed: () {
-                                      Navigator.pop(context);
+                                      Navigator.pop(context, false);
                                     },
                                     icon: const Icon(
                                       Icons.menu,
@@ -985,7 +985,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanSaleBarcodePage> {
                                         grayButton(() {
                                           cameraController.start();
                                           Navigator.pop(context);
-                                          Navigator.pop(context);
+                                          Navigator.pop(context, true);
                                         }, AppLocalizations.of(context)!.ok),
                                       ],
                                     ));

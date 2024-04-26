@@ -1032,6 +1032,7 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
                                 };
                               });
                               ref.refresh(getFiltersProvider).value;
+                              Navigator.pop(context);
                             }, AppLocalizations.of(context)!.clearAllCaps),
                             const SizedBox(
                               width: 18,
