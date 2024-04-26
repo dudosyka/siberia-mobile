@@ -167,6 +167,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                             Image.asset(
                               "assets/images/assortment_filter_icon.png",
                               scale: 4,
+                              width: 30,
+                              height: 30,
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -274,6 +276,8 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                             Image.asset(
                               "assets/images/assortment_search_icon.png",
                               scale: 4,
+                              width: 30,
+                              height: 30,
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -689,14 +693,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                 Expanded(
                   flex: 1,
                   child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        isTappedName = true;
-                        data.sort((prod1, prod2) => compareString(
-                            isAscendingName, prod1.name, prod2.name));
-                        isAscendingName = !isAscendingName;
-                      });
-                    },
+                    onTap: null,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -730,16 +727,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                 Expanded(
                   flex: 1,
                   child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        isTappedVendor = true;
-                        data.sort((prod1, prod2) => compareString(
-                            isAscendingVendor,
-                            prod1.vendorCode,
-                            prod2.vendorCode));
-                        isAscendingVendor = !isAscendingVendor;
-                      });
-                    },
+                    onTap: null,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -964,14 +952,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 InkWell(
-                  onTap: () {
-                    setState(() {
-                      isTappedName = true;
-                      data.sort((prod1, prod2) => compareString(
-                          isAscendingName, prod1.name, prod2.name));
-                      isAscendingName = !isAscendingName;
-                    });
-                  },
+                  onTap: null,
                   child: Text(
                     AppLocalizations.of(context)!.nameCaps,
                     style: const TextStyle(
@@ -997,16 +978,7 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                   width: 20,
                 ),
                 InkWell(
-                  onTap: () {
-                    setState(() {
-                      isTappedVendor = true;
-                      data.sort((prod1, prod2) => compareString(
-                          isAscendingVendor,
-                          prod1.vendorCode,
-                          prod2.vendorCode));
-                      isAscendingVendor = !isAscendingVendor;
-                    });
-                  },
+                  onTap: null,
                   child: Text(
                     AppLocalizations.of(context)!.skuCaps,
                     style: const TextStyle(

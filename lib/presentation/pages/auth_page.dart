@@ -132,7 +132,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                     if (data.stockModel != null) {
                                       if (data.stockModel!.typeId == 3 &&
                                           data.stockModel!.statusId == 2 &&
-                                          data.stockModel!.transfersManaging) {
+                                          data.stockModel!.transfersProcessing!) {
                                         final newData = await ref
                                             .read(transferProvider)
                                             .getCurrentStock();

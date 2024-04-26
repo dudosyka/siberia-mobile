@@ -61,7 +61,7 @@ class RemoteData {
           "Content-Type": "application/json",
           "authorization": "Bearer $token",
         }));
-    print(token);
+
     if (res.statusCode == 200) {
       final List<AssortmentModel> data =
           (res.data as List).map((e) => AssortmentModel.fromJson(e)).toList();

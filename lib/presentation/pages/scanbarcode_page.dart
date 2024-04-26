@@ -245,7 +245,6 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                               }
                                             } else {
                                               if (value is bool) {
-
                                               } else {
                                                 cameraController.start();
                                                 Navigator.pop(context);
@@ -255,7 +254,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                                       seconds: 1),
                                                   content: Text(
                                                       AppLocalizations.of(
-                                                          context)!
+                                                              context)!
                                                           .anErrorOccured),
                                                 ));
                                               }
@@ -522,15 +521,19 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                                                         .w500),
                                                           ),
                                                           actions: [
-                                                            outlinedGrayButton(() {
-                                                              cameraController.start();
-                                                              if (context.mounted) {
+                                                            outlinedGrayButton(
+                                                                () {
+                                                              cameraController
+                                                                  .start();
+                                                              if (context
+                                                                  .mounted) {
                                                                 Navigator.pop(
-                                                                    context, true);
+                                                                    context,
+                                                                    true);
                                                               }
                                                             },
                                                                 AppLocalizations.of(
-                                                                    context)!
+                                                                        context)!
                                                                     .cancelCaps),
                                                           ],
                                                           content: SizedBox(
@@ -607,6 +610,8 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                                                         context)!
                                                                     .anErrorOccured),
                                                           ));
+                                                          cameraController
+                                                              .start();
                                                           listOfScanned.remove(
                                                               barcodes.first
                                                                   .rawValue!);
@@ -627,6 +632,8 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                                                       context)!
                                                                   .anErrorOccured),
                                                         ));
+                                                        cameraController
+                                                            .start();
                                                         listOfScanned.remove(
                                                             barcodes.first
                                                                 .rawValue!);
@@ -647,6 +654,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage> {
                                                                     context)!
                                                                 .anErrorOccured),
                                                       ));
+                                                      cameraController.start();
                                                       listOfScanned.remove(
                                                           barcodes
                                                               .first.rawValue!);

@@ -132,18 +132,18 @@ class _AssemblingPageState extends ConsumerState<AssemblingPage> {
                                                         MainAxisAlignment
                                                             .center,
                                                     children: [
-                                                      outlinedGrayButton(() {
-                                                        showDialog(
-                                                            context: context,
-                                                            builder: (context) =>
-                                                                addressModal());
-                                                      },
-                                                          AppLocalizations.of(
-                                                                  context)!
-                                                              .addAddressCaps),
-                                                      const SizedBox(
-                                                        width: 18,
-                                                      ),
+                                                      // outlinedGrayButton(() {
+                                                      //   showDialog(
+                                                      //       context: context,
+                                                      //       builder: (context) =>
+                                                      //           addressModal());
+                                                      // },
+                                                      //     AppLocalizations.of(
+                                                      //             context)!
+                                                      //         .addAddressCaps),
+                                                      // const SizedBox(
+                                                      //   width: 18,
+                                                      // ),
                                                       grayButton(() {
                                                         ref
                                                             .read(

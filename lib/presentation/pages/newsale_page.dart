@@ -186,6 +186,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                             Image.asset(
                               "assets/images/assortment_filter_icon.png",
                               scale: 4,
+                              width: 30,
+                              height: 30,
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -251,7 +253,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                       ),
                     ),
                     Expanded(
-                      flex: 2,
+                      flex: 4,
                       child: InkWell(
                         onTap: () {
                           ref
@@ -264,39 +266,12 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                             Image.asset(
                               "assets/images/assortment_search_icon.png",
                               scale: 4,
+                              width: 30,
+                              height: 30,
                             ),
                             const SizedBox(height: 4),
                             Text(
                               AppLocalizations.of(context)!.search,
-                              style: const TextStyle(fontSize: 12),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      ScanSaleBarcodePage(
-                                        stockModel: widget.stockModel,
-                                        isQr: widget.isTransaction
-                                      )));
-                        },
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              "assets/images/dark_scan_icon.png",
-                              scale: 4,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              AppLocalizations.of(context)!.scan,
                               style: const TextStyle(fontSize: 12),
                             )
                           ],
@@ -405,8 +380,10 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                     Padding(
                                       padding: const EdgeInsets.only(top: 10),
                                       child: Text(
-                                        AppLocalizations.of(context)!
-                                            .newSaleCaps,
+                                        widget.isTransaction
+                                            ? "Sale"
+                                            : AppLocalizations.of(context)!
+                                                .newSaleCaps,
                                         style: const TextStyle(
                                             fontSize: 24,
                                             color: Color(0xFF909090),
@@ -535,6 +512,34 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                               mainAxisAlignment:
                                                   MainAxisAlignment.end,
                                               children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.only(left: 20),
+                                                  child: InkWell(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => ScanSaleBarcodePage(
+                                                                  stockModel: widget.stockModel,
+                                                                  isQr: widget.isTransaction)));
+                                                    },
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Image.asset(
+                                                          "assets/images/dark_scan_icon.png",
+                                                          scale: 3,
+                                                        ),
+                                                        const SizedBox(width: 14,),
+                                                        Text(
+                                                          AppLocalizations.of(context)!.scan,
+                                                          style: const TextStyle(fontSize: 20, color: Color(0xFFAAAAAA)),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                const Spacer(),
                                                 Text(
                                                   AppLocalizations.of(context)!
                                                       .viewCaps,
@@ -725,14 +730,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                 Expanded(
                   flex: 1,
                   child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        isTappedName = true;
-                        data.sort((prod1, prod2) => compareString(
-                            isAscendingName, prod1.name, prod2.name));
-                        isAscendingName = !isAscendingName;
-                      });
-                    },
+                    onTap: null,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -766,16 +764,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                 Expanded(
                   flex: 1,
                   child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        isTappedVendor = true;
-                        data.sort((prod1, prod2) => compareString(
-                            isAscendingVendor,
-                            prod1.vendorCode,
-                            prod2.vendorCode));
-                        isAscendingVendor = !isAscendingVendor;
-                      });
-                    },
+                    onTap: null,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -817,7 +806,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                           .getAvailability(e.id);
                       if (availability.errorModel == null) {
                         if (mounted) {
-                          if(!isProductOpened) {
+                          if (!isProductOpened) {
                             setState(() {
                               isProductOpened = true;
                             });
@@ -832,7 +821,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                         ean: data[index].eanCode,
                                         count: data[index].quantity ?? 0.0,
                                         availabilityModel:
-                                        availability.availabilityModel!,
+                                            availability.availabilityModel!,
                                         stockModel: widget.stockModel,
                                         isQr: widget.isTransaction)));
                           }
@@ -1005,14 +994,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 InkWell(
-                  onTap: () {
-                    setState(() {
-                      isTappedName = true;
-                      data.sort((prod1, prod2) => compareString(
-                          isAscendingName, prod1.name, prod2.name));
-                      isAscendingName = !isAscendingName;
-                    });
-                  },
+                  onTap: null,
                   child: Text(
                     AppLocalizations.of(context)!.nameCaps,
                     style: const TextStyle(
@@ -1038,16 +1020,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                   width: 20,
                 ),
                 InkWell(
-                  onTap: () {
-                    setState(() {
-                      isTappedVendor = true;
-                      data.sort((prod1, prod2) => compareString(
-                          isAscendingVendor,
-                          prod1.vendorCode,
-                          prod2.vendorCode));
-                      isAscendingVendor = !isAscendingVendor;
-                    });
-                  },
+                  onTap: null,
                   child: Text(
                     AppLocalizations.of(context)!.skuCaps,
                     style: const TextStyle(
@@ -1092,7 +1065,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                           .getAvailability(element.id);
                       if (availability.errorModel == null) {
                         if (context.mounted) {
-                          if(!isProductOpened) {
+                          if (!isProductOpened) {
                             setState(() {
                               isProductOpened = true;
                             });
@@ -1107,7 +1080,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                         ean: data[index].eanCode,
                                         count: data[index].quantity ?? 0.0,
                                         availabilityModel:
-                                        availability.availabilityModel!,
+                                            availability.availabilityModel!,
                                         stockModel: widget.stockModel,
                                         isQr: widget.isTransaction)));
                           }
@@ -1240,8 +1213,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                       child: DotsIndicator(
                                         dotsCount: data[index].fileNames != null
                                             ? data[index].fileNames!.length <= 4
-                                            ? data[index].fileNames!.length
-                                            : 4
+                                                ? data[index].fileNames!.length
+                                                : 4
                                             : 1,
                                         position: data[index].currentIndex % 4,
                                         decorator: DotsDecorator(
@@ -2879,8 +2852,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                               quantityCont.text == ""
                                   ? pricesData[curPrice].toString()
                                   : (pricesData[curPrice]! *
-                                          int.parse(quantityCont.text))
-                                      .toString(),
+                                  int.parse(quantityCont.text))
+                                      .toStringAsFixed(5),
                               style: const TextStyle(
                                   fontSize: 14,
                                   fontStyle: FontStyle.italic,
@@ -3247,7 +3220,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                   ? pricesData[curPrice].toString()
                                   : (pricesData[curPrice]! *
                                           int.parse(quantityCont.text))
-                                      .toString(),
+                                      .toStringAsFixed(5),
                               style: const TextStyle(
                                   fontSize: 14,
                                   fontStyle: FontStyle.italic,

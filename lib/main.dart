@@ -32,7 +32,6 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
-
   @override
   void initState() {
     super.initState();
@@ -107,8 +106,10 @@ class _MyAppState extends ConsumerState<MyApp> {
                         return const HomePage();
                       } else if (value.$1.authModel!.type == "transaction") {
                         if (value.$2.stockModel!.statusId == 2 &&
-                            value.$2.stockModel!.typeId == 3 &&
-                            value.$2.stockModel!.transfersManaging) {
+                                value.$2.stockModel!.typeId == 3 &&
+                                value.$2.stockModel!.transfersProcessing == null
+                            ? false
+                            : value.$2.stockModel!.transfersProcessing!) {
                           return SelectAddressPage(
                             stockModel: value.$2.stockModel!,
                             currentStock: value.$3.currentStock!,

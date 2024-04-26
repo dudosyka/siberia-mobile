@@ -26,6 +26,7 @@ class TransferNotifier extends ChangeNotifier {
       }
     }
     if (!flag) {
+      newModel.curPrice = double.parse(newModel.curPrice.toStringAsFixed(5));
       cartData.add(newModel);
     }
     notifyListeners();

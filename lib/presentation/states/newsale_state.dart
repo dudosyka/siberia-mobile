@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app_slb/data/repository/newsale_repository.dart';
+import 'package:mobile_app_slb/domain/usecases/assortment_usecase.dart';
 import 'package:mobile_app_slb/domain/usecases/productinfo_usecase.dart';
 
 import '../../data/models/cart_model.dart';
@@ -22,6 +23,18 @@ class CartDataNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<AssortmentUseCase> getAssortment() async {
+    final data = await AssortmentRepository().getAssortment({
+      "name": "",
+      "availability": true,
+      "color": "",
+      "brand": null,
+      "collection": null,
+      "category": null
+    });
+    return data;
+  }
+
   Future<void> addToCart(CartModel newModel, int storeId) async {
     bool flag = false;
     for (var element in cartData) {
@@ -40,6 +53,7 @@ class CartDataNotifier extends ChangeNotifier {
       }
     }
     if (!flag) {
+      newModel.curPrice = double.parse(newModel.curPrice.toStringAsFixed(5));
       cartData.add(newModel);
     }
     if (transactionId == null) {

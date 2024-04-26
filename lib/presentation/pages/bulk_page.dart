@@ -344,16 +344,7 @@ class _BulkPageState extends ConsumerState<BulkPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     InkWell(
-                      onTap: () {
-                        setState(() {
-                          isTappedDate = true;
-                          data.sort((prod1, prod2) => compareString(
-                              isAscendingDate,
-                              prod1.timestamp,
-                              prod2.timestamp));
-                          isAscendingDate = !isAscendingDate;
-                        });
-                      },
+                      onTap: null,
                       child: Center(
                         child: Text(
                           AppLocalizations.of(context)!.dateCaps,
