@@ -131,7 +131,7 @@
 
   "newTransferCaps": "NEW REQUEST",
   "addedToTransfer": "Added to request",
-  "completeTransferCaps": "COMPLETE REQUEST",
+  "completeTransferCaps": "SAVE REQUEST",
   "transferItemEdit": "REQUEST ITEM EDIT",
 
   "inStockCaps": "IN STOREHOUSE",
@@ -160,7 +160,9 @@
   "orderCaps": "ORDER",
   "saleQr": "Sale",
   "adrBag": "Not enough products",
-  "bulkLeave": "Are you sure you want to go out?"
+  "bulkLeave": "Are you sure you want to go out?",
+  "transferCreateCaps": "REQUEST SUCCESSFULLY CREATED!",
+  "transferCloseCaps": "REQUEST SUCCESSFULLY ACCEPTED!"
 
 
 

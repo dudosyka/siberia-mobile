@@ -131,7 +131,7 @@
 
   "newTransferCaps": "НОВЫЙ ЗАПРОС",
   "addedToTransfer": "добавлено в запрос",
-  "completeTransferCaps": "ЗАПРОС ЗАВЕРШЕН",
+  "completeTransferCaps": "СОХРАНИТЬ ЗАПРОС",
   "transferItemEdit": "ЗАПРОС РЕДАКТИРОВАНИЕ",
 
   "inStockCaps": "НАЛИЧИЕ",
@@ -161,5 +161,8 @@
    "orderCaps": "ЗАКАЗ",
    "saleQr": "Продажа",
    "adrBag": "Недостаточно товаров",
-   "bulkLeave": "Вы уверены, что хотите выйти?"
+   "bulkLeave": "Вы уверены, что хотите выйти?",
+
+   "transferCreateCaps": "ЗАПРОС УСПЕШНО СОЗДАН!",
+   "transferCloseCaps": "ЗАПРОС УСПЕШНО ПРИНЯТ"
 }

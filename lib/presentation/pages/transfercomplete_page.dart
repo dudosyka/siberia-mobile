@@ -8,9 +8,17 @@ import '../states/auth_state.dart';
 import 'home_page.dart';
 
 class TransferCompletePage extends ConsumerStatefulWidget {
-  const TransferCompletePage({super.key, required this.isQr});
+  const TransferCompletePage(
+      {super.key,
+      required this.isQr,
+      required this.isNew,
+      required this.isAssembling,
+      required this.isEnd});
 
   final bool isQr;
+  final bool isNew;
+  final bool isAssembling;
+  final bool isEnd;
 
   @override
   ConsumerState<TransferCompletePage> createState() =>
@@ -89,14 +97,28 @@ class _TransferCompletePageState extends ConsumerState<TransferCompletePage> {
                           ],
                         ),
                         const SizedBox(height: 36),
-                        Text(
+                        widget.isNew ? Text(
+                          AppLocalizations.of(context)!.transferCreateCaps,
+                          style: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF424242)),
+                          textAlign: TextAlign.center,
+                        ) : widget.isAssembling ? Text(
                           AppLocalizations.of(context)!.transferAssemblingCompCaps,
                           style: const TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFF424242)),
                           textAlign: TextAlign.center,
-                        ),
+                        ) : widget.isEnd ? Text(
+                          AppLocalizations.of(context)!.transferCloseCaps,
+                          style: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF424242)),
+                          textAlign: TextAlign.center,
+                        ) : Container(),
                         Text(
                           AppLocalizations.of(context)!.youWillGetBack,
                           style: const TextStyle(

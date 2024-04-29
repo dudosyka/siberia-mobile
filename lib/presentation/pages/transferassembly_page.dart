@@ -122,7 +122,10 @@ class _TransferAssemblyPageState extends ConsumerState<TransferAssemblyPage>
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     const TransferCompletePage(
-                                                        isQr: true)),
+                                                        isQr: true,
+                                                        isNew: false,
+                                                        isAssembling: true,
+                                                        isEnd: false)),
                                             (route) => false);
                                       }
                                     } else {

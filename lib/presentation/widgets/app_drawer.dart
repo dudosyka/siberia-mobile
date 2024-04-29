@@ -142,59 +142,69 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                       }
                     },
                   ),
-                  const Divider(),
-                  ListTile(
-                    title: Text(
-                      AppLocalizations.of(context)!.transfer,
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                    leading: Image.asset(
-                      "assets/images/transfer_screen_icon.png",
-                      scale: 4,
-                    ),
-                    onTap: () {
-                      if (widget.isAbleToNavigate) {
-                        if (widget.stockModel.transfersManaging) {
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => NewTransferPage(
-                                      currentStorehouse: widget.stockModel.name,
-                                      storehouseId: widget.stockModel.id,
-                                      stockModel: widget.stockModel)),
-                              (route) => false);
-                        }
-                      } else {
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return exitDialog(context,
-                                  AppLocalizations.of(context)!.areYouSure);
-                            }).then((returned) {
-                          if (returned) {
-                            ref.read(transferProvider).deleteCart();
-                            ref.read(newArrivalProvider).deleteCart();
-                            if (widget.isAssembly) {
-                              ref.read(cartDataProvider).deleteCart();
+                  widget.stockModel.transfersManaging
+                      ? const Divider()
+                      : Container(),
+                  widget.stockModel.transfersManaging
+                      ? ListTile(
+                          title: Text(
+                            AppLocalizations.of(context)!.transfer,
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                          leading: Image.asset(
+                            "assets/images/transfer_screen_icon.png",
+                            scale: 4,
+                          ),
+                          onTap: () {
+                            if (widget.isAbleToNavigate) {
+                              if (widget.stockModel.transfersManaging) {
+                                Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => NewTransferPage(
+                                            currentStorehouse:
+                                                widget.stockModel.name,
+                                            storehouseId: widget.stockModel.id,
+                                            stockModel: widget.stockModel)),
+                                    (route) => false);
+                              }
                             } else {
-                              ref.read(cartDataProvider).deleteOutcome();
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return exitDialog(
+                                        context,
+                                        AppLocalizations.of(context)!
+                                            .areYouSure);
+                                  }).then((returned) {
+                                if (returned) {
+                                  ref.read(transferProvider).deleteCart();
+                                  ref.read(newArrivalProvider).deleteCart();
+                                  if (widget.isAssembly) {
+                                    ref.read(cartDataProvider).deleteCart();
+                                  } else {
+                                    ref.read(cartDataProvider).deleteOutcome();
+                                  }
+                                  if (widget.stockModel.transfersManaging) {
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                NewTransferPage(
+                                                    currentStorehouse:
+                                                        widget.stockModel.name,
+                                                    storehouseId:
+                                                        widget.stockModel.id,
+                                                    stockModel:
+                                                        widget.stockModel)),
+                                        (route) => false);
+                                  }
+                                }
+                              });
                             }
-                            if (widget.stockModel.transfersManaging) {
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => NewTransferPage(
-                                          currentStorehouse:
-                                              widget.stockModel.name,
-                                          storehouseId: widget.stockModel.id,
-                                          stockModel: widget.stockModel)),
-                                  (route) => false);
-                            }
-                          }
-                        });
-                      }
-                    },
-                  ),
+                          },
+                        )
+                      : Container(),
                   const Divider(),
                   ListTile(
                     title: Text(

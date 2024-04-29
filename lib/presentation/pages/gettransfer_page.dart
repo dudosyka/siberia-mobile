@@ -140,7 +140,11 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage>
                                                   MaterialPageRoute(
                                                       builder: (context) =>
                                                           const TransferCompletePage(
-                                                              isQr: true)),
+                                                              isQr: true,
+                                                              isNew: false,
+                                                              isAssembling:
+                                                                  false,
+                                                              isEnd: true)),
                                                   (route) => false);
                                             }
                                           } else {
@@ -547,7 +551,10 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage>
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   const TransferCompletePage(
-                                                      isQr: true)),
+                                                      isQr: true,
+                                                      isNew: false,
+                                                      isAssembling: false,
+                                                      isEnd: true)),
                                           (route) => false);
                                     }
                                   } else {
@@ -596,7 +603,10 @@ class _GetTransferPageState extends ConsumerState<GetTransferPage>
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   const TransferCompletePage(
-                                                      isQr: true)),
+                                                      isQr: true,
+                                                      isNew: false,
+                                                      isAssembling: false,
+                                                      isEnd: true)),
                                           (route) => false);
                                     }
                                   } else {

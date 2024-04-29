@@ -2442,7 +2442,10 @@ class _NewTransferPageState extends ConsumerState<NewTransferPage>
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     const TransferCompletePage(
-                                                        isQr: false)),
+                                                        isQr: false,
+                                                        isNew: true,
+                                                        isAssembling: false,
+                                                        isEnd: false)),
                                             (route) => false));
                                   }
                                 });
