@@ -694,63 +694,63 @@ class _AssortmentPageState extends ConsumerState<AssortmentPage> {
       padding: const EdgeInsets.only(top: 10, left: 30, right: 30, bottom: 20),
       child: Column(
         children: [
-          SizedBox(
-            height: 30,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                InkWell(
-                  onTap: null,
-                  child: Text(
-                    AppLocalizations.of(context)!.nameCaps,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFFAAAAAA),
-                        fontSize: 16),
-                  ),
-                ),
-                isTappedName
-                    ? isAscendingName
-                        ? const Icon(
-                            Icons.arrow_downward,
-                            color: Color(0xFFAAAAAA),
-                            size: 14,
-                          )
-                        : const Icon(
-                            Icons.arrow_upward,
-                            color: Color(0xFFAAAAAA),
-                            size: 14,
-                          )
-                    : Container(),
-                const SizedBox(
-                  width: 20,
-                ),
-                InkWell(
-                  onTap: null,
-                  child: Text(
-                    AppLocalizations.of(context)!.skuCaps,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFFAAAAAA),
-                        fontSize: 16),
-                  ),
-                ),
-                isTappedVendor
-                    ? isAscendingVendor
-                        ? const Icon(
-                            Icons.arrow_downward,
-                            color: Color(0xFFAAAAAA),
-                            size: 14,
-                          )
-                        : const Icon(
-                            Icons.arrow_upward,
-                            color: Color(0xFFAAAAAA),
-                            size: 14,
-                          )
-                    : Container()
-              ],
-            ),
-          ),
+          // SizedBox(
+          //   height: 30,
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.start,
+          //     children: [
+          //       // InkWell(
+          //       //   onTap: null,
+          //       //   child: Text(
+          //       //     AppLocalizations.of(context)!.nameCaps,
+          //       //     style: const TextStyle(
+          //       //         fontWeight: FontWeight.w500,
+          //       //         color: Color(0xFFAAAAAA),
+          //       //         fontSize: 16),
+          //       //   ),
+          //       // ),
+          //       isTappedName
+          //           ? isAscendingName
+          //               ? const Icon(
+          //                   Icons.arrow_downward,
+          //                   color: Color(0xFFAAAAAA),
+          //                   size: 14,
+          //                 )
+          //               : const Icon(
+          //                   Icons.arrow_upward,
+          //                   color: Color(0xFFAAAAAA),
+          //                   size: 14,
+          //                 )
+          //           : Container(),
+          //       const SizedBox(
+          //         width: 20,
+          //       ),
+          //       // InkWell(
+          //       //   onTap: null,
+          //       //   child: Text(
+          //       //     AppLocalizations.of(context)!.skuCaps,
+          //       //     style: const TextStyle(
+          //       //         fontWeight: FontWeight.w500,
+          //       //         color: Color(0xFFAAAAAA),
+          //       //         fontSize: 16),
+          //       //   ),
+          //       // ),
+          //       isTappedVendor
+          //           ? isAscendingVendor
+          //               ? const Icon(
+          //                   Icons.arrow_downward,
+          //                   color: Color(0xFFAAAAAA),
+          //                   size: 14,
+          //                 )
+          //               : const Icon(
+          //                   Icons.arrow_upward,
+          //                   color: Color(0xFFAAAAAA),
+          //                   size: 14,
+          //                 )
+          //           : Container()
+          //     ],
+          //   ),
+          // ),
           const SizedBox(height: 20),
           Expanded(
             child: GridView.builder(
