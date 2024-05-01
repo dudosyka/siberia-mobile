@@ -45,7 +45,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
     return MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Siberia',
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,

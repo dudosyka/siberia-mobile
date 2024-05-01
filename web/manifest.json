@@ -1,11 +1,11 @@
 {
-    "name": "mobile_app_slb",
-    "short_name": "mobile_app_slb",
+    "name": "Siberia",
+    "short_name": "Siberia",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "Mobile App Slb",
+    "description": "Siberia IS mobile application",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -1,1 +1,1 @@
-const String baseUrl = "https://api.siberia.dudosyka.ru/";
+const String baseUrl = "https://api.siberia-panel.com/";
