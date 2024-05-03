@@ -681,7 +681,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanSaleBarcodePage> {
       "Distribution": productInfo.distributionPrice,
       "Professional": productInfo.professionalPrice,
       "Oferta": productInfo.offertaPrice,
-      "Other": 0.0
+      // "Other": 0.0
     };
     String curPrice = "Distribution";
 
@@ -858,10 +858,10 @@ class _ScanBarcodePageState extends ConsumerState<ScanSaleBarcodePage> {
                                       : const Color(0xFF969696),
                                 )),
                           ),
-                          DropdownMenuItem(
-                            value: "Other",
-                            child: Text(AppLocalizations.of(context)!.other),
-                          ),
+                          // DropdownMenuItem(
+                          //   value: "Other",
+                          //   child: Text(AppLocalizations.of(context)!.other),
+                          // ),
                         ],
                         onChanged: (Object? value) {
                           setState(() {

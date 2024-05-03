@@ -895,7 +895,7 @@ class _NewArrivalPageState extends ConsumerState<NewArrivalPage>
                                 controller: priceCont,
                                 cursorColor: Colors.black,
                                 textAlign: TextAlign.center,
-                                keyboardType: TextInputType.number,
+                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                                 style: const TextStyle(
                                     fontSize: 14,
                                     fontStyle: FontStyle.italic,
