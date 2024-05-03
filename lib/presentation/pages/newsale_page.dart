@@ -105,7 +105,6 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                   context, AppLocalizations.of(context)!.areYouSure);
             }).then((returned) {
           if (returned) {
-            ref.read(cartDataProvider).deleteOutcome();
             if (widget.isTransaction) {
               ref.read(deleteAuthProvider).deleteAuth();
               Future.microtask(() => Navigator.pushAndRemoveUntil(
@@ -113,6 +112,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                   MaterialPageRoute(builder: (context) => const AuthPage()),
                   (route) => false));
             } else {
+              ref.read(cartDataProvider).deleteOutcome();
               Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => const HomePage()),
@@ -145,10 +145,19 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                     context, AppLocalizations.of(context)!.areYouSure);
               }).then((returned) {
             if (returned) {
-              ref.read(cartDataProvider).deleteOutcome();
-              navigator.pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const HomePage()),
-                  (route) => false);
+              if (widget.isTransaction) {
+                ref.read(deleteAuthProvider).deleteAuth();
+                Future.microtask(() => Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AuthPage()),
+                        (route) => false));
+              } else {
+                ref.read(cartDataProvider).deleteOutcome();
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                        (route) => false);
+              }
             }
           });
         },
@@ -333,9 +342,6 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                                         .areYouSure);
                                               }).then((returned) {
                                             if (returned) {
-                                              ref
-                                                  .read(cartDataProvider)
-                                                  .deleteOutcome();
                                               if (widget.isTransaction) {
                                                 ref
                                                     .read(deleteAuthProvider)
@@ -348,6 +354,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage>
                                                                 const AuthPage()),
                                                         (route) => false));
                                               } else {
+                                                ref
+                                                    .read(cartDataProvider)
+                                                    .deleteOutcome();
                                                 Navigator.pushAndRemoveUntil(
                                                     context,
                                                     MaterialPageRoute(

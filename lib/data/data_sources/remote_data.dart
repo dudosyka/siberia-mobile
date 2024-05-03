@@ -212,26 +212,26 @@ class RemoteData {
   }
 
   Future<dynamic> deleteOutcome(String token, int transactionId) async {
-    // final res =
-    //     await dio.delete("${baseUrl}transaction/outcome/hidden/$transactionId",
-    //         options: Options(validateStatus: (_) => true, headers: {
-    //           "Content-Type": "application/json",
-    //           "authorization": "Bearer $token",
-    //         }));
-    //
-    // if (res.statusCode == 200) {
-    //   return true;
-    // } else if (res.statusCode == 404) {
-    //   return ErrorModel("not found", 404, "Transaction not found");
-    // } else if (res.statusCode == 400) {
-    //   return ErrorModel(
-    //       "bad transaction id", 400, "Transaction id must be INT");
-    // } else if (res.statusCode == 403) {
-    //   return ErrorModel("bad transaction", 403, "Forbidden");
-    // } else {
-    //   return ErrorModel("auth error", 401, "Unauthorized");
-    // }
-    return true;
+    final res =
+        await dio.delete("${baseUrl}transaction/outcome/hidden/$transactionId",
+            options: Options(validateStatus: (_) => true, headers: {
+              "Content-Type": "application/json",
+              "authorization": "Bearer $token",
+            }));
+
+    if (res.statusCode == 200) {
+      return true;
+    } else if (res.statusCode == 404) {
+      return ErrorModel("not found", 404, "Transaction not found");
+    } else if (res.statusCode == 400) {
+      return ErrorModel(
+          "bad transaction id", 400, "Transaction id must be INT");
+    } else if (res.statusCode == 403) {
+      return ErrorModel("bad transaction", 403, "Forbidden");
+    } else {
+      return ErrorModel("auth error", 401, "Unauthorized");
+    }
+    // return true;
   }
 
   Future<dynamic> startAssembly(String token, int transactionId) async {

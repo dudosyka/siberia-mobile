@@ -940,7 +940,10 @@ class _NewArrivalPageState extends ConsumerState<NewArrivalPage>
                                       color: const Color(0xFFC8C8C8)),
                                   borderRadius: BorderRadius.circular(6)),
                               child: Center(
-                                child: Text(pricesData[curPrice].toString(),
+                                child: Text(
+                                    (double.parse(pricesData[curPrice]!
+                                        .toStringAsFixed(2)))
+                                        .toString(),
                                     style: const TextStyle(
                                         fontSize: 14,
                                         fontStyle: FontStyle.italic,
