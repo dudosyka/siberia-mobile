@@ -65,7 +65,7 @@
   "addToCartCaps": "В КОРЗИНУ",
   "areYouSureCart": "Вы уверены? Вы больше не сможете редактировать корзину.",
   "youHaventCart": "Вы не добавили ни одного товара в корзину",
-  "startAssemblyCaps": "НАЧАТЬ СБОРКУ",
+  "startAssemblyCaps": "СОЗДАТЬ ПРОДАЖУ",
   "priceCaps": "ЦЕНА",
   "total": "Итого:",
   "cartItemEditCaps": "ИЗМЕНЕНИЕ ЭЛЕМЕНТА ",
@@ -164,5 +164,7 @@
    "bulkLeave": "Вы уверены, что хотите выйти?",
 
    "transferCreateCaps": "ЗАПРОС УСПЕШНО СОЗДАН!",
-   "transferCloseCaps": "ЗАПРОС УСПЕШНО ПРИНЯТ"
+   "transferCloseCaps": "ЗАПРОС УСПЕШНО ПРИНЯТ",
+   "saleCreatedScreen": "Продажа создана и ожидает сборки",
+   "areYouWantAssembling": "Хотите начать сборку?"
 }

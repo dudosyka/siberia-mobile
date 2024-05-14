@@ -65,7 +65,7 @@
   "addToCartCaps": "ADD TO CART",
   "areYouSureCart": "Are you sure? You would not be able to edit cart anymore",
   "youHaventCart": "You haven't added any products to cart",
-  "startAssemblyCaps": "START ASSEMBLY",
+  "startAssemblyCaps": "CREATE SALE",
   "priceCaps": "PRICE",
   "total": "Total:",
   "cartItemEditCaps": "CART ITEM EDIT",
@@ -162,7 +162,9 @@
   "adrBag": "Not enough products",
   "bulkLeave": "Are you sure you want to go out?",
   "transferCreateCaps": "REQUEST SUCCESSFULLY CREATED!",
-  "transferCloseCaps": "REQUEST SUCCESSFULLY ACCEPTED!"
+  "transferCloseCaps": "REQUEST SUCCESSFULLY ACCEPTED!",
+  "saleCreatedScreen": "Sale created. Waiting for start assembly",
+  "areYouWantAssembling": "Are you want to start assembling?"
 
 
 
