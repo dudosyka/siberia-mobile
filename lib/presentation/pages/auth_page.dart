@@ -26,6 +26,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   bool isError = false;
   bool isLoading = false;
   bool isScanned = false;
+  List<String> errorQrs = [];
 
   @override
   void initState() {
@@ -77,7 +78,13 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                             setState(() {
                               isLoading = true;
                             });
-                            if (!isScanned) {
+                            if(errorQrs.contains(barcodes[0].rawValue!)) {
+                              setState(() {
+                                isLoading = false;
+                              });
+                            }
+                            if (!isScanned &&
+                                !errorQrs.contains(barcodes[0].rawValue!)) {
                               setState(() {
                                 isScanned = true;
                               });
@@ -122,6 +129,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                         isError = true;
                                         isScanned = false;
                                       });
+                                      errorQrs.add(barcodes[0].rawValue!);
                                       ref.read(deleteAuthProvider).deleteAuth();
                                     }
                                   } else if (value.authModel!.type ==
@@ -132,7 +140,8 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                     if (data.stockModel != null) {
                                       if (data.stockModel!.typeId == 3 &&
                                           data.stockModel!.statusId == 2 &&
-                                          data.stockModel!.transfersProcessing) {
+                                          data.stockModel!
+                                              .transfersProcessing) {
                                         final newData = await ref
                                             .read(transferProvider)
                                             .getCurrentStock();
@@ -154,6 +163,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                             isError = true;
                                             isScanned = false;
                                           });
+                                          errorQrs.add(barcodes[0].rawValue!);
                                           ref
                                               .read(deleteAuthProvider)
                                               .deleteAuth();
@@ -188,6 +198,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                             isError = true;
                                             isScanned = false;
                                           });
+                                          errorQrs.add(barcodes[0].rawValue!);
                                           ref
                                               .read(deleteAuthProvider)
                                               .deleteAuth();
@@ -231,6 +242,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                         isError = true;
                                         isScanned = false;
                                       });
+                                      errorQrs.add(barcodes[0].rawValue!);
                                       ref.read(deleteAuthProvider).deleteAuth();
                                     }
                                   } else {
@@ -238,6 +250,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                       isError = true;
                                       isScanned = false;
                                     });
+                                    errorQrs.add(barcodes[0].rawValue!);
                                     ref.read(deleteAuthProvider).deleteAuth();
                                   }
                                 } else {
@@ -245,6 +258,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                     isError = true;
                                     isScanned = false;
                                   });
+                                  errorQrs.add(barcodes[0].rawValue!);
                                   ref.read(deleteAuthProvider).deleteAuth();
                                 }
                                 setState(() {

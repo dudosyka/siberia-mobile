@@ -475,13 +475,11 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage>
                                         final List<Barcode> barcodes =
                                             capture.barcodes;
 
-                                        if (!listOfScanned.contains(barcodes
-                                                .first.rawValue
-                                                .toString()) &&
+                                        if (!listOfScanned.contains(
+                                                barcodes.first.rawValue) &&
                                             !isScanned &&
-                                            !badBarcodes.contains(barcodes
-                                                .first.rawValue
-                                                .toString())) {
+                                            !badBarcodes.contains(
+                                                barcodes.first.rawValue)) {
                                           setState(() {
                                             isLoading = true;
                                             listOfScanned.add(barcodes
@@ -496,6 +494,8 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage>
                                                   barcodes.first.rawValue!)
                                               .then((value) async {
                                             if (value.errorModel != null) {
+                                              badBarcodes.add(
+                                                  barcodes.first.rawValue!);
                                               if (context.mounted) {
                                                 ScaffoldMessenger.of(context)
                                                     .showSnackBar(SnackBar(
@@ -515,6 +515,8 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage>
                                             } else {
                                               if (value.arrivalProductModels!
                                                   .isEmpty) {
+                                                badBarcodes.add(
+                                                    barcodes.first.rawValue!);
                                                 if (context.mounted) {
                                                   ScaffoldMessenger.of(context)
                                                       .showSnackBar(SnackBar(
@@ -632,6 +634,9 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage>
                                                             });
                                                           });
                                                         } else {
+                                                          badBarcodes.add(
+                                                              barcodes.first
+                                                                  .rawValue!);
                                                           ScaffoldMessenger.of(
                                                                   context)
                                                               .showSnackBar(
@@ -654,6 +659,8 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage>
                                                           });
                                                         }
                                                       } else {
+                                                        badBarcodes.add(barcodes
+                                                            .first.rawValue!);
                                                         ScaffoldMessenger.of(
                                                                 context)
                                                             .showSnackBar(
@@ -676,6 +683,8 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage>
                                                         });
                                                       }
                                                     } else {
+                                                      badBarcodes.add(barcodes
+                                                          .first.rawValue!);
                                                       ScaffoldMessenger.of(
                                                               context)
                                                           .showSnackBar(
@@ -1007,7 +1016,9 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage>
                                 controller: priceCont,
                                 cursorColor: Colors.black,
                                 textAlign: TextAlign.center,
-                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true),
                                 style: const TextStyle(
                                     fontSize: 14,
                                     fontStyle: FontStyle.italic,
@@ -1054,7 +1065,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage>
                               child: Center(
                                 child: Text(
                                     (double.parse(pricesData[curPrice]!
-                                        .toStringAsFixed(2)))
+                                            .toStringAsFixed(2)))
                                         .toString(),
                                     style: const TextStyle(
                                         fontSize: 14,
@@ -1160,7 +1171,7 @@ class _ScanBarcodePageState extends ConsumerState<ScanBarcodePage>
                 decoration: InputDecoration(
                   hintText: AppLocalizations.of(context)!.barcodeCaps,
                   contentPadding: EdgeInsets.zero,
-                  fillColor: Color(0xFFFCFCFC),
+                  fillColor: const Color(0xFFFCFCFC),
                   border: const OutlineInputBorder(
                       borderSide: BorderSide(color: Color(0xFFC8C8C8)),
                       borderRadius: BorderRadius.all(Radius.circular(6))),

@@ -18,7 +18,7 @@ dependencies:
   localstorage: ^4.0.1+4
   mobile_scanner: ^4.0.1
   qr_scanner_overlay: ^0.0.2
-  intl: ^0.18.1
+  intl: any
   intl_utils: ^2.8.7
   data_table_2: ^2.5.11
   collection: ^1.18.0
@@ -30,6 +30,9 @@ dependencies:
   provider: ^6.1.2
   marquee: ^2.2.3
   shared_preferences: ^2.2.2
+
+dependency_overrides:
+  fading_edge_scrollview: ^4.1.1
 
 dev_dependencies:
   flutter_test:
